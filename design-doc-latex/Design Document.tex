@@ -1,0 +1,314 @@
+% For easier proof-reading, use the single-column, double-spaced layout:
+\documentclass{cseminar}
+% Final Paper use double-column, normal line spacing. Comment the line above and uncomment the following for the full paper
+%\documentclass[cameraready]{cseminar}
+
+\usepackage[breaklinks]{hyperref}
+\usepackage[hyphenbreaks]{breakurl}
+
+\begin{document}
+
+%=========================================================
+
+\title{Design Document: Java API for Trusted Application}
+
+\author{RUI YANG \\
+	\texttt{rui.yang@aalto.fi}}
+\maketitle
+
+%==========================================================
+
+\begin{abstract}
+Based on GlobalPlatform specification, Open-TEE paved a way for normal application developers to develop and deploy GP-compiant Trusted Applications (TA) in Trust Execution Environment (TEE). However, in order to develop a Client Application (CA) (especially Android application), there still lacks an efficient way of exposing the underlining C-based APIs to the application layer which is written in Java. In this design document, this problem will be adderssed in more details and the possibility to wrap the C APIs into Java APIs is discussed.
+\vspace{3mm}\\
+\noindent KEYWORDS: Open-TEE, Java API, JNI
+\end{abstract}
+
+%============================================================
+\section{Problem Description}
+Open-TEE is a virtual TEE which is based on GlobalPlatform (GP) TEE specifications. It can run on a mobile device on which without real GP-Compliant TEE hardwares. If the mobile device is equipped with GP-Compliant TEE hardware, via one module of Open-TEE called "libtee" \url{https://github.com/Open-TEE/libtee} with corrsponding lower layer linux driver \url{https://github.com/Open-TEE/tee-engine-Driver}, Open-TEE can allow the communications between CAs in Rich Execution Environment (REE) and TAs in the real TEE.\\
+
+If the mobile device does not have a real GP-Compliant TEE hardware, Open-TEE can run as an application in REE itself, which does not provide the security features of a TEE. TAs can be deployed in Open-TEE and the communications between CAs and TAs are provided.\\
+
+The corresponding GP specifications are written in C as such Open-TEE is implemented in C programming language. The problems are list as follows which will occur once Android application developers start using Open-TEE.
+
+\subsection{Problem With C Level API}
+The first problem is how to use the C APIs in the application layer. Java Native Interface (JNI) provides the ways to allow the communications between C and Java. So a middle layer between the application layer and C API layer should be provided to reduce the redundant works of application developers.
+
+\subsection{Problem With Shared Memory}
+As stated above, the GP TEE specifications only focus on C. There is one notion called "Shared Memory" which is utilized in the specification to avoid big string of memory copies between the CA and TA if they wants to communicate with each other. In C programming language, sharing memory between two processes can be achieved by declaring that these two processes want to share part of their memory. However, since the CA in our scenario is written in Java which does not have the notions of referencing to the memory address in run time environment, which makes the notion of "Shared Memory" hard to implement.
+
+\subsection{Problem With Transferring Big String of Data}
+Moreover, since the architecture of Open-TEE for android has been changed in a way that the Open-TEE will run in a seperate android application which running as a service, there is a problem with transferring big string of data from one user application to our Open-TEE CA. For instance, the user application wants to transfer a big file to the TA via CA in Open-TEE to encrypt or decrpt.
+
+\begin{figure}[t]
+  \begin{center}
+    % Note how the file extension has been removed from the filename below
+    % so that the LaTeX command can automatically pick any supported file format
+    \includegraphics[width=\textwidth]{figures/draft.JPG}
+    \caption{Draft for reminder}
+    \label{fig:architec}
+  \end{center}
+\end{figure}
+
+
+%============================================================
+\section{Possible Solutions}
+Android Shared Memory: Ashmem
+How to use \url{http://stackoverflow.com/questions/16099904/how-to-use-shared-memory-ipc-in-android} and \url{http://notjustburritos.tumblr.com/post/21442138796/an-introduction-to-android-shared-memory}
+
+Currently there are two ways to solve the problem No.3. The first solution is to create a shared memory between the user application and CA. So I am trying to share the MemoryFile FD between two different applications. The second solution is to create a parcable object.
+
+\section{Data Type}
+All the constants specified in GlobalPlatform TEE Client API specification are the same in this report. The following list defines the extra data types.
+
+\begin{enumerate}
+	\item \texttt{
+		class TEEC\_SharedMemory\{
+		\\ int reference = -1; // reference number to shared memory
+		\\ int size = 0; // size of shared memory
+		\\ int flags = 0; // flags for the I/O direction
+		\\ set\{\}, get\{\} // set and get functions for each variable
+		\\\}
+	}
+	\item \texttt{
+		class TEEC\_RESULT\_UNION\{
+			\\ TEEC\_RESULT result;
+			\\ int referenceNum;
+			\\ set\{\}, get\{\} // set and get functions for each variable
+		\\\}
+	}
+	\item \texttt{
+		class TEEC\_OPERATION\{
+			\\ int started;
+			\\ int paramsTypes;
+			\\ TEEC\_PARAMETER[] params = new TEEC\_PARAMETER[4];
+			\\ set\{\}, get\{\} // set and get functions for each variable		
+		\\\}	
+	}
+	\item \texttt{
+		class TEEC\_PARAMETER\{
+			\\ TEEC\_TempMemoryReference tmpref;
+			\\ TEEC\_RegisteredMemoryReference memref;
+			\\ TEEC\_Value value;
+			\\ set\{\}, get\{\} // set and get functions for each variable
+		\\\}	
+	}
+	\item \texttt{
+		class TEEC\_TempMemoryReference\{
+			\\ int size;
+			\\ int[] buffer;
+			\\ set\{\}, get\{\} // set and get functions for each variable		
+		\\\}	
+	}
+	\item \texttt{
+		class TEEC\_RegisteredMemoryReference\{
+			\\ int memRef;
+			\\ int size;
+			\\ int offset;		
+			\\ set\{\}, get\{\} // set and get functions for each variable
+		\\\}	
+	}
+	\item \texttt{
+		class TEEC\_Value\{
+			int a;
+			int b;	
+			\\ set\{\}, get\{\} // set and get functions for each variable		
+		\\\}	
+	}
+\end{enumerate}
+
+\section{Java APIs}
+\begin{enumerate}
+
+	\item \texttt{int TEEU\_GetAPPID(\\static String name);}
+
+	\item \texttt{TEEC\_RESULT TEEC\_InitializeContext(\\int APP\_ID);}
+
+	\item \texttt{void TEEC\_FinalizeContext(\\int APP\_ID);}
+
+	\item \texttt{TEEC\_RESULT\_UNION TEEC\_RegisterSharedMemory(\\int APP\_ID);}
+
+	\item \texttt{TEEC\_RESULT\_UNION TEEC\_AllocateSharedMemory(\\int APP\_ID);}
+
+	\item \texttt{void TEE\_ReleaseSharedMemory(\\int APP\_ID,\\ TEEC\_RESULT\_UNION.referenceNum);}
+
+	\item \texttt{TEEC\_RESULT\_UNION TEEC\_OpenSession(\\int APP\_ID,\\ int destination,\\ int connectionMethod,\\ int connectionData,\\ TEEC\_Operation operation);}
+
+	\item \texttt{void TEEC\_CloseSession(\\int APP\_ID,\\ TEEC\_RESULT\_UNION.referenceNum);}
+
+	\item \texttt{TEEC\_RESULT TEEC\_InvokeCommand(\\int APP\_ID,\\ int mSessionReferenceNum,\\ int command\_ID,\\ TEEC\_OPERATION operation);}
+
+	\item \texttt{void TEEC\_RequestCancellation(\\int APP\_ID,\\ TEEC\_OPERATION operation);}
+
+
+\end{enumerate}
+
+
+%============================================================
+\iffalse
+
+\section{Simple things first}
+
+In this section, we give some simple examples of Latex mark-up.
+Sec.~\ref{sec:emphasis} emphasizes important points and
+Sec.~\ref{sec:math} gives examples of math formulas.
+Finally, \ref{sec:list} demonstrates lists.
+
+
+%------------------------------------------------------------
+
+
+\subsection{Emphasizing text}
+\label{sec:emphasis}
+
+\textit{Italics} is a good way to emphasize printed text. However,
+\textbf{boldface} looks better when converted to HTML.
+
+Paragraphs are separated by an empty line in the Latex source code.
+Latex puts extra space between sentences, which you must suppress
+after a period that does not end a sentence, e.g.\ after this acronym.
+
+Cross-references to figures (Fig.~\ref{fig:mypicture1}), tables
+(Table~\ref{tab:mytable1}), other sections (Sec.~\ref{sec:math})
+are easy to create. 
+
+
+%------------------------------------------------------------
+
+
+\subsection{Mathematics}
+\label{sec:math}
+
+In the mathematics mode, you can have subscripts such as $K_{master}$
+and superscripts like $2^x$. Longer formulas may be put on a separate
+line:
+\[ \emptyset \in \emptyset \; \Rightarrow \; E \neq mc^2. \]
+
+You may also want to number the formulas like Eq.~(\ref{eqn:myequation1})
+below.
+\begin{equation}\label{eqn:myequation1}
+C = E_{K_{public}}(P) = P^e. \hspace{10mm}   P = D_{K_{private}}(C) = C^d.
+\end{equation}
+
+
+
+%------------------------------------------------------------
+
+
+\subsection{Make a list}
+\label{sec:list}
+
+Lists can have either bullets or numbers on them. 
+
+\begin{itemize}
+\item one item
+\item another item, which is an exceptionally long one for an item
+  and consequently continues on the next line.
+\end{itemize}
+
+Lists can have several levels. Item~\ref{kukkuu} below contains
+another list.
+\begin{enumerate}
+\item the fist item \label{kukkuu}
+  \begin{enumerate}
+  \item the first subitem 
+  \item the second subitem
+  \end{enumerate}
+\item the second item
+\end{enumerate}
+
+
+%============================================================
+
+
+\section{More complex stuff}
+
+This section provides examples of more complex things.
+
+
+%------------------------------------------------------------
+
+
+\subsection{Data served on a table}
+
+
+Table~\ref{tab:mytable1} presents some data in tabular form. 
+
+\begin{table}[t]
+  \begin{center}
+    \begin{tabular}{|l|lr|}
+    \hline
+    Protocol & Year &  RFC \\
+    \hline
+    TCP      & 1981 &  793 \\
+    ISAKMP   & 1998 & 2408 \\
+    Photuris & 1999 & 2522 \\
+    \hline
+    \end{tabular}
+    \caption{A table with some protocols}
+    \label{tab:mytable1}
+  \end{center}
+\end{table}
+
+
+%------------------------------------------------------------
+
+
+\subsection{Adding references}
+\label{sec:references}
+
+Do not forget to give pointers to the literature. If you are listing
+stuff related to your topic, you can give several references once
+\cite{Com00,HTS03,Nik99}. However, usually you should give only one, for example the standard describing the stuff \cite{RFC2408} and if you want to directly use someone else's words, use both quotation marks and refer to the source, for example that ``the developer does not need to know all about the framework to develop a working implementation'' \cite{Suo98}. Remember also to mark references to your pictures if they are not created by your own mind!
+
+If you plan to write with Latex regularly, create your own BibTeX
+database and use BibTeX to typeset the bibliographies automatically.
+In the long run, it will save you a lot of time and effort compared to
+compiling reference lists by hand.
+
+
+%------------------------------------------------------------
+
+
+\subsection{Embedded pictures}
+\label{sec:pictures}
+
+Fig.~\ref{fig:mypicture1} is an embedded picture. The supported formats for pictures
+depend on the actual LaTeX command used. For instance, regular \LaTeX supports
+pictures in EPS (Embedded PostScript) format, while pdf\LaTeX supports PDF (Portable
+Document Format), PNG (Portable Network Graphics) and JPEG (Joint Photographic Experts
+Group). It is recommended to use either EPS or PDF for diagrams as well as for any picture
+which includes vector images.
+
+\begin{figure}[t]
+  \begin{center}
+    % Note how the file extension has been removed from the filename below
+    % so that the LaTeX command can automatically pick any supported file format
+    \includegraphics[width=.5\textwidth]{figures/sample}
+    \caption{An embedded picture}
+    \label{fig:mypicture1}
+  \end{center}
+\end{figure}
+
+
+%============================================================
+
+
+\section{Yet another section title}
+
+
+%============================================================
+
+
+\section{Conclusion}
+
+
+%============================================================
+
+% List of references is created with bibtex.
+
+
+\fi
+\bibliography{seminar-paper}
+\end{document}
