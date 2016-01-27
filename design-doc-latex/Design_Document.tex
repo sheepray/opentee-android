@@ -41,6 +41,7 @@ As stated above, the GP TEE specifications only focus on C. There is one notion 
 \subsection{Problem With Transferring Big String of Data}
 Moreover, since the architecture of Open-TEE for android has been changed in a way that the Open-TEE will run in a seperate android application which running as a service, there is a problem with transferring big string of data from one user application to our Open-TEE CA. For instance, the user application wants to transfer a big file to the TA via CA in Open-TEE to encrypt or decrpt.
 
+\iffalse
 \begin{figure}[t]
   \begin{center}
     % Note how the file extension has been removed from the filename below
@@ -50,96 +51,189 @@ Moreover, since the architecture of Open-TEE for android has been changed in a w
     \label{fig:architec}
   \end{center}
 \end{figure}
-
+\fi
 
 %============================================================
 \section{Possible Solutions}
 Android Shared Memory: Ashmem
 How to use \url{http://stackoverflow.com/questions/16099904/how-to-use-shared-memory-ipc-in-android} and \url{http://notjustburritos.tumblr.com/post/21442138796/an-introduction-to-android-shared-memory}
 
-Currently there are two ways to solve the problem No.3. The first solution is to create a shared memory between the user application and CA. So I am trying to share the MemoryFile FD between two different applications. The second solution is to create a parcable object.
+Currently there are two ways to solve the problem No.3. The first solution is to create a shared memory between the user application and CA. So we are trying to share the MemoryFile FD between two different applications. The second solution is to create a parcable object.
 
 \section{Data Type}
-All the constants specified in GlobalPlatform TEE Client API specification are the same in this report. The following list defines the extra data types.
+All the constants specified in GlobalPlatform TEE Client API specification are the same in this report. Note for the following three symbols:
 
 \begin{enumerate}
+	\item[] - indicates private
+	\item[] + indicates public
+	\item[] \# indicates protected
+\end{enumerate}
+The following list defines the extra data types.
+\begin{enumerate}
 	\item \texttt{
-		class TEEC\_SharedMemory\{
-		\\ int reference = -1; // reference number to shared memory
-		\\ int size = 0; // size of shared memory
+		+ class TEEC\_SharedMemory\{
+		\\ Byte[] buffer;
 		\\ int flags = 0; // flags for the I/O direction
-		\\ set\{\}, get\{\} // set and get functions for each variable
 		\\\}
 	}
 	\item \texttt{
-		class TEEC\_RESULT\_UNION\{
+		+ class TEEC\_RESULT\_UNION\{
 			\\ TEEC\_RESULT result;
-			\\ int referenceNum;
-			\\ set\{\}, get\{\} // set and get functions for each variable
+			\\ int payload;
 		\\\}
 	}
 	\item \texttt{
-		class TEEC\_OPERATION\{
+		+ class TEEC\_UUID\{
+			\\ int timeLow;
+			\\ int timeMed;
+			\\ int timeHiAndVersion;
+			\\ int clockSeqAndNode[] = new int[8]();		
+		\\\}	
+	}
+	\item \texttt{
+		+ class TEEC\_OPERATION\{
 			\\ int started;
-			\\ int paramsTypes;
-			\\ TEEC\_PARAMETER[] params = new TEEC\_PARAMETER[4];
-			\\ set\{\}, get\{\} // set and get functions for each variable		
+			\\ TEEC\_PARAMETER[] params = new TEEC\_PARAMETER[4];		
 		\\\}	
 	}
 	\item \texttt{
-		class TEEC\_PARAMETER\{
-			\\ TEEC\_TempMemoryReference tmpref;
-			\\ TEEC\_RegisteredMemoryReference memref;
-			\\ TEEC\_Value value;
-			\\ set\{\}, get\{\} // set and get functions for each variable
+		+ class TEEC\_PARAMETER extends
+			\\ TEEC\_TempMemoryReference;
+			\\ TEEC\_RegisteredMemoryReference;
+			\\or TEEC\_Value;
+	}
+	\item \texttt{
+		+ class TEEC\_TempMemoryReference\{
+			\\ Byte[] buffer;	
 		\\\}	
 	}
 	\item \texttt{
-		class TEEC\_TempMemoryReference\{
-			\\ int size;
-			\\ int[] buffer;
-			\\ set\{\}, get\{\} // set and get functions for each variable		
+		+ class TEEC\_RegisteredMemoryReference\{
+			\\ TEEC\_SharedMemory parent;
 		\\\}	
 	}
 	\item \texttt{
-		class TEEC\_RegisteredMemoryReference\{
-			\\ int memRef;
-			\\ int size;
-			\\ int offset;		
-			\\ set\{\}, get\{\} // set and get functions for each variable
-		\\\}	
-	}
-	\item \texttt{
-		class TEEC\_Value\{
+		+ class TEEC\_Value\{
 			int a;
-			int b;	
-			\\ set\{\}, get\{\} // set and get functions for each variable		
+			int b;		
 		\\\}	
 	}
 \end{enumerate}
 
-\section{Java APIs}
+\section{Java APIs corresponding to C APIs}
 \begin{enumerate}
 
-	\item \texttt{int TEEU\_GetAPPID(\\static String name);}
+%	\item \texttt{int TEEU\_GetAPPID(\\static String name);}
 
-	\item \texttt{TEEC\_RESULT TEEC\_InitializeContext(\\int APP\_ID);}
+	\item Java\\
+				\texttt{TEEC\_RESULT\_UNION TEEC\_InitializeContext(
+				\\static const string TA\_ID,
+				\\static const string UA\_Name)
+				}
+	\item[] C 
+				\\\texttt{TEEC\_RESULT TEEC\_InitializeContext(
+				\\const char* name,
+				\\TEEC\_Context* context)
+				}
 
-	\item \texttt{void TEEC\_FinalizeContext(\\int APP\_ID);}
 
-	\item \texttt{TEEC\_RESULT\_UNION TEEC\_RegisterSharedMemory(\\int APP\_ID);}
+	\item Java\\
+				\texttt{void TEEC\_FinalizeContext(
+				\\int CA\_Session)
+				}
+	\item[] C\\
+				\texttt{void TEEC\_FinalizeContext(
+				\\TEEC\_Context* context)
+				}
 
-	\item \texttt{TEEC\_RESULT\_UNION TEEC\_AllocateSharedMemory(\\int APP\_ID);}
+	\item Java\\
+				\texttt{TEEC\_RESULT TEEC\_RegisterSharedMemory(
+				\\int CA\_Session,
+				\\TEEC\_SharedMemory sharedMem)
+				}
+	\item[] C\\
+				\texttt{TEEC\_RESULT TEEC\_RegisterSharedMemory(
+				\\TEEC\_Context* context,
+				\\TEEC\_SharedMemory sharedMem)
+				}
 
-	\item \texttt{void TEE\_ReleaseSharedMemory(\\int APP\_ID,\\ TEEC\_RESULT\_UNION.referenceNum);}
+	\item Java\\
+				\texttt{TEEC\_RESULT TEEC\_AllocateSharedMemory(
+				\\int CA\_Session,
+				\\TEEC\_SharedMemory sharedMem)
+				}
+	\item[] C\\
+				\texttt{TEEC\_RESULT TEEC\_AllocateSharedMemory(
+				\\TEEC\_Context* context,
+				\\TEEC\_SharedMemory sharedMem)
+				}
 
-	\item \texttt{TEEC\_RESULT\_UNION TEEC\_OpenSession(\\int APP\_ID,\\ int destination,\\ int connectionMethod,\\ int connectionData,\\ TEEC\_Operation operation);}
 
-	\item \texttt{void TEEC\_CloseSession(\\int APP\_ID,\\ TEEC\_RESULT\_UNION.referenceNum);}
+	\item Java\\
+				\texttt{void TEE\_ReleaseSharedMemory(
+				\\int CA\_Session,
+				\\ TEEC\_SharedMemory sharedMem)
+				}
+	\item[] C\\
+				\texttt{void TEE\_ReleaseSharedMemory(
+				\\TEEC\_Context* contxt,
+				\\TEEC\_SharedMemory sharedMem)
+				}
 
-	\item \texttt{TEEC\_RESULT TEEC\_InvokeCommand(\\int APP\_ID,\\ int mSessionReferenceNum,\\ int command\_ID,\\ TEEC\_OPERATION operation);}
+	\item Java\\
+				\texttt{TEEC\_RESULT TEEC\_OpenSession(
+				\\int CA\_Session,
+				\\Integer session;
+				\\const TEEC\_UUID destination,
+				\\int connectionMethod,
+				\\Byte[] connectionData,
+				\\TEEC\_Operation operation,
+				\\Integer returnOrigin)
+				}
+	\item[] C\\
+				\texttt{TEEC\_RESULT TEEC\_OpenSession(
+				\\TEEC\_Context* context,
+				\\TEEC\_Session* session;
+				\\const TEEC\_UUID* destination,
+				\\uint32\_t connectionMethod,
+				\\const void* connectionData,
+				\\TEEC\_Operation* operation,
+				\\uint32\_t* returnOrigin)
+				}
 
-	\item \texttt{void TEEC\_RequestCancellation(\\int APP\_ID,\\ TEEC\_OPERATION operation);}
+	\item Java\\
+				\texttt{void TEEC\_CloseSession(
+				\\int session)
+				}
+	\item[] C\\
+				\texttt{void TEEC\_CloseSession(
+				\\TEEC\_Session* session)
+				}
+
+	\item Java\\
+				\texttt{TEEC\_RESULT TEEC\_InvokeCommand(
+				\\int session,
+				\\int command\_ID,
+				\\TEEC\_OPERATION operation,
+				\\Integer returnOrigin)
+				}
+	\item[] C\\
+				\texttt{TEEC\_RESULT TEEC\_InvokeCommand(
+				\\TEEC\_Session* session,
+				\\uint32\_t command\_ID,
+				\\TEEC\_OPERATION* operation,
+				\\uint32\_t* returnOrigin)
+				}				
+			
+
+	\item Java\\
+				\texttt{void TEEC\_RequestCancellation(
+				\\TEEC\_OPERATION operation)
+				}
+	\item[] C\\
+				\texttt{void TEEC\_RequestCancellation(
+				\\TEEC\_OPERATION* operation)
+				}
 
 
 \end{enumerate}
