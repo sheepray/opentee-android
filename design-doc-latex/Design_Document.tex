@@ -5,6 +5,29 @@
 
 \usepackage[breaklinks]{hyperref}
 \usepackage[hyphenbreaks]{breakurl}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=false,
+  breakatwhitespace=false,
+  tabsize=3
+}
 
 \begin{document}
 
@@ -70,171 +93,513 @@ All the constants specified in GlobalPlatform TEE Client API specification are t
 \end{enumerate}
 The following list defines the extra data types.
 \begin{enumerate}
-	\item \texttt{
-		+ class TEEC\_SharedMemory\{
-		\\ Byte[] buffer;
-		\\ int flags = 0; // flags for the I/O direction
-		\\\}
-	}
-	\item \texttt{
-		+ class TEEC\_RESULT\_UNION\{
-			\\ TEEC\_RESULT result;
-			\\ int payload;
-		\\\}
-	}
-	\item \texttt{
-		+ class TEEC\_UUID\{
-			\\ int timeLow;
-			\\ int timeMed;
-			\\ int timeHiAndVersion;
-			\\ int clockSeqAndNode[] = new int[8]();		
-		\\\}	
-	}
-	\item \texttt{
-		+ class TEEC\_OPERATION\{
-			\\ int started;
-			\\ TEEC\_PARAMETER[] params = new TEEC\_PARAMETER[4];		
-		\\\}	
-	}
-	\item \texttt{
-		+ class TEEC\_PARAMETER extends
-			\\ TEEC\_TempMemoryReference;
-			\\ TEEC\_RegisteredMemoryReference;
-			\\or TEEC\_Value;
-	}
-	\item \texttt{
-		+ class TEEC\_TempMemoryReference\{
-			\\ Byte[] buffer;	
-		\\\}	
-	}
-	\item \texttt{
-		+ class TEEC\_RegisteredMemoryReference\{
-			\\ TEEC\_SharedMemory parent;
-		\\\}	
-	}
-	\item \texttt{
-		+ class TEEC\_Value\{
-			int a;
-			int b;		
-		\\\}	
-	}
+	\item TEEC\_Result
+			\\C
+			\begin{lstlisting}
+			typedef uint32_t TEEC_Result;
+			\end{lstlisting}
+	
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Result{
+				- int result;
+				
+				+ TEEC_Result(int result){
+					this.result = result;						
+				}
+				+ int get_result(void){
+					return this.result;						
+				}
+			}
+			\end{lstlisting}
+			
+	\item <Implementation-Defined Type>
+			\\C
+			\begin{lstlisting}
+			<Implementation-Defined Type> imp;
+			\end{lstlisting}
+	
+			Java
+			\begin{lstlisting}
+			+ class TEEC_IMP{
+				- List<TEEC_IMP> imps;
+				- String name;
+				
+				+ TEEC_IMP(){
+					this.imps = new	ArrayList<TEEC_IMP>();
+				}
+				+ void add_imp(TEEC_IMP imp){
+					this.imps.add(imp);						
+				}
+				+ void set_name(String name){
+					this.name = name;				
+				}
+				+ String get_name(void){
+					return this.name;				
+				}
+			}
+			\end{lstlisting}
+			
+	\item TEEC\_SharedMemory
+			\\C
+			\begin{lstlisting}
+			typedef struct
+			{
+				void* buffer;
+				size_t size;
+				uint32_t flags;
+				<Implementation-Defined Type> imp;
+			}TEEC_SharedMemory;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_SharedMemory{
+				- Byte[] buffer;
+				- int flags;
+				- TEEC_IMP imp;
+				
+				+ TEEC_SharedMemory(
+								Byte[] buffer,
+								int flags,
+								TEEC_IMP imp){
+					this.buffer = Arrays.copyOf(buffer, buffer.length());
+					this.flags = flags;
+					this.imp = imp;
+				}
+				+ Byte[] get_buffer(){
+					return this.buffer;				
+				}				
+				+ int get_flags(){
+					return this.flags;				
+				}
+				+ TEEC_IMP get_imp(){
+					return this.imp;				
+				}
+				
+			}
+			\end{lstlisting}
+			
+	
+	\item TEEC\_Result\_Union
+			\\Java
+			\begin{lstlisting}
+			+ class TEEC_Result_Union{
+				- TEEC_Result result;
+				- int payload;
+				
+				+ TEEC_Result_Union(
+								TEEC_Result result,
+								int payload){
+					this.result = result;
+					this.payload = payload;				
+				}
+				+ TEEC_Result get_result(){
+					return this.result; 				
+				}
+				+ int get_payload(){
+					return this.payload;				
+				}
+			}
+			\end{lstlisting}
+	
+	\item TEEC\_UUID
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				uint32_t timeLow;
+				uint16_t timeMid;
+				uint16_t timeHiAndVersion;
+				uint8_t clockSeqAndNode[8];			
+			}TEEC_UUID;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_UUID{
+				- int timeLow;
+				- int timeMid;
+				- int timeHiAndVersion;
+				- int[] clockSeqAndNode;
+				
+				+ TEEC_UUID(
+							int l,
+							int m,
+							int h,
+							int[] c){
+					this.timeLow = l;
+					this.timeMid = m;
+					timeHiAndVersion = h;
+					
+					if ( c.length == 8 ) this.clockSeqAndNode = Array.copyOf(c, 8);				
+				}
+				
+				+ int get_timeLow(){
+					return this.timeLow;				
+				}			
+				+ int get_timeMid(){
+					return this.timeMid;				
+				}
+				+ int get_timeHiAndVersion(){
+					return this.timeHiAndVersion;				
+				}
+				+ int[] get_clockSeqAndNode(){
+					return this.clockSeqAndNode;				
+				}
+			}
+			\end{lstlisting}
+	\item TEEC\_OPERATION
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				uint32_t started;
+				uint32_t paramTypes;
+				TEEC_Parameter params[4];
+				<Implementation-Defined Type> img;
+			}TEEC_Operation;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Operation{
+				- int started = 0;
+				- int paramTypes;
+				- TEEC_Parameter[] params;
+				- TEEC_IMP imp;
+				
+				+ TEEC_Operation(
+								int s,
+								int p,
+								TEEC_Parameter[] params,
+								TEEC_IMP imp){
+					this.started = s;
+					this.paramTypes = p;
+					this.imp = imp;
+										
+					if (params.length == 4) this.params = Array.copyOf(params, 4);				
+				}
+				+ int get_started(){
+					return this.started;				
+				}			
+				+ int get_paramTypes(){
+					return this.paraTypes;				
+				}
+				+ TEEC_Parameter[] get_params(){
+					return this.params;				
+				}
+				+ TEEC_IMP get_imp(){
+					return this.imp;				
+				}
+			}
+			\end{lstlisting}
+			
+	\item TEEC\_Parameter
+			\\C
+			\begin{lstlisting}
+			typedef union
+			{
+				TEEC_TempMemoryReference tmpref;
+				TEEC_RegisteredMemoryReference memref;
+				TEEC_Value value;
+			}TEEC_Parameter;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Parameter extends:
+				TEEC_TempMemoryReference
+				TEEC_RegisteredMemoryReference
+			or	TEEC_Value	
+			\end{lstlisting}
+	
+
+	\item TEEC\_TempMemoryReference
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				void*  buffer;
+				size_t size;			
+			}TEEC_TempMemoryReference;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_TempMemoryReference{
+				- Byte[] buffer;
+				
+				+ TEEC_TempMemoryReference(Byte[] buffer){
+					this.buffer = Array.copyOf(buffer, buffer.length);				
+				}
+				+ Byte[] get_buffer(){
+					return this.buffer;				
+				}
+			}
+			\end{lstlisting}	
+	
+	\item TEEC\_RegisteredMemoryReference
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				TEEC_SharedMemory*	parent;
+				size_t			  	size;
+				size_t				offset;
+			}TEEC_RegisteredMemoryReference;
+			\end{lstlisting}
+	
+			Java
+			\begin{lstlisting}
+			+ class TEEC_RegisteredMemoryReference{
+				- TEEC_SharedMemory parent;
+				- int				size;
+				- int				offset;
+				
+				+ TEEC_RegisteredMemoryReference(
+								TEEC_SharedMemory parent,
+								int size,
+								int offset){
+					this.parent = parent;
+					this.size 	= size;
+					this.offset = offset;				
+				}
+				+ TEEC_SharedMemory get_parent(){
+					return this.parent;				
+				}
+				+ int get_size(){
+					return this.size;				
+				}
+				+ int get_offset(){
+					return this.offset;				
+				}
+			}
+			\end{lstlisting}
+	
+	\item TEEC\_Value
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				uint32_t a;
+				uint32_t b;
+			}TEEC_Value;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Value{
+				- int a;
+				- int b;
+				
+				+ TEEC_Value(
+							int a,
+							int b){
+					this.a = a;
+					this.b = b;							
+				}
+				+ int get_a(){
+					return this.a;				
+				}
+				+ int get_b(){
+					return this.b;				
+				}
+			}
+			\end{lstlisting}
+			
+	\item TEEC\_Context
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				<Implementation-Defined Type> imp;
+			}TEEC_Context;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Context{
+				- int context;
+				
+				+ TEEC_Context(int context){
+					this.context = context;				
+				}
+				+ int get_context(){
+					return this.context;				
+				}
+			}
+			\end{lstlisting}
+			
+	\item TEEC\_Session
+			\\C
+			\begin{lstlisting}
+			typedef struct{
+				<Implementation-Defined Type> imp;
+			}TEEC_Session;
+			\end{lstlisting}
+			
+			Java
+			\begin{lstlisting}
+			+ class TEEC_Session{
+				- int session;
+				
+				+ TEEC_Session(int session){
+					this.session = session;				
+				}
+				+ int get_session(){
+					return this.session;				
+				}
+			}
+			\end{lstlisting}
 \end{enumerate}
+
+
 
 \section{Java APIs corresponding to C APIs}
 \begin{enumerate}
 
 %	\item \texttt{int TEEU\_GetAPPID(\\static String name);}
 
-	\item Java\\
-				\texttt{TEEC\_RESULT\_UNION TEEC\_InitializeContext(
-				\\static const string TA\_ID,
-				\\static const string UA\_Name)
-				}
-	\item[] C 
-				\\\texttt{TEEC\_RESULT TEEC\_InitializeContext(
-				\\const char* name,
-				\\TEEC\_Context* context)
-				}
+	\item C
+			\begin{lstlisting}
+			TEEC_RESULT TEEC_InitializeContext(
+				const char* name,
+				TEEC_Context* context)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	TEEC_RESULT_UNION TEEC_InitializeContext(
+				static const string name,
+				TEEC_Context context)	/** context passed in should be the ID 
+				* of the TA it wants to initialize and the output value
+				* should be an int value regarded as context for later usage;
+				**/
+			\end{lstlisting}
 
 
-	\item Java\\
-				\texttt{void TEEC\_FinalizeContext(
-				\\int CA\_Session)
-				}
-	\item[] C\\
-				\texttt{void TEEC\_FinalizeContext(
-				\\TEEC\_Context* context)
-				}
-
-	\item Java\\
-				\texttt{TEEC\_RESULT TEEC\_RegisterSharedMemory(
-				\\int CA\_Session,
-				\\TEEC\_SharedMemory sharedMem)
-				}
-	\item[] C\\
-				\texttt{TEEC\_RESULT TEEC\_RegisterSharedMemory(
-				\\TEEC\_Context* context,
-				\\TEEC\_SharedMemory sharedMem)
-				}
-
-	\item Java\\
-				\texttt{TEEC\_RESULT TEEC\_AllocateSharedMemory(
-				\\int CA\_Session,
-				\\TEEC\_SharedMemory sharedMem)
-				}
-	\item[] C\\
-				\texttt{TEEC\_RESULT TEEC\_AllocateSharedMemory(
-				\\TEEC\_Context* context,
-				\\TEEC\_SharedMemory sharedMem)
-				}
+	\item C
+			\begin{lstlisting}
+			void TEEC_FinalizeContext(
+				TEEC_Context* context)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	void TEEC_FinalizeContext(
+				TEEC_Context context)
+			\end{lstlisting}
 
 
-	\item Java\\
-				\texttt{void TEE\_ReleaseSharedMemory(
-				\\int CA\_Session,
-				\\ TEEC\_SharedMemory sharedMem)
-				}
-	\item[] C\\
-				\texttt{void TEE\_ReleaseSharedMemory(
-				\\TEEC\_Context* contxt,
-				\\TEEC\_SharedMemory sharedMem)
-				}
+	\item C
+			\begin{lstlisting}
+			TEEC_RESULT TEEC_RegisterSharedMemory(
+				TEEC_Context* context,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	TEEC_RESULT TEEC_RegisterSharedMemory(
+				TEEC_Context context,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
 
-	\item Java\\
-				\texttt{TEEC\_RESULT TEEC\_OpenSession(
-				\\int CA\_Session,
-				\\Integer session;
-				\\const TEEC\_UUID destination,
-				\\int connectionMethod,
-				\\Byte[] connectionData,
-				\\TEEC\_Operation operation,
-				\\Integer returnOrigin)
-				}
-	\item[] C\\
-				\texttt{TEEC\_RESULT TEEC\_OpenSession(
-				\\TEEC\_Context* context,
-				\\TEEC\_Session* session;
-				\\const TEEC\_UUID* destination,
-				\\uint32\_t connectionMethod,
-				\\const void* connectionData,
-				\\TEEC\_Operation* operation,
-				\\uint32\_t* returnOrigin)
-				}
 
-	\item Java\\
-				\texttt{void TEEC\_CloseSession(
-				\\int session)
-				}
-	\item[] C\\
-				\texttt{void TEEC\_CloseSession(
-				\\TEEC\_Session* session)
-				}
+	\item C
+			\begin{lstlisting}
+			TEEC_RESULT TEEC_AllocateSharedMemory(
+				TEEC_Context* context,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	TEEC_RESULT TEEC_AllocateSharedMemory(
+				TEEC_Context context,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
 
-	\item Java\\
-				\texttt{TEEC\_RESULT TEEC\_InvokeCommand(
-				\\int session,
-				\\int command\_ID,
-				\\TEEC\_OPERATION operation,
-				\\Integer returnOrigin)
-				}
-	\item[] C\\
-				\texttt{TEEC\_RESULT TEEC\_InvokeCommand(
-				\\TEEC\_Session* session,
-				\\uint32\_t command\_ID,
-				\\TEEC\_OPERATION* operation,
-				\\uint32\_t* returnOrigin)
-				}				
+
+	\item C
+			\begin{lstlisting}
+			void TEE_ReleaseSharedMemory(
+				TEEC_Context* contxt,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	void TEE_ReleaseSharedMemory(
+				TEEC_Context context,
+				TEEC_SharedMemory sharedMem)
+			\end{lstlisting}
+
+
+	\item C
+			\begin{lstlisting}
+			TEEC_RESULT TEEC_OpenSession(
+				TEEC_Context* context,
+				TEEC_Session* session;
+				const TEEC_UUID* destination,
+				uint32_t connectionMethod,
+				const void* connectionData,
+				TEEC_Operation* operation,
+				uint32_t* returnOrigin)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	TEEC\_RESULT TEEC\_OpenSession(
+				TEEC_Context context,
+				TEEC_Session session;
+				const TEEC_UUID destination,
+				int connectionMethod,
+				Byte[] connectionData,
+				TEEC_Operation operation,
+				Integer returnOrigin)
+			\end{lstlisting}
+
+
+	\item C
+			\begin{lstlisting}
+			void TEEC_CloseSession(
+				TEEC_Session* session)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	void TEEC_CloseSession(
+				TEEC_Session session)
+			\end{lstlisting}
+
+
+
+	\item C
+			\begin{lstlisting}
+			TEEC_RESULT TEEC_InvokeCommand(
+				TEEC_Session* session,
+				uint32_t command_ID,
+				TEEC_OPERATION* operation,
+				uint32_t* returnOrigin)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	TEEC_RESULT TEEC_InvokeCommand(
+				TEEC_Session session,
+				int command_ID,
+				TEEC_OPERATION operation,
+				Integer returnOrigin)
+			\end{lstlisting}
+
 			
-
-	\item Java\\
-				\texttt{void TEEC\_RequestCancellation(
-				\\TEEC\_OPERATION operation)
-				}
-	\item[] C\\
-				\texttt{void TEEC\_RequestCancellation(
-				\\TEEC\_OPERATION* operation)
-				}
-
+	\item C
+			\begin{lstlisting}
+			void TEEC_RequestCancellation(
+				TEEC_OPERATION* operation)
+			\end{lstlisting}
+		  
+		  Java
+		  	\begin{lstlisting}
+		  	void TEEC_RequestCancellation(
+				TEEC_OPERATION operation)
+			\end{lstlisting}
 
 \end{enumerate}
 
