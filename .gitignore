@@ -4,3 +4,14 @@
 !*.cls
 !*.md
 !*.gitignore
+
+build
+gradle
+.idea
+!*.java
+!*.aidl
+!*.xml
+!*.gradle
+!*.c
+!*.cpp
+!*.properties
