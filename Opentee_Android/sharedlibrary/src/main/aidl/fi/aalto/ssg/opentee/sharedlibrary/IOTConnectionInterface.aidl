@@ -11,4 +11,7 @@ interface IOTConnectionInterface {
     void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
             double aDouble, String aString);
 
+     //TO-DO:
+     void test();
+
 }

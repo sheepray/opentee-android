@@ -8,6 +8,9 @@
 build
 gradle
 .idea
+.gradle/
+androidTest/
+test/
 !*.java
 !*.aidl
 !*.xml
