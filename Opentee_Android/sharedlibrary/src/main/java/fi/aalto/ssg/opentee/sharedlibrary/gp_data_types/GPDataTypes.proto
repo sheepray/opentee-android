@@ -1,0 +1,70 @@
+package fi.aalto.ssg.opentee.sharedlibrary.gp_data_types;
+
+option java_package = "fi.aalto.ssg.opentee.sharedlibrary.gp_data_types";
+option java_outer_classname = "GPDataTypes";
+
+message TEEC_Context{
+    required TEEC_IMP imp = 1;
+}
+
+message TEEC_IMP{
+    repeated TEEC_IMP imps = 1;
+    required string name = 2;
+}
+
+message TEEC_Operation{
+    required int32 started = 1;
+    optional TEEC_Parameter paramTypes = 2;
+    repeated TEEC_Parameter params = 3;
+    optional TEEC_IMP imp = 4;
+}
+
+message TEEC_Parameter{
+    optional TEEC_TempMemoryReference tmpref = 1;
+    optional TEEC_RegisteredMemoryReference memref = 2;
+    optional TEEC_Value value = 3;
+}
+
+message TEEC_Result{
+    required int32 result = 1;
+}
+
+message TEEC_Result_Union{
+    required TEEC_Result result = 1;
+    required int32 playload = 2;
+}
+
+message TEEC_RegisteredMemoryReference{
+    required TEEC_SharedMemory parent = 1;
+    required int32 size = 2;
+    required int32 offset = 3;
+}
+
+message TEEC_Session{
+    required int32 session = 1;
+    optional TEEC_IMP imp = 2;
+}
+
+message TEEC_SharedMemory{
+    required bytes buffer = 1;
+    required int32 size = 2;
+    required int32 flags = 3;
+    optional TEEC_IMP imp = 4;
+}
+
+message TEEC_TempMemoryReference{
+    required bytes buffer = 1;
+}
+
+message TEEC_UUID{
+    required int32 timeLow = 1;
+    required int32 timeMid = 2;
+    required int32 timeHiAndVersion = 3;
+    repeated int32 clockSeqAndNode = 4;
+}
+
+message TEEC_Value{
+    required int32 a = 1;
+    required int32 b = 2;
+}
+
