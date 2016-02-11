@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fi.aalto.ssg.opentee.opentee_android;
+package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.app.Service;
 import android.content.Intent;
@@ -22,7 +22,7 @@ import android.widget.Toast;
 import fi.aalto.ssg.opentee.sharedlibrary.IOTConnectionInterface;
 
 /**
- * handle connection with Client Application (CA)
+ * handle connection with Client  Application (CA)
  */
 public class OTConnectionService extends Service {
     public OTConnectionService() {

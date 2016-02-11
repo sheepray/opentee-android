@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fi.aalto.ssg.opentee.opentee_android;
+package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.content.Context;
 import android.util.Log;
