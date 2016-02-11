@@ -1,1 +1,1 @@
-include ':opentee_service', ':sharedlibrary', ':test_app'
+include ':openteeservice', ':sharedlibrary', ':testapp'
