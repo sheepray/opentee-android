@@ -1,13 +1,16 @@
 package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * the main logical container linking at Client Application with a particular TEE
  */
-public class TeecContext {
+public class TeecContext implements Parcelable{
     private int mContext;
 
-    public TeecContext(){}
+    public TeecContext(int context){this.mContext = context;}
 
 
     /**
@@ -89,4 +92,34 @@ public class TeecContext {
      */
     public void teecRequestCancellation(TeecOperation teecOperation){}
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    private TeecContext(Parcel in){
+        readFromParcel(in);
+    }
+
+    public void readFromParcel(Parcel in){
+        this.mContext = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {dest.writeInt(this.mContext);}
+
+    public static final Parcelable.Creator<TeecContext> CREATOR = new
+            Parcelable.Creator<TeecContext>(){
+                @Override
+                public TeecContext createFromParcel(Parcel in){
+                    return new TeecContext(in);
+                }
+
+                @Override
+                public TeecContext[] newArray(int size) {
+                    return new TeecContext[size];
+                }
+
+
+            };
 }

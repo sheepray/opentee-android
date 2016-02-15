@@ -2,7 +2,8 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
 
 /**
  * this class defines the session login method that the Client Application uses to open a session to
- * a TEE within an existed context
+ * a TEE within an existed context. For detailed definition, please refer it in Global Platform TEE
+ * Client API Specification Version 1.0
  */
 public class TeecConnectionMethod {
     public final int TEEC_LOGIN_PUBLIC = 0x00000000;

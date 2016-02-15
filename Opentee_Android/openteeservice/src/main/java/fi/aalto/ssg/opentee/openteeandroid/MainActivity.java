@@ -14,6 +14,7 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -86,8 +87,11 @@ public class MainActivity extends AppCompatActivity {
 
                 worker.stopExecutor();
 
+                Log.d(TAG, "Installation ready");
+
             }
         });
+
     }
 
     @Override

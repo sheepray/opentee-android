@@ -7,10 +7,12 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fi.aalto.ssg.opentee.test_app.MainActivity">
+    tools:context="fi.aalto.ssg.opentee.testapp.MainActivity">
 
-    <TextView
+
+    <Button
+        android:id="@+id/mButtonStartTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Start test"/>
 </RelativeLayout>
