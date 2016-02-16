@@ -17,9 +17,12 @@ package fi.aalto.ssg.opentee.openteeandroid;
  * wrapper class for libtee
  */
 public class LibteeWrapper{
-    static{
-        System.loadLibrary("libtee");
+
+    static {
+        System.loadLibrary(OTJniConstants.LIBTEE_MODULE_NAME);
     }
 
+    //native functions
+    public static native int teecInitializeContext(String name);
 
 }

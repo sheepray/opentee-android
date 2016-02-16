@@ -7,7 +7,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import fi.aalto.ssg.opentee.sharedlibrary.IOTConnectionInterface;
-import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecContext;
 
 public class OTConnectionService extends Service {
     final String TAG = "OTConnectionService.Imp";
@@ -15,6 +14,7 @@ public class OTConnectionService extends Service {
         super();
         Log.e(TAG, "creating OTConnectionService");
     }
+
 
     private final IOTConnectionInterface.Stub mBinder = new IOTConnectionInterface.Stub(){
 
@@ -24,8 +24,8 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public TeecContext newTeecContext() throws RemoteException {
-            return null;
+        public int teecInitializeContext(String name) throws RemoteException {
+            return 100;
         }
     };
 

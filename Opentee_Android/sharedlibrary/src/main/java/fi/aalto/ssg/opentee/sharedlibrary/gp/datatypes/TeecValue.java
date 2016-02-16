@@ -4,7 +4,7 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
  * Created by yangr1 on 2/11/16.
  */
 public class TeecValue extends TeecParameter {
-    private TeecParameterTypes.Type mType;
+    private Type mType;
     private int mA;
     private int mB;
 
@@ -14,14 +14,14 @@ public class TeecValue extends TeecParameter {
      * @param a
      * @param b
      */
-    public TeecValue(TeecParameterTypes.Type type, int a, int b){}
+    public TeecValue(Type type, int a, int b){}
 
     public int getA(){return this.mA;}
 
     public int getB(){return this.mB;}
 
     @Override
-    public TeecParameterTypes.Type getType() {
+    public Type getType() {
         return this.mType;
     }
 }

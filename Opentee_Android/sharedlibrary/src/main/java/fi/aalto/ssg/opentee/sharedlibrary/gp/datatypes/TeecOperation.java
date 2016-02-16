@@ -5,8 +5,8 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
  */
 public class TeecOperation {
     private int started = 0;
-    private TeecParameter[] parmas;
+    private TeecParameter[] params;
 
     public TeecOperation(int started,
-                         TeecParameter[] parmas){}
+                         TeecParameter[] params){}
 }

@@ -5,7 +5,7 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
  * between Client Application and Trust Application
  */
 public class TeecTempMemoryReference extends TeecParameter {
-    private TeecParameterTypes.Type mType;
+    private Type mType;
     private byte[] mBuffer;
 
     /**
@@ -13,11 +13,11 @@ public class TeecTempMemoryReference extends TeecParameter {
      * @param type only accept TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_OUTPUT and TEEC_MEMREF_TEMP_INOUT
      * @param buffer
      */
-    public TeecTempMemoryReference(TeecParameterTypes type, byte[] buffer){}
+    public TeecTempMemoryReference(Type type, byte[] buffer){}
 
 
     @Override
-    public TeecParameterTypes.Type getType() {
+    public Type getType() {
         return this.mType;
     }
 

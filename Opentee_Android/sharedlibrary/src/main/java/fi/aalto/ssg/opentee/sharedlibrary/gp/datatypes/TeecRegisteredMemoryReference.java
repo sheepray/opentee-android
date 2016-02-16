@@ -4,7 +4,7 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
  * a reference to pre-registered or allocated memory
  */
 public class TeecRegisteredMemoryReference extends TeecParameter {
-    TeecParameterTypes.Type mType;
+    Type mType;
     TeecSharedMemory mParent;
     int mOffset;
 
@@ -14,12 +14,12 @@ public class TeecRegisteredMemoryReference extends TeecParameter {
      * @param parent must not be null
      * @param offset
      */
-    public TeecRegisteredMemoryReference(TeecParameterTypes type,
+    public TeecRegisteredMemoryReference(Type type,
                                          TeecSharedMemory parent,
                                          int offset){}
 
     @Override
-    public TeecParameterTypes.Type getType() {
+    public Type getType() {
         return this.mType;
     }
 }

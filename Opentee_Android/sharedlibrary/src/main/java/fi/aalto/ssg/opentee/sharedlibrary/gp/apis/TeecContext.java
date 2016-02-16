@@ -1,35 +1,44 @@
-package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
+package fi.aalto.ssg.opentee.sharedlibrary.gp.apis;
 
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.RemoteException;
+
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecConnectionMethod;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecException;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecOperation;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecSession;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecSharedMemory;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecUuid;
+import fi.aalto.ssg.opentee.sharedlibrary.imp.ProxyApis;
 
 /**
  * the main logical container linking at Client Application with a particular TEE
  */
-public class TeecContext implements Parcelable{
-    private int mContext;
+public interface TeecContext{
+/*    int mContextCApi;
+    Context mContext;
+    ProxyApis mProxyApis = null;
 
-    public TeecContext(int context){this.mContext = context;}
-
-
-    /**
-     * creating a connection to a TEE
-     * @param name the name of the TEE. Connection will be made to default TEE if provided with null
-     * @throws TeecException is the error message from the TEE side
-     */
-    public void teecInitializeContext(String name) throws TeecException{}
+    public TeecContext(int contextCApi, Context context){
+        this.mContextCApi = contextCApi;
+        this.mContext = context;
+        this.mProxyApis = new ProxyApis(this.mContextCApi, this.mContext);
+    }
+*/
 
     /**
      * Finalize the context and close the connection to TEE after all sessions have been terminated
      * and all shared memory has been released
      */
-    public void teecFinalizeContext(){}
+    public void teecFinalizeContext();
 
     /**
      * Finalize the context and close the connection to TEE immediately
      */
-    public void teecFinalizeContextNow(){}
+    public void teecFinalizeContextNow();
 
     /**
      * register a block of existing Client Application memory as a block of Shared Memory within the
@@ -39,7 +48,7 @@ public class TeecContext implements Parcelable{
      * error such as context not initialized, sharedMemory not correctly populated or trying to
      * initialize the same shared memory structure concurrently from multiple threads
      */
-    public void teecRegisterSharedMemory(TeecSharedMemory sharedMemory) throws TeecException{}
+    public void teecRegisterSharedMemory(TeecSharedMemory sharedMemory) throws TeecException;
 
     /**
      * allocate a new block of memory as a block of Shared Memory within the scope of the specified
@@ -49,7 +58,7 @@ public class TeecContext implements Parcelable{
      * program error such as context not initialized, sharedMemory not correctly populated or trying
      * to initialize the same shared memory structure concurrently from multiple threads
      */
-    public void teecAllocateSharedMemory(TeecSharedMemory sharedMemory) throws TeecException{}
+    public void teecAllocateSharedMemory(TeecSharedMemory sharedMemory) throws TeecException;
 
     /**
      * release the Shared Memory which previously obtained using teecRegisterSharedMemory or
@@ -59,7 +68,7 @@ public class TeecContext implements Parcelable{
      * which is used by a pending operation or
      * attempting to relaes the same Shared Memory structure concureently from multiple threads
      */
-    public void teecReleaseSharedMemory(TeecSharedMemory sharedMemory) throws TeecException{}
+    public void teecReleaseSharedMemory(TeecSharedMemory sharedMemory) throws TeecException;
 
     /**
      *
@@ -73,8 +82,7 @@ public class TeecContext implements Parcelable{
     public TeecSession teecOpenSession (final TeecUuid uuid,
                                         TeecConnectionMethod connectionMethod,
                                         int connectionData,
-                                        TeecOperation teecOperation) throws TeecException{return new TeecSession(-1);}
-                                        //TODO: remove the dummy place holder at the end of function
+                                        TeecOperation teecOperation) throws TeecException;
 
     /**
      * close a session
@@ -83,15 +91,15 @@ public class TeecContext implements Parcelable{
      * commands running, attempting to close the same Session concurrently from multiple threads and
      * attempting to close the same Session more than once
      */
-    public void teecCloseSession(TeecSession teecSession)throws TeecException{}
+    public void teecCloseSession(TeecSession teecSession)throws TeecException;
 
     /**
      * request the cancellation of a pending open Session operation or a Command invocation operation
      * in a seperate thread
      * @param teecOperation
      */
-    public void teecRequestCancellation(TeecOperation teecOperation){}
-
+    public void teecRequestCancellation(TeecOperation teecOperation);
+/*
     @Override
     public int describeContents() {
         return 0;
@@ -101,12 +109,13 @@ public class TeecContext implements Parcelable{
         readFromParcel(in);
     }
 
+
     public void readFromParcel(Parcel in){
-        this.mContext = in.readInt();
+        this.mContextCApi = in.readInt();
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {dest.writeInt(this.mContext);}
+    public void writeToParcel(Parcel dest, int flags) {dest.writeInt(this.mContextCApi);}
 
     public static final Parcelable.Creator<TeecContext> CREATOR = new
             Parcelable.Creator<TeecContext>(){
@@ -122,4 +131,5 @@ public class TeecContext implements Parcelable{
 
 
             };
+            */
 }

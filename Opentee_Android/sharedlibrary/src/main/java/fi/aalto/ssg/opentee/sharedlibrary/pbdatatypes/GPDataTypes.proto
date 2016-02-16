@@ -1,70 +1,71 @@
-package fi.aalto.ssg.opentee.sharedlibrary.gp_data_types;
+package fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes;
 
-option java_package = "fi.aalto.ssg.opentee.sharedlibrary.gp_data_types";
-option java_outer_classname = "GPDataTypes";
+option java_package = "fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes";
+option java_outer_classname = "PbDataTypes";
 
-message TEEC_Context{
-    required TEEC_IMP imp = 1;
+message TeecContext{
+    required int32 mContext = 1;
 }
 
-message TEEC_IMP{
-    repeated TEEC_IMP imps = 1;
-    required string name = 2;
+message TeecOperation{
+    required int32 mStarted = 1;
+    required TeecParameter mParams = 2;
 }
 
-message TEEC_Operation{
-    required int32 started = 1;
-    optional TEEC_Parameter paramTypes = 2;
-    repeated TEEC_Parameter params = 3;
-    optional TEEC_IMP imp = 4;
+message TeecParameter{
+    enum Type{
+        TEEC_VALUE_INPUT = 1;
+        TEEC_VALUE_OUTPUT = 2;
+        TEEC_VALUE_INOUT = 3;
+
+        TEEC_MEMREF_TMP_INPUT = 4;
+        TEEC_MEMREF_TMP_OUTPUT = 5;
+        TEEC_MEMREF_TMP_INOUT = 6;
+
+        TEEC_MEMREF_WHOLE = 7;
+        TEEC_MEMREF_PARTIAL_INPUT = 8;
+        TEEC_MEMREF_PARTIAL_OUTPUT = 9;
+        TEEC_MEMREF_PARTIAL_INOUT = 10;
+    }
+
+    optional TeecRegisteredMemoryReference teecRegisteredMemoryReference = 1;
+    optional TeecTempMemoryReference teecTempMemoryReference = 2;
+    optional TeecValue teecValue = 3;
 }
 
-message TEEC_Parameter{
-    optional TEEC_TempMemoryReference tmpref = 1;
-    optional TEEC_RegisteredMemoryReference memref = 2;
-    optional TEEC_Value value = 3;
-}
-
-message TEEC_Result{
-    required int32 result = 1;
-}
-
-message TEEC_Result_Union{
-    required TEEC_Result result = 1;
-    required int32 playload = 2;
-}
-
-message TEEC_RegisteredMemoryReference{
-    required TEEC_SharedMemory parent = 1;
+message TeecRegisteredMemoryReference{
+    required TeecSharedMemory parent = 1;
     required int32 size = 2;
     required int32 offset = 3;
+    required TeecParameter.Type type = 4;
 }
 
-message TEEC_Session{
+message TeecSession{
     required int32 session = 1;
-    optional TEEC_IMP imp = 2;
 }
 
-message TEEC_SharedMemory{
+message TeecSharedMemory{
     required bytes buffer = 1;
     required int32 size = 2;
     required int32 flags = 3;
-    optional TEEC_IMP imp = 4;
 }
 
-message TEEC_TempMemoryReference{
+message TeecTempMemoryReference{
     required bytes buffer = 1;
+    required int32 size = 2;
+    required TeecParameter.Type type = 3;
 }
 
-message TEEC_UUID{
+message TeecUuid{
     required int32 timeLow = 1;
     required int32 timeMid = 2;
     required int32 timeHiAndVersion = 3;
-    repeated int32 clockSeqAndNode = 4;
+    required bytes clockSeqAndNode = 4;
 }
 
-message TEEC_Value{
+message TeecValue{
     required int32 a = 1;
     required int32 b = 2;
+    required TeecParameter.Type type = 3;
 }
 
