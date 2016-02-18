@@ -8,6 +8,9 @@ import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecOperation;
  * This class implements the ITeecSession interface.
  */
 public class OTSession implements ITeecSession{
+    //session identifier
+    int mSession;
+
 
     @Override
     public void teecInvokeCommand(int commandId, TeecOperation teecOperation) throws TeecException {
@@ -15,7 +18,7 @@ public class OTSession implements ITeecSession{
     }
 
     @Override
-    public void teecCloseSession(ITeecSession teecSession) throws TeecException {
+    public void teecCloseSession() throws TeecException {
 
     }
 }

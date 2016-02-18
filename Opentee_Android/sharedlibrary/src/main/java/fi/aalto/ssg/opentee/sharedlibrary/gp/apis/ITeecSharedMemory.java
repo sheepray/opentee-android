@@ -8,6 +8,12 @@ import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecException;
  * real implementation resides in OTSharedMemory.
  */
 public interface ITeecSharedMemory {
+    static enum flag{
+        TEEC_MEM_INPUT,
+        TEEC_MEM_OUTPUT,
+        TEEC_MEM_INOUT
+    };
+
     /**
      * get the flag of the shared memory.
      * @return the flags of SharedMemory.

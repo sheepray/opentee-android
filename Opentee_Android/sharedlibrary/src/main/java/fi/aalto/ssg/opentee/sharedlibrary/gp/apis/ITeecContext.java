@@ -33,7 +33,7 @@ public interface ITeecContext {
      * error such as context not initialized, sharedMemory not correctly populated or trying to
      * initialize the same shared memory structure concurrently from multiple threads
      */
-    public ITeecSharedMemory teecRegisterSharedMemory(byte[] buffer, int flags) throws TeecException;
+    public ITeecSharedMemory teecRegisterSharedMemory(byte[] buffer, ITeecSharedMemory.flag flags) throws TeecException;
 
     /**
      * allocate a new block of memory as a block of Shared Memory within the scope of the specified
@@ -65,7 +65,7 @@ public interface ITeecContext {
      */
     public ITeecSession teecOpenSession (final TeecUuid uuid,
                                         TeecConnectionMethod connectionMethod,
-                                        int connectionData,
+                                        Integer connectionData,
                                         TeecOperation teecOperation) throws TeecException;
 
     /**

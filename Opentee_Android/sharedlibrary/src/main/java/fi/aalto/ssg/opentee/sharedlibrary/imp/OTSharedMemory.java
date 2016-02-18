@@ -10,8 +10,8 @@ public class OTSharedMemory implements ITeecSharedMemory {
     byte[] mBuffer;
     int mFlag;
 
-    static int TEEC_MEM_INPUT = 0x0000001;
-    static int TEEC_MEM_OUTPUT = 0x00000002;
+    //static int TEEC_MEM_INPUT = 0x0000001;
+    //static int TEEC_MEM_OUTPUT = 0x00000002;
 
     public OTSharedMemory(byte[] buffer, int flag){
         this.mBuffer = buffer;

@@ -10,6 +10,7 @@ import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecConnectionMethod;
 import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecException;
 import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecOperation;
 import fi.aalto.ssg.opentee.sharedlibrary.gp.apis.ITeecSharedMemory;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecParameter;
 import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecUuid;
 
 /**
@@ -23,7 +24,7 @@ public class OTContext implements ITeecContext {
     public OTContext(String teeName, Context context) throws TeecConnectionException, RemoteException {
         this.mTeeName = teeName;
 
-        //TODO: connect to the OpenTEE
+        //connect to the OpenTEE
         mProxyApis = new ProxyApis(teeName, context);
 
         this.mInitialized = true;
@@ -42,7 +43,7 @@ public class OTContext implements ITeecContext {
     }
 
     @Override
-    public ITeecSharedMemory teecRegisterSharedMemory(byte[] buffer, int flag) throws TeecException {
+    public ITeecSharedMemory teecRegisterSharedMemory(byte[] buffer, ITeecSharedMemory.flag flag) throws TeecException {
         //new OTSharedMemory(buffer, flag);
         return null;
     }
@@ -55,7 +56,7 @@ public class OTContext implements ITeecContext {
     @Override
     public ITeecSession teecOpenSession(TeecUuid uuid,
                                        TeecConnectionMethod connectionMethod,
-                                       int connectionData,
+                                       Integer connectionData,
                                        TeecOperation teecOperation) throws TeecException {
         return null;
     }
