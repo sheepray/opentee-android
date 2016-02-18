@@ -1,7 +1,7 @@
 package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
 
 /**
- * return code
+ * return code for ITeecContext interface and Teec.initializeContext.
  */
 public class TeecResult {
     public static final int TEEC_SUCCESS = 0x00000000;

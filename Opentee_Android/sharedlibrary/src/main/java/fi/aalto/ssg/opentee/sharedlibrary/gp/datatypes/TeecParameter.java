@@ -22,5 +22,9 @@ abstract public class TeecParameter {
         TEEC_MEMREF_PARTIAL_INOUT
     }
 
+    /**
+     * get method for Type
+     * @return TeecParameter.Type
+     */
     abstract public Type getType();
 }

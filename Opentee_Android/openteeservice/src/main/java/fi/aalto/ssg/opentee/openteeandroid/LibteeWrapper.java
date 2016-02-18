@@ -19,10 +19,18 @@ package fi.aalto.ssg.opentee.openteeandroid;
 public class LibteeWrapper{
 
     static {
-        System.loadLibrary(OTJniConstants.LIBTEE_MODULE_NAME);
+        System.loadLibrary(OTJniConstants.LIBTEE_WRAPPER_MODULE_NAME);
     }
 
-    //native functions
-    public static native int teecInitializeContext(String name);
+    /**
+     * native functions section
+     */
+
+    /**
+     *
+     * @param name specifies the name of the TEE to connect to.
+     * @return TeecResult
+     */
+    public static synchronized native int teecInitializeContext(String name);
 
 }

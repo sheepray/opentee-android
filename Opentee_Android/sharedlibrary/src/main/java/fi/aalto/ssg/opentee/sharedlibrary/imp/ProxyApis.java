@@ -24,13 +24,12 @@ public class ProxyApis {
 
     Context mContext;
     boolean mConnected;
-    String mName;
+    String mTeeName;
     IOTConnectionInterface mService;
-    //Object lock; // used to deal with the asynchronization issue
 
-    public ProxyApis(Context context, String name){
+    public ProxyApis(String teeName, Context context){
         this.mContext = context;
-        this.mName = name;
+        this.mTeeName = teeName;
 
         mConnected = false;
         mService = null;
@@ -79,7 +78,7 @@ public class ProxyApis {
     public ProxyApis teecInitializeContext() {
         int return_code = 0;
         try {
-            return_code = mService.teecInitializeContext(mName);
+            return_code = mService.teecInitializeContext(mTeeName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

@@ -2,7 +2,7 @@ package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
 
 /**
  * this class indicates where in the software stack the return code was generated for either an
- * openSession or an invokeCommand operation
+ * openSession or an invokeCommand operation.
  */
 public class TeecReturnCodeOrigin {
     static enum origin{

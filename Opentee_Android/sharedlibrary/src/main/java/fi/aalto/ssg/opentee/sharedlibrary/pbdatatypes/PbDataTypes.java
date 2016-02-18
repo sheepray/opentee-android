@@ -9,7 +9,7 @@ public final class PbDataTypes {
       com.google.protobuf.ExtensionRegistry registry) {
   }
   public interface TeecContextOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext)
+      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -22,13 +22,13 @@ public final class PbDataTypes {
     int getMContext();
   }
   /**
-   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext}
+   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext}
    */
   public static final class TeecContext extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext)
+      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext)
       TeecContextOrBuilder {
-    // Use TeecContext.newBuilder() to construct.
+    // Use ITeecContext.newBuilder() to construct.
     private TeecContext(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
@@ -248,11 +248,11 @@ public final class PbDataTypes {
       return builder;
     }
     /**
-     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext}
+     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext)
+        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext)
         TeecContextOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
@@ -266,7 +266,7 @@ public final class PbDataTypes {
                 TeecContext.class, Builder.class);
       }
 
-      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.TeecContext.newBuilder()
+      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.ITeecContext.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -402,7 +402,7 @@ public final class PbDataTypes {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext)
+      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext)
     }
 
     static {
@@ -410,7 +410,7 @@ public final class PbDataTypes {
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecContext)
+    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecContext)
   }
 
   public interface TeecOperationOrBuilder extends
@@ -2104,15 +2104,15 @@ public final class PbDataTypes {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     boolean hasParent();
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     TeecSharedMemory getParent();
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     TeecSharedMemoryOrBuilder getParentOrBuilder();
 
@@ -2272,19 +2272,19 @@ public final class PbDataTypes {
     public static final int PARENT_FIELD_NUMBER = 1;
     private TeecSharedMemory parent_;
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     public boolean hasParent() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     public TeecSharedMemory getParent() {
       return parent_;
     }
     /**
-     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
      */
     public TeecSharedMemoryOrBuilder getParentOrBuilder() {
       return parent_;
@@ -2668,13 +2668,13 @@ public final class PbDataTypes {
       private com.google.protobuf.SingleFieldBuilder<
           TeecSharedMemory, TeecSharedMemory.Builder, TeecSharedMemoryOrBuilder> parentBuilder_;
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public boolean hasParent() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public TeecSharedMemory getParent() {
         if (parentBuilder_ == null) {
@@ -2684,7 +2684,7 @@ public final class PbDataTypes {
         }
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public Builder setParent(TeecSharedMemory value) {
         if (parentBuilder_ == null) {
@@ -2700,7 +2700,7 @@ public final class PbDataTypes {
         return this;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public Builder setParent(
           TeecSharedMemory.Builder builderForValue) {
@@ -2714,7 +2714,7 @@ public final class PbDataTypes {
         return this;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public Builder mergeParent(TeecSharedMemory value) {
         if (parentBuilder_ == null) {
@@ -2733,7 +2733,7 @@ public final class PbDataTypes {
         return this;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public Builder clearParent() {
         if (parentBuilder_ == null) {
@@ -2746,7 +2746,7 @@ public final class PbDataTypes {
         return this;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public TeecSharedMemory.Builder getParentBuilder() {
         bitField0_ |= 0x00000001;
@@ -2754,7 +2754,7 @@ public final class PbDataTypes {
         return getParentFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       public TeecSharedMemoryOrBuilder getParentOrBuilder() {
         if (parentBuilder_ != null) {
@@ -2764,7 +2764,7 @@ public final class PbDataTypes {
         }
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required .fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory parent = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           TeecSharedMemory, TeecSharedMemory.Builder, TeecSharedMemoryOrBuilder>
@@ -2891,7 +2891,7 @@ public final class PbDataTypes {
   }
 
   public interface TeecSessionOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession)
+      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -2904,13 +2904,13 @@ public final class PbDataTypes {
     int getSession();
   }
   /**
-   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession}
+   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession}
    */
   public static final class TeecSession extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession)
+      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession)
       TeecSessionOrBuilder {
-    // Use TeecSession.newBuilder() to construct.
+    // Use ITeecSession.newBuilder() to construct.
     private TeecSession(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
@@ -3130,11 +3130,11 @@ public final class PbDataTypes {
       return builder;
     }
     /**
-     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession}
+     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession)
+        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession)
         TeecSessionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
@@ -3148,7 +3148,7 @@ public final class PbDataTypes {
                 TeecSession.class, Builder.class);
       }
 
-      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.TeecSession.newBuilder()
+      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.ITeecSession.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -3284,7 +3284,7 @@ public final class PbDataTypes {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession)
+      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession)
     }
 
     static {
@@ -3292,11 +3292,11 @@ public final class PbDataTypes {
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSession)
+    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSession)
   }
 
   public interface TeecSharedMemoryOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory)
+      // @@protoc_insertion_point(interface_extends:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -3327,13 +3327,13 @@ public final class PbDataTypes {
     int getFlags();
   }
   /**
-   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory}
+   * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory}
    */
   public static final class TeecSharedMemory extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory)
+      // @@protoc_insertion_point(message_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory)
       TeecSharedMemoryOrBuilder {
-    // Use TeecSharedMemory.newBuilder() to construct.
+    // Use ITeecSharedMemory.newBuilder() to construct.
     private TeecSharedMemory(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
@@ -3617,11 +3617,11 @@ public final class PbDataTypes {
       return builder;
     }
     /**
-     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory}
+     * Protobuf type {@code fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory)
+        // @@protoc_insertion_point(builder_implements:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory)
         TeecSharedMemoryOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
@@ -3635,7 +3635,7 @@ public final class PbDataTypes {
                 TeecSharedMemory.class, Builder.class);
       }
 
-      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.TeecSharedMemory.newBuilder()
+      // Construct using fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.PbDataTypes.ITeecSharedMemory.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -3864,7 +3864,7 @@ public final class PbDataTypes {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory)
+      // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory)
     }
 
     static {
@@ -3872,7 +3872,7 @@ public final class PbDataTypes {
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.TeecSharedMemory)
+    // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.sharedlibrary.pbdatatypes.ITeecSharedMemory)
   }
 
   public interface TeecTempMemoryReferenceOrBuilder extends

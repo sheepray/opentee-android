@@ -16,17 +16,18 @@ public class TeecTempMemoryReference extends TeecParameter {
     public TeecTempMemoryReference(Type type, byte[] buffer){}
 
 
+    /**
+     * get method for Type.
+     * @return TeecParameter.Type
+     */
     @Override
     public Type getType() {
         return this.mType;
     }
 
     /**
-     * set the content of the buffer if allowed based on the type
-     * @param buffer
-     * @throws TeecException unable to set buffer exception
+     * get the reference to buffer.
+     * @return a byte array reference.
      */
-    public void setBuffer(byte[] buffer) throws TeecException{}
-
-    public byte[] getBuffer(){return this.mBuffer;} //TODO: remove the place holder at the end of the function
+    public byte[] getBuffer(){return null;}
 }

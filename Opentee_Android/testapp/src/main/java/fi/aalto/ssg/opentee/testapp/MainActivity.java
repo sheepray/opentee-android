@@ -10,11 +10,12 @@ import android.view.View;
 import android.widget.Button;
 
 import fi.aalto.ssg.opentee.sharedlibrary.gp.apis.Teec;
-import fi.aalto.ssg.opentee.sharedlibrary.gp.apis.TeecContext;
+import fi.aalto.ssg.opentee.sharedlibrary.gp.apis.ITeecContext;
 import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecConnectionException;
 
 public class MainActivity extends AppCompatActivity {
     public static String TAG = "Test_APP";
+    public static String TEE_NAME = null;   //currently only one default TEE
 
     HandlerThread mHandler;
     Button mButton = null;
@@ -52,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
     void test(){
         Log.d(TAG, "******* Starting test ********");
 
-        TeecContext ctx = null;
+        ITeecContext ctx = null;
         try {
-            ctx = Teec.initializeContext(TAG, getApplicationContext());
+            ctx = Teec.initializeContext(TEE_NAME, getApplicationContext());
         } catch (TeecConnectionException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if ( ctx != null ){
-            ctx.teecFinalizeContext();
+            //ctx.teecFinalizeContext();
         }
 
         Log.d(TAG, "******* End of test ********");

@@ -25,7 +25,7 @@ public class OTConnectionService extends Service {
 
         @Override
         public int teecInitializeContext(String name) throws RemoteException {
-            return 100;
+            return LibteeWrapper.teecInitializeContext(name);
         }
     };
 

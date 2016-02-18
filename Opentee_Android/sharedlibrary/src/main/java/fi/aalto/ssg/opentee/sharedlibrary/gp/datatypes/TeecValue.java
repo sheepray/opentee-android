@@ -1,7 +1,7 @@
 package fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes;
 
 /**
- * Created by yangr1 on 2/11/16.
+ * This class defines a pair of value which can be passed as a parameter for one TeecOperation.
  */
 public class TeecValue extends TeecParameter {
     private Type mType;
@@ -16,10 +16,22 @@ public class TeecValue extends TeecParameter {
      */
     public TeecValue(Type type, int a, int b){}
 
+    /**
+     * get method for private member A.
+     * @return int
+     */
     public int getA(){return this.mA;}
 
+    /**
+     * get method for private member B.
+     * @return int
+     */
     public int getB(){return this.mB;}
 
+    /**
+     * get method for the type of the parameter.
+     * @return TeecParameter.Type
+     */
     @Override
     public Type getType() {
         return this.mType;

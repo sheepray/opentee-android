@@ -13,7 +13,7 @@ interface IOTConnectionInterface {
 
 
      /**
-     * create a TeecContext instance
+     * create a ITeecContext instance
      */
 
      int teecInitializeContext(String name);
