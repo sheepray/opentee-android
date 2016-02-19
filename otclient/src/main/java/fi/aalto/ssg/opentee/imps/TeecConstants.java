@@ -1,4 +1,4 @@
-package fi.aalto.ssg.opentee.imps.pbdatatypes;
+package fi.aalto.ssg.opentee.imps;
 
 /**
  * This class defines global constant variables under this project

@@ -1,5 +1,5 @@
 // IOTConnectionInterface.aidl
-package fi.aalto.ssg.opentee.sharedlibrary;
+package fi.aalto.ssg.opentee;
 
 // Declare any non-default types here with import statements
 
@@ -13,7 +13,7 @@ interface IOTConnectionInterface {
 
 
      /**
-     * create a ITeecContext instance
+     * create a IContext instance
      */
 
      int teecInitializeContext(String name);

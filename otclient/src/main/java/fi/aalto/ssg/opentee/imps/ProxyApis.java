@@ -9,8 +9,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import fi.aalto.ssg.opentee.sharedlibrary.IOTConnectionInterface;
-import fi.aalto.ssg.opentee.imps.pbdatatypes.TeecConstants;
+import fi.aalto.ssg.opentee.IOTConnectionInterface;
 
 /**
  * This class handles the communication with the service on behalf of the Client Application.

@@ -6,7 +6,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import fi.aalto.ssg.opentee.sharedlibrary.IOTConnectionInterface;
+import fi.aalto.ssg.opentee.IOTConnectionInterface;
 
 public class OTConnectionService extends Service {
     final String TAG = "OTConnectionService.Imp";

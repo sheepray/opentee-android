@@ -2,8 +2,6 @@ package fi.aalto.ssg.opentee.imps;
 
 import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
-import fi.aalto.ssg.opentee.sharedlibrary.gp.apis.ITeecSharedMemory;
-import fi.aalto.ssg.opentee.sharedlibrary.gp.datatypes.TeecException;
 
 /**
  * this class implements the ISharedMemory interface
