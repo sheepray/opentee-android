@@ -1,0 +1,71 @@
+package fi.aalto.ssg.opentee.imps.pbdatatypes;
+
+option java_package = "fi.aalto.ssg.opentee.imps.pbdatatypes";
+option java_outer_classname = "PbDataTypes";
+
+message TeecContext{
+    required int32 mContext = 1;
+}
+
+message TeecOperation{
+    required int32 mStarted = 1;
+    required TeecParameter mParams = 2;
+}
+
+message TeecParameter{
+    enum Type{
+        TEEC_VALUE_INPUT = 1;
+        TEEC_VALUE_OUTPUT = 2;
+        TEEC_VALUE_INOUT = 3;
+
+        TEEC_MEMREF_TMP_INPUT = 4;
+        TEEC_MEMREF_TMP_OUTPUT = 5;
+        TEEC_MEMREF_TMP_INOUT = 6;
+
+        TEEC_MEMREF_WHOLE = 7;
+        TEEC_MEMREF_PARTIAL_INPUT = 8;
+        TEEC_MEMREF_PARTIAL_OUTPUT = 9;
+        TEEC_MEMREF_PARTIAL_INOUT = 10;
+    }
+
+    optional TeecRegisteredMemoryReference teecRegisteredMemoryReference = 1;
+    optional TeecTempMemoryReference teecTempMemoryReference = 2;
+    optional TeecValue teecValue = 3;
+}
+
+message TeecRegisteredMemoryReference{
+    required TeecSharedMemory parent = 1;
+    required int32 size = 2;
+    required int32 offset = 3;
+    required TeecParameter.Type type = 4;
+}
+
+message TeecSession{
+    required int32 session = 1;
+}
+
+message TeecSharedMemory{
+    required bytes buffer = 1;
+    required int32 size = 2;
+    required int32 flags = 3;
+}
+
+message TeecTempMemoryReference{
+    required bytes buffer = 1;
+    required int32 size = 2;
+    required TeecParameter.Type type = 3;
+}
+
+message TeecUuid{
+    required int32 timeLow = 1;
+    required int32 timeMid = 2;
+    required int32 timeHiAndVersion = 3;
+    required bytes clockSeqAndNode = 4;
+}
+
+message TeecValue{
+    required int32 a = 1;
+    required int32 b = 2;
+    required TeecParameter.Type type = 3;
+}
+
