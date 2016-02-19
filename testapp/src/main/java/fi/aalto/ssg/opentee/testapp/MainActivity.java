@@ -6,10 +6,7 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
-import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTClient;
 
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             if (client != null) client.initializeContext(TEE_NAME, getApplication());
-        } catch (ClientException e) {
+        } catch (ITEEClient.ClientException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();

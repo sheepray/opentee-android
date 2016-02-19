@@ -1,6 +1,5 @@
 package fi.aalto.ssg.opentee.imps;
 
-import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
 
 /**
@@ -21,7 +20,7 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory {
     }
 
     @Override
-    public byte[] asByteArray() throws ClientException {
+    public byte[] asByteArray() throws ITEEClient.ClientException {
         return this.mBuffer;
     }
 }

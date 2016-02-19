@@ -3,5 +3,5 @@ package fi.aalto.ssg.opentee;
 /**
  * The operation was cancelled
  */
-public class CancelErrorClientException extends ClientException {
+public class CancelErrorClientException extends ITEEClient.ClientException {
 }

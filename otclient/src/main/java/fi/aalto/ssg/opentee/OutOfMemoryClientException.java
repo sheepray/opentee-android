@@ -3,5 +3,5 @@ package fi.aalto.ssg.opentee;
 /**
  * System ran out of resources.
  */
-public class OutOfMemoryClientException extends ClientException {
+public class OutOfMemoryClientException extends ITEEClient.ClientException {
 }

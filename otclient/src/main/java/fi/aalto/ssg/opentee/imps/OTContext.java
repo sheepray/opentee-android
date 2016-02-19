@@ -5,7 +5,6 @@ import android.os.RemoteException;
 
 import java.util.UUID;
 
-import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
 
 /**
@@ -16,7 +15,7 @@ public class OTContext implements ITEEClient.IContext {
     boolean mInitialized;
     ProxyApis mProxyApis = null; // one service connection per context
 
-    public OTContext(String teeName, Context context) throws ClientException, RemoteException {
+    public OTContext(String teeName, Context context) throws ITEEClient.ClientException, RemoteException {
         this.mTeeName = teeName;
 
         //connect to the OpenTEE
@@ -32,17 +31,17 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISharedMemory registerSharedMemory(byte[] buffer, ISharedMemory.Flag flags) throws ClientException {
+    public ISharedMemory registerSharedMemory(byte[] buffer, ISharedMemory.Flag flags) throws ITEEClient.ClientException {
         return null;
     }
 
     @Override
-    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ClientException {
+    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.ClientException {
 
     }
 
     @Override
-    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData, ITEEClient.Operation teecOperation) throws ClientException {
+    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData, ITEEClient.Operation teecOperation) throws ITEEClient.ClientException {
         return null;
     }
 

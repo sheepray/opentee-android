@@ -3,7 +3,6 @@ package fi.aalto.ssg.opentee.imps;
 import android.content.Context;
 import android.os.RemoteException;
 
-import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
 
 /**

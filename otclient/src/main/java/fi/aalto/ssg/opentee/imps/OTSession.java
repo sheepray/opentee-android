@@ -1,6 +1,5 @@
 package fi.aalto.ssg.opentee.imps;
 
-import fi.aalto.ssg.opentee.ClientException;
 import fi.aalto.ssg.opentee.ITEEClient;
 
 /**
@@ -12,12 +11,12 @@ public class OTSession implements ITEEClient.IContext.ISession {
 
 
     @Override
-    public void teecInvokeCommand(int commandId, ITEEClient.Operation operation) throws ClientException {
+    public void teecInvokeCommand(int commandId, ITEEClient.Operation operation) throws ITEEClient.ClientException {
 
     }
 
     @Override
-    public void teecCloseSession() throws ClientException {
+    public void teecCloseSession() throws ITEEClient.ClientException {
 
     }
 }
