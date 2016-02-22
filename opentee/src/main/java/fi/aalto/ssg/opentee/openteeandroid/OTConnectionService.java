@@ -2,6 +2,7 @@ package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -9,10 +10,14 @@ import android.util.Log;
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
 
 public class OTConnectionService extends Service {
-    final String TAG = "OTConnectionService.Imp";
+    String TAG = "OTConnectionService.Imp";
+    String mQuote = "You Shall Not Pass!";
+    OTGuard mOTGuard = null;
+
     public OTConnectionService() {
         super();
-        Log.e(TAG, "creating OTConnectionService");
+        Log.d(TAG, "creating OTConnectionService");
+        this.mOTGuard = new OTGuard(this.mQuote);
     }
 
 
@@ -24,13 +29,15 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecInitializeContext(String name) throws RemoteException {
-            return LibteeWrapper.teecInitializeContext(name);
+        public int teecInitializeContext(String teeName) throws RemoteException {
+            //Log.d(TAG, Binder.getCallingPid() + " is calling me.");
+            return mOTGuard.initializeContext(Binder.getCallingPid(), teeName);
         }
     };
 
     @Override
     public IBinder onBind(Intent intent) {
+        //Log.d(TAG, intent.get)
         return mBinder;
     }
 }
