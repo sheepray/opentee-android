@@ -46,14 +46,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "******* Starting test ********");
 
         ITEEClient client = new OTClient();
-
+        ITEEClient.IContext ctx = null;
         try {
-            if (client != null) client.initializeContext(TEE_NAME, getApplication());
+            if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
         } catch (ITEEClient.ClientException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
 
         Log.d(TAG, "******* End of test ********");
     }

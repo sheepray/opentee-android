@@ -23,10 +23,12 @@ public class ProxyApis {
     boolean mConnected;
     String mTeeName;
     IOTConnectionInterface mService;
+    Object mLock;
 
-    public ProxyApis(String teeName, Context context){
+    public ProxyApis(String teeName, Context context, Object lock){
         this.mContext = context;
         this.mTeeName = teeName;
+        this.mLock = lock;
 
         mConnected = false;
         mService = null;
@@ -44,6 +46,11 @@ public class ProxyApis {
 
             //after connected, call initializeContext.
             teecInitializeContext();
+
+            synchronized (mLock) {
+                // release the lock from another thread.
+                mLock.notifyAll();
+            }
         }
 
         @Override
