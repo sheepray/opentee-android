@@ -20,6 +20,7 @@ android {
 
     sourceSets.main {
         jni.srcDirs = []    // This prevents the autogeneration of Android.mk
+        jniLibs.srcDirs 'src/main/libs'
     }
 
     // Task for building JNI

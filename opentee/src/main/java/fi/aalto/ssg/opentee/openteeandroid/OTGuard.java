@@ -53,12 +53,19 @@ public class OTGuard {
      */
     public int initializeContext(int callerID, String teeName){
         // call teecInitializeContext returned with TEEC_Context value and TEEC_Result;
-        PbDataTypes.TeecContextOrBuilder teecContextOrBuilder;
+
+
+        PbDataTypes.TeecContext.Builder teecContextBuilder = PbDataTypes.TeecContext.newBuilder();
+        //teecContextBuilder.setMContext();
+
 
         // construct a Caller instance and add to mCallerList;
 
         // return the TEEC_Result;
+        OTContext otContext = new OTContext(-1);
+        int return_code = LibteeWrapper.teecInitializeContext(teeName, otContext);
 
-        return LibteeWrapper.teecInitializeContext(teeName);
+        Log.e(TAG, " changed? " + otContext.getIndex() + " return code " + return_code);
+        return return_code;
     }
 }

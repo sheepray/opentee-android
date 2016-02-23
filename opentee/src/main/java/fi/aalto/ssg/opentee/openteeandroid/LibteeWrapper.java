@@ -31,6 +31,6 @@ public class LibteeWrapper{
      * @param name specifies the name of the TEE to connect to.
      * @return TeecResult
      */
-    public static synchronized native int teecInitializeContext(String name);
+    public static synchronized native int teecInitializeContext(String name, OTContext otContext);
 
 }

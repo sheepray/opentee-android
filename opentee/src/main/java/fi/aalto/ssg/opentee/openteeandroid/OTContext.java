@@ -7,11 +7,13 @@ package fi.aalto.ssg.opentee.openteeandroid;
  * } TEEC_Context;
  */
 public class OTContext {
-    byte[] imp;
+    int mIndex;
 
-    public OTContext(byte[] imp){
-        this.imp = imp;
+    public OTContext(int index){
+        this.mIndex = index;
     }
+
+    public int getIndex(){return this.mIndex;}
 
     /**
      * OTSharedMemory children class
