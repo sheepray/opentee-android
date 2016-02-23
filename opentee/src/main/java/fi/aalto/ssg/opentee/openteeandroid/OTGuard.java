@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fi.aalto.ssg.opentee.imps.pbdatatypes.PbDataTypes;
+
 
 /**
- * This class implements the multiplexing in the service side.It controls and monitors AIDL calls
+ * This class implements the multiplexing in the service side.It controls and monitors IPC calls
  * from remote clients.
  */
 public class OTGuard {
@@ -29,6 +31,8 @@ public class OTGuard {
         int mCallerID;
 
         public Caller(int id){this.mCallerID = id;}
+
+        public int getCallerID(){return this.mCallerID;}
     }
 
 
@@ -48,6 +52,13 @@ public class OTGuard {
      * @return
      */
     public int initializeContext(int callerID, String teeName){
+        // call teecInitializeContext returned with TEEC_Context value and TEEC_Result;
+        PbDataTypes.TeecContextOrBuilder teecContextOrBuilder;
+
+        // construct a Caller instance and add to mCallerList;
+
+        // return the TEEC_Result;
+
         return LibteeWrapper.teecInitializeContext(teeName);
     }
 }

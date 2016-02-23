@@ -4,7 +4,7 @@ option java_package = "fi.aalto.ssg.opentee.imps.pbdatatypes";
 option java_outer_classname = "PbDataTypes";
 
 message TeecContext{
-    required int32 mContext = 1;
+    required bytes mContext = 1;
 }
 
 message TeecOperation{
@@ -41,7 +41,7 @@ message TeecRegisteredMemoryReference{
 }
 
 message TeecSession{
-    required int32 session = 1;
+    required bytes session = 1;
 }
 
 message TeecSharedMemory{
