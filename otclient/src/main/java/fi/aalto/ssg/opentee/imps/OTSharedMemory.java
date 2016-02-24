@@ -20,7 +20,7 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory {
     }
 
     @Override
-    public byte[] asByteArray() throws ITEEClient.ClientException {
+    public byte[] asByteArray() throws ITEEClient.Exception {
         return this.mBuffer;
     }
 }

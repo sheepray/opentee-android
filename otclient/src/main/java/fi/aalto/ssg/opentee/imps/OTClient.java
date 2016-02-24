@@ -10,7 +10,7 @@ import fi.aalto.ssg.opentee.ITEEClient;
  */
 public class OTClient implements ITEEClient {
     @Override
-    public IContext initializeContext(String teeName, Context context) throws ClientException, RemoteException {
+    public IContext initializeContext(String teeName, Context context) throws Exception, RemoteException {
         return new OTContext(teeName, context);
     }
 }

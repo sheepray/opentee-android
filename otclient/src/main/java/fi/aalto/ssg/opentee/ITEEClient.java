@@ -14,20 +14,20 @@ public interface ITEEClient {
      * @param teeName the name of remote TEE.
      * @param context Android application context.
      * @return IContext interface.
-     * @throws ClientException
+     * @throws Exception
      * @throws RemoteException
      */
-    IContext initializeContext(String teeName, Context context) throws ClientException, RemoteException;
+    IContext initializeContext(String teeName, Context context) throws Exception, RemoteException;
 
     /**
      * ClientException extends the java.lang.ClientException class. All exceptions in this project should subclass it
      * excluding exceptions defined by Android.
      */
-    abstract class ClientException extends java.lang.Exception {
-        public ClientException() { super(); }
-        public ClientException(String message) { super(message); }
-        public ClientException(String message, Throwable cause) { super(message, cause); }
-        public ClientException(Throwable cause) { super(cause); }
+    abstract class Exception extends java.lang.Exception {
+        public Exception() { super(); }
+        public Exception(String message) { super(message); }
+        public Exception(String message, Throwable cause) { super(message, cause); }
+        public Exception(Throwable cause) { super(cause); }
     }
 
     /**
@@ -259,7 +259,7 @@ public interface ITEEClient {
              *
              * @param commandId command identifier that is agreed with the Trusted Application
              * @param operation
-             * @throws ClientException throws program error including:
+             * @throws Exception throws program error including:
              * 1. session not initialized;
              * 2. calling with invalid content in the teecOperation structure
              * 3. encoding Registered Memory Reference which refer to Shared Memory blocks allocated or
@@ -267,15 +267,15 @@ public interface ITEEClient {
              * 4. using the same operation structure concurrently for multiple operations
              */
             void teecInvokeCommand(int commandId,
-                                          Operation operation) throws ClientException;
+                                          Operation operation) throws Exception;
 
             /**
              * close a session.
-             * @throws ClientException throws program error includes calling with a session while still has
+             * @throws Exception throws program error includes calling with a session while still has
              * commands running, attempting to close the same Session concurrently from multiple threads and
              * attempting to close the same Session more than once.
              */
-            void teecCloseSession()throws ClientException;
+            void teecCloseSession()throws Exception;
         }
 
 
@@ -298,9 +298,9 @@ public interface ITEEClient {
             /**
              * get the content of the buffer.
              * @return an byte array reference.
-             * @throws ClientException error if not allowed to get buffer
+             * @throws Exception error if not allowed to get buffer
              */
-            byte[] asByteArray() throws ClientException;
+            byte[] asByteArray() throws Exception;
 
         }
 
@@ -318,12 +318,12 @@ public interface ITEEClient {
          * @param buffer indicates the reference of pre-allocated byte array which is to be shared.
          * @param flags indicates I/O direction of this shared memory. Its value can only be TEEC_MEM_INPUT and
          *              TEEC_MEM_OUPUT.
-         * @throws ClientException exception message can be the return code in TeecResult or program
+         * @throws Exception exception message can be the return code in TeecResult or program
          * error such as context not initialized, sharedMemory not correctly populated or trying to
          * initialize the same shared memory structure concurrently from multiple threads
          */
         ISharedMemory registerSharedMemory(byte[] buffer,
-                                                      ISharedMemory.Flag flags) throws ClientException;
+                                                      ISharedMemory.Flag flags) throws Exception;
 
         /**
          * allocate a new block of memory as a block of Shared Memory within the scope of the specified
@@ -338,11 +338,11 @@ public interface ITEEClient {
          * release the Shared Memory which previously obtained using teecRegisterSharedMemory or
          * teecAllocateSharedMemory.
          * @param sharedMemory the reference the ITeecSharedMemory instance.
-         * @throws ClientException program error exceptions including attempting to release Shared Memory
+         * @throws Exception program error exceptions including attempting to release Shared Memory
          * which is used by a pending operation or
          * attempting to relaes the same Shared Memory structure concureently from multiple threads.
          */
-        void releaseSharedMemory(ISharedMemory sharedMemory) throws ClientException;
+        void releaseSharedMemory(ISharedMemory sharedMemory) throws Exception;
 
         /**
          * this API opens a session within the context which is already built.
@@ -351,12 +351,12 @@ public interface ITEEClient {
          * @param connectionData any necessary data for connectionMethod.
          * @param teecOperation operations to perform.
          * @return an ITeecSession instance.
-         * @throws ClientException
+         * @throws Exception
          */
         ISession openSession (final UUID uuid,
                                              ConnectionMethod connectionMethod,
                                              Integer connectionData,
-                                             Operation teecOperation) throws ClientException;
+                                             Operation teecOperation) throws Exception;
 
 
         /**
@@ -372,87 +372,87 @@ public interface ITEEClient {
     /**
      * Concurrent accesses caused conflict.
      */
-    class AcessConflictClientException extends ITEEClient.ClientException {}
+    class AccessConflictException extends ITEEClient.Exception {}
 
     /**
      * Access privileges are not sufficient
      */
-    class AcessDeniedClientException extends ITEEClient.ClientException {}
+    class AcessDeniedException extends ITEEClient.Exception {}
 
     /**
      * Input data was of invalid format.
      */
-    class BadFormatClientException extends ITEEClient.ClientException {}
+    class BadFormatException extends ITEEClient.Exception {}
 
     /**
      * Input parameters were invalid.
      */
-    class BadParametersClientException extends ITEEClient.ClientException {}
+    class BadParametersException extends ITEEClient.Exception {}
 
     /**
      * Operation is not valid in the current state.
      */
-    class BadStateClientException extends ITEEClient.ClientException {}
+    class BadStateException extends ITEEClient.Exception {}
 
     /**
      * The system is busy working on something else.
      */
-    class BusyClientException extends ITEEClient.ClientException {}
+    class BusyException extends ITEEClient.Exception {}
 
     /**
      * The operation was cancelled
      */
-    class CancelErrorClientException extends ITEEClient.ClientException {}
+    class CancelErrorException extends ITEEClient.Exception {}
 
     /**
      * Communication with a remote party failed.
      */
-    class CommunicationErrorClientException extends ITEEClient.ClientException {}
+    class CommunicationErrorException extends ITEEClient.Exception {}
 
     /**
      * Too much data for the requested operation was passed.
      */
-    class ExcessDataClientException extends ITEEClient.ClientException {
+    class ExcessDataException extends ITEEClient.Exception {
     }
 
     /**
      * Non-specific cause exception.
      */
-    class GenericErrorClientException extends ITEEClient.ClientException {}
+    class GenericErrorException extends ITEEClient.Exception {}
 
     /**
      * The requested data item is not found.
      */
-    class ItemNotFoundClientException extends ITEEClient.ClientException {}
+    class ItemNotFoundException extends ITEEClient.Exception {}
 
     /**
      * Expected data was missing.
      */
-    class NoDataClientException extends ITEEClient.ClientException {}
+    class NoDataException extends ITEEClient.Exception {}
 
     /**
      * The requested operation should exist but is not yet implemented.
      */
-    class NotImplementedClientException extends ITEEClient.ClientException {}
+    class NotImplementedException extends ITEEClient.Exception {}
 
     /**
      * The requested operation is valid but is not supported in this implementation.
      */
-    class NotSupportedClientException extends ITEEClient.ClientException {}
+    class NotSupportedException extends ITEEClient.Exception {}
 
     /**
      * System ran out of resources.
      */
-    class OutOfMemoryClientException extends ITEEClient.ClientException {}
+    class OutOfMemoryException extends ITEEClient.Exception {}
 
     /**
      * A security fault was detected.
      */
-    class SecurityErrorClientException extends ITEEClient.ClientException {}
+    class SecurityErrorException extends ITEEClient.Exception {}
 
     /**
      * The supplied buffer is too short for the generated output.
      */
-    class ShortBufferClientException extends ITEEClient.ClientException {}
+    class ShortBufferException extends ITEEClient.Exception {}
     /******************* end of the client exception definitions ******************************/
 }

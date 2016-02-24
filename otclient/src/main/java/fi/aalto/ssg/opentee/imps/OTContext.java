@@ -19,7 +19,7 @@ public class OTContext implements ITEEClient.IContext {
     boolean mInitialized;
     ProxyApis mProxyApis = null; // one service connection per context
 
-    public OTContext(String teeName, Context context) throws ITEEClient.ClientException, RemoteException {
+    public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
 
         //connect to the OpenTEE
@@ -51,17 +51,17 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISharedMemory registerSharedMemory(byte[] buffer, ISharedMemory.Flag flags) throws ITEEClient.ClientException {
+    public ISharedMemory registerSharedMemory(byte[] buffer, ISharedMemory.Flag flags) throws ITEEClient.Exception {
         return null;
     }
 
     @Override
-    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.ClientException {
+    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.Exception {
 
     }
 
     @Override
-    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData, ITEEClient.Operation teecOperation) throws ITEEClient.ClientException {
+    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData, ITEEClient.Operation teecOperation) throws ITEEClient.Exception {
         return null;
     }
 

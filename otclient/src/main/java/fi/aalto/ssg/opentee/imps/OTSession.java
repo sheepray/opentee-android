@@ -11,12 +11,12 @@ public class OTSession implements ITEEClient.IContext.ISession {
 
 
     @Override
-    public void teecInvokeCommand(int commandId, ITEEClient.Operation operation) throws ITEEClient.ClientException {
+    public void teecInvokeCommand(int commandId, ITEEClient.Operation operation) throws ITEEClient.Exception {
 
     }
 
     @Override
-    public void teecCloseSession() throws ITEEClient.ClientException {
+    public void teecCloseSession() throws ITEEClient.Exception {
 
     }
 }

@@ -93,7 +93,7 @@ public class ProxyApis {
             }
         */
 
-        Log.d(TAG, "Return code from OT: " + return_code);
+        Log.d(TAG, "Return code from OT: " + Integer.toHexString(return_code));
 
         return this;
     }
