@@ -11,11 +11,8 @@ interface IOTConnectionInterface {
     void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
             double aDouble, String aString);
 
-
-     /**
-     * create a IContext instance
-     */
-
      int teecInitializeContext(String name);
+
+     void teecFinalizeContext();
 
 }

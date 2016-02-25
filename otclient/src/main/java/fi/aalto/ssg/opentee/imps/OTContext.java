@@ -22,10 +22,10 @@ public class OTContext implements ITEEClient.IContext {
     public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
 
-        //connect to the OpenTEE
-        // try to lock here.
+        /**
+         * connect to the OpenTEE
+         */
         Object lock = new Object();
-
         ServiceGetterThread serviceGetterThread = new ServiceGetterThread(teeName, context, lock);
         serviceGetterThread.run();
 
@@ -47,7 +47,22 @@ public class OTContext implements ITEEClient.IContext {
 
     @Override
     public void finalizeContext() {
+        if ( !mInitialized && mProxyApis == null ){
+            Log.i(TAG, "Nothing to finalize");
+            return;
+        }
 
+        if ( mInitialized ) mInitialized = false;
+        if ( mProxyApis != null ){
+            try {
+                mProxyApis.teecFinalizeContext();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            mProxyApis.terminateConnection();
+        }
+
+        Log.i(TAG, "context finalized and connection terminated");
     }
 
     @Override

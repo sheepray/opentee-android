@@ -26,6 +26,7 @@ public class OTGuard {
     List<OTCaller> mOTCallerList = new ArrayList<OTCaller>();
     boolean mConnectedToOT = false;
     Context mContext;
+    String mTeeName;
 
     public OTGuard(String quote, Context context){
         this.mQuote = quote;
@@ -83,6 +84,7 @@ public class OTGuard {
 
             if ( return_code == ITEEClient.TEEC_SUCCESS){
                 mConnectedToOT = true;
+                mTeeName = teeName;
 
                 Log.i(TAG, "Connected to opentee.");
             }
@@ -110,5 +112,37 @@ public class OTGuard {
         }
 
         return return_code;
+    }
+
+    public void teecFinalizeContext(int callerID){
+
+        if ( this.mOTCallerList.size() == 0 ){
+            Log.d(TAG, "Nothing to finalize.");
+            return;
+        }
+
+        int tmpID;
+        for ( tmpID = 0; tmpID < mOTCallerList.size(); tmpID++){
+            if ( mOTCallerList.get(tmpID).getID() == callerID ){
+                break;
+            }
+        }
+
+        if ( tmpID == mOTCallerList.size() ){
+            Log.d(TAG, "Unknown caller. Context will not be finalized");
+            return;
+        }
+
+        // remove the caller.
+        mOTCallerList.remove(tmpID);
+
+        Log.i(TAG, "context for " + callerID + " is finalized");
+
+        if ( mOTCallerList.size() == 0 ){
+            LibteeWrapper.teecFinalizeContext();
+
+            Log.i(TAG, "caller list empty now, finalize the context in opentee");
+        }
+
     }
 }

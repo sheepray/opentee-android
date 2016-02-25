@@ -98,5 +98,11 @@ public class ProxyApis {
         return this;
     }
 
+    public void teecFinalizeContext() throws RemoteException {
+        if ( mService != null ){
+            mService.teecFinalizeContext();
+        }
+    }
+
     public boolean getConnected(){ return this.mConnected; }
 }

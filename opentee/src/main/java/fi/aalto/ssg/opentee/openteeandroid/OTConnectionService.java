@@ -30,8 +30,14 @@ public class OTConnectionService extends Service {
 
         @Override
         public int teecInitializeContext(String teeName) throws RemoteException {
-            Log.d(TAG, Binder.getCallingPid() + " is calling me.");
+            Log.d(TAG, Binder.getCallingPid() + " is calling me to initialize context.");
             return mOTGuard.initializeContext(Binder.getCallingPid(), teeName);
+        }
+
+        @Override
+        public void teecFinalizeContext() throws RemoteException {
+            Log.d(TAG, Binder.getCallingPid() + " is calling me to finalize context.");
+            mOTGuard.teecFinalizeContext(Binder.getCallingPid());
         }
     };
 

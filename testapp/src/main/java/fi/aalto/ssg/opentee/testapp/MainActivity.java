@@ -51,12 +51,14 @@ public class MainActivity extends AppCompatActivity {
             if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
 
             //test code
-            if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
+            //if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+        ctx.finalizeContext();
 
 
         Log.d(TAG, "******* End of test ********");

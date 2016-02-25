@@ -20,35 +20,6 @@ pthread_mutex_t session_lock;
 
 int open_tee_socket_env_set = 0;
 
-JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecInitializeContext
-        (JNIEnv* env, jclass jc, jstring teeName, jstring otSocketFilePathInJava){
-
-    if ( 0 == open_tee_socket_env_set )
-        preparationFunc(env, otSocketFilePathInJava);
-
-    /**
-     * Initialize Context.
-     */
-    // preparation to initialize the context
-    TEEC_Result tmpResult;
-
-    if ( teeName ==  NULL){
-        // initialize context
-        tmpResult = TEEC_InitializeContext(NULL, &g_contextRecord);
-    }
-    else{
-        // get string in char* style
-        const char* teeNameInC = (*env)->GetStringUTFChars(env, teeName, 0);
-
-        // initialize context
-        tmpResult = TEEC_InitializeContext(teeNameInC, &g_contextRecord);
-
-        // release the string
-        (*env)->ReleaseStringUTFChars(env, teeName, teeNameInC);
-    }
-
-    return tmpResult;
-}
 
 void preparationFunc(JNIEnv* env, jstring otSocketFilePathInJava){
     /**
@@ -86,3 +57,45 @@ void preparationFunc(JNIEnv* env, jstring otSocketFilePathInJava){
                             tmpEnv);
     }
 }
+
+
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecInitializeContext
+        (JNIEnv* env, jclass jc, jstring teeName, jstring otSocketFilePathInJava){
+
+    if ( 0 == open_tee_socket_env_set )
+        preparationFunc(env, otSocketFilePathInJava);
+
+    /**
+     * Initialize Context.
+     */
+    // preparation to initialize the context
+    TEEC_Result tmpResult;
+
+    if ( teeName ==  NULL){
+        // initialize context
+        tmpResult = TEEC_InitializeContext(NULL, &g_contextRecord);
+    }
+    else{
+        // get string in char* style
+        const char* teeNameInC = (*env)->GetStringUTFChars(env, teeName, 0);
+
+        // initialize context
+        tmpResult = TEEC_InitializeContext(teeNameInC, &g_contextRecord);
+
+        // release the string
+        (*env)->ReleaseStringUTFChars(env, teeName, teeNameInC);
+    }
+
+    return tmpResult;
+}
+
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper
+ * Method:    teecFinalizeContext
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecFinalizeContext
+        (JNIEnv *env, jclass jc){
+    TEEC_FinalizeContext(&g_contextRecord);
+}
+
