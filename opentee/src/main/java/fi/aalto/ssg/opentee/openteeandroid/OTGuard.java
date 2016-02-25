@@ -1,11 +1,18 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.telecom.Call;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.imps.OTReturnCode;
+import fi.aalto.ssg.opentee.imps.TeecConstants;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.PbDataTypes;
 
 
@@ -16,25 +23,16 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.PbDataTypes;
 public class OTGuard {
     String TAG = "OTGuard";
     String mQuote;
-    List<Caller> mCallerList = new ArrayList<Caller>();
+    List<OTCaller> mOTCallerList = new ArrayList<OTCaller>();
+    boolean mConnectedToOT = false;
+    Context mContext;
 
-    public OTGuard(String quote){
+    public OTGuard(String quote, Context context){
         this.mQuote = quote;
+        this.mContext = context;
 
         Log.e(TAG, this.mQuote);
     }
-
-    /**
-     * children classes definitions
-     */
-    class Caller{
-        int mCallerID;
-
-        public Caller(int id){this.mCallerID = id;}
-
-        public int getCallerID(){return this.mCallerID;}
-    }
-
 
     /**
      *
@@ -45,6 +43,11 @@ public class OTGuard {
         return Arrays.asList(OTPermissions.ALLOWED_PID_LIST).contains(pid);
     }
 
+    String getOtSocketFilePath() throws IOException, InterruptedException {
+        //String oTSocketFilePath;
+        return OTUtils.getFullPath(mContext) + "/open_tee_socket";
+    }
+
     /**
      *
      * @param callerID
@@ -52,22 +55,60 @@ public class OTGuard {
      * @return
      */
     public int initializeContext(int callerID, String teeName){
-        // call teecInitializeContext returned with TEEC_Context value and TEEC_Result;
+        int return_code = OTReturnCode.TEEC_SUCCESS;
 
+        /**
+         * If not connected to opentee, then connect.
+         */
+        if ( !mConnectedToOT ){
+            String otSocketFilePath = null;
+            try {
+                otSocketFilePath = getOtSocketFilePath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        //PbDataTypes.TeecContext.Builder teecContextBuilder = PbDataTypes.TeecContext.newBuilder();
-        //teecContextBuilder.setMContext();
+            if ( otSocketFilePath == null ){
+                Log.e(TAG, "try to get OPENTEE_SOCKET_FILE_PATH failed");
+                return OTReturnCode.TEEC_ERROR_GENERIC;
+            }
 
-        // construct a Caller instance and add to mCallerList;
+            Log.e(TAG, "initializeContext teeName: " + teeName + " OT_SOCKET_FILE_PATH:" + otSocketFilePath);
 
-        // return the TEEC_Result;
-        OTContext otContext = new OTContext(-1);
+            return_code = LibteeWrapper.teecInitializeContext(teeName, otSocketFilePath);
 
-        Log.e(TAG, "initializeContext teeName: " + teeName);
+            Log.e(TAG, " return code " + Integer.toHexString(return_code));
 
-        int return_code = LibteeWrapper.teecInitializeContext(teeName, otContext);
+            if ( return_code == ITEEClient.TEEC_SUCCESS){
+                mConnectedToOT = true;
 
-        Log.e(TAG, " changed? " + otContext.getIndex() + " return code " + Integer.toHexString(return_code));
+                Log.i(TAG, "Connected to opentee.");
+            }
+
+        }
+
+        /**
+         * caller id identification.
+         */
+        boolean existedCaller = false;
+        for ( OTCaller iOTCaller: this.mOTCallerList){
+            if ( callerID == iOTCaller.getID() ){
+                existedCaller = true;
+            }
+        }
+
+        if ( !existedCaller ) {
+            //create new caller identity if not exist.
+            Log.i(TAG, "Caller not existed. Create one.");
+
+            OTCaller caller = new OTCaller(callerID);
+            this.mOTCallerList.add(caller);
+        }else{
+            Log.i(TAG, "Caller existed. Will not create a new one");
+        }
+
         return return_code;
     }
 }

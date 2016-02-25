@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         ITEEClient.IContext ctx = null;
         try {
             if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
+
+            //test code
+            if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();
         } catch (RemoteException e) {

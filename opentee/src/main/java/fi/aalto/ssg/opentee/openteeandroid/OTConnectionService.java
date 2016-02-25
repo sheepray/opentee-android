@@ -17,7 +17,7 @@ public class OTConnectionService extends Service {
     public OTConnectionService() {
         super();
         Log.d(TAG, "creating OTConnectionService");
-        this.mOTGuard = new OTGuard(this.mQuote);
+        this.mOTGuard = new OTGuard(this.mQuote, this);
     }
 
 

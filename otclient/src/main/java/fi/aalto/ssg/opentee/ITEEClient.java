@@ -10,6 +10,13 @@ import java.util.UUID;
  */
 public interface ITEEClient {
     /**
+     * the return value for TEEC_SUCCESS.
+     * Other value for return value is wrapped into different exceptions.
+     *
+     */
+    static int TEEC_SUCCESS = 0;
+
+    /**
      * initialize context.
      * @param teeName the name of remote TEE.
      * @param context Android application context.
@@ -23,7 +30,7 @@ public interface ITEEClient {
      * ClientException extends the java.lang.ClientException class. All exceptions in this project should subclass it
      * excluding exceptions defined by Android.
      */
-    abstract class Exception extends java.lang.Exception {
+    class Exception extends java.lang.Exception {
         public Exception() { super(); }
         public Exception(String message) { super(message); }
         public Exception(String message, Throwable cause) { super(message, cause); }

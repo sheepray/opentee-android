@@ -1,19 +1,14 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
 /**
- * Java representation for TEEC_Context.
- * typedef struct {
- *  void *imp;
- * } TEEC_Context;
+ * Caller resource hierarchy.
  */
-public class OTContext {
-    int mIndex;
+public class OTCaller {
+    int mID;
 
-    public OTContext(int index){
-        this.mIndex = index;
-    }
+    public OTCaller(int id){this.mID = id;}
 
-    public int getIndex(){return this.mIndex;}
+    public int getID(){return this.mID;}
 
     /**
      * OTSharedMemory children class
