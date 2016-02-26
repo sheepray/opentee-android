@@ -6,7 +6,7 @@ import android.os.RemoteException;
 import java.util.UUID;
 
 /**
- * Public interface as main entrances of APIs for developer
+ * Public interface as main entrances of APIs for developer.
  */
 public interface ITEEClient {
     /**
@@ -27,7 +27,7 @@ public interface ITEEClient {
     IContext initializeContext(String teeName, Context context) throws Exception, RemoteException;
 
     /**
-     * ClientException extends the java.lang.ClientException class. All exceptions in this project should subclass it
+     * Exception extends the java.lang.Exception class. All exceptions in this project should subclass it
      * excluding exceptions defined by Android.
      */
     class Exception extends java.lang.Exception {
@@ -94,12 +94,13 @@ public interface ITEEClient {
      * This class extends the Parameter abstract class.
      * It will be subclassed by TempMemoryReference and RegisteredMemoryReference.
      */
-    abstract class MemoryReference extends Parameter {}
+    // abstract class MemoryReference extends Parameter {}
 
     /**
      * this class defines a Temporary Memory Reference which is temporarily registered for data exchange
      * between Client Application and Trusted Application.
      */
+    /*
     class TempMemoryReference extends MemoryReference {
         Type mType;
         byte[] mBuffer;
@@ -121,16 +122,14 @@ public interface ITEEClient {
             return this.mType.getId();
         }
 
-        /**
-         * get the reference to buffer.
-         * @return a byte array reference.
-         */
         public byte[] asByteArray(){return this.mBuffer;}
     }
+    */
 
     /**
      * a reference to pre-registered or allocated memory.
      */
+    /*
     class RegisteredMemoryReference extends MemoryReference {
         Type mType;
         ITEEClient.IContext.ISharedMemory mParent;
@@ -147,28 +146,20 @@ public interface ITEEClient {
             int getId(){return this.id;}
         }
 
-
-        /**
-         *
-         * @param type only accept TEEC_MEMREF_WHOLE, TEEC_MEMREF_PARTIAL_INPUT, TEEC_MEMREF_PARTIAL_OUTPUT
-         *             and TEEC_MEMREF_PARTIAL_INOUT.
-         * @param parent must not be null and should refer to already registered TeecSharedMemory instance.
-         * @param offset the beginning address of TeecSharedMemory instance. It is used to indicates which
-         *               part of the TeecSharedMemory should be used.
-         */
         public RegisteredMemoryReference(Type type,
                                          ITEEClient.IContext.ISharedMemory parent,
                                          int offset){}
         @Override
         public int getType() {return this.mType.getId();}
     }
+    */
 
     /**
      * This class defines the payload of either an open session or an invoke command operation.
      */
     class Operation {
-        private int started = 0;
-        private ITEEClient.Parameter[] params;
+        int started = 0;
+        ITEEClient.Parameter[] params;
 
         /**
          * Public constructor for no Parameter
@@ -231,7 +222,7 @@ public interface ITEEClient {
      * openSession or an invokeCommand operation.
      */
     class TeecReturnCodeOrigin {
-        static enum origin{
+        enum origin{
             TEEC_ORIGIN_API,
             TEEC_ORIGIN_COMMS,
             TEEC_ORIGIN_TEE,
@@ -287,20 +278,17 @@ public interface ITEEClient {
 
 
         /**
-         * SharedMemory interface.
+         * SharedMemory interface. OTSharedMemory implements this interface.
          */
         interface ISharedMemory {
-            enum Flag{
-                TEEC_MEM_INPUT,
-                TEEC_MEM_OUTPUT,
-                TEEC_MEM_INOUT
-            };
+            int TEEC_MEM_INPUT = 0x00000001;
+            int TEEC_MEM_OUTPUT = 0x00000002;
 
             /**
              * get the flag of the shared memory.
              * @return the flags of ISharedMemory.
              */
-            ISharedMemory.Flag getFlags();
+            int getFlags();
 
             /**
              * get the content of the buffer.
@@ -308,6 +296,18 @@ public interface ITEEClient {
              * @throws Exception error if not allowed to get buffer
              */
             byte[] asByteArray() throws Exception;
+
+            /**
+             * get the size of the output from Trusted Application if there is such an output.
+             * @return the size of the actual output byte array.
+             */
+            int getReturnSize();
+
+            /**
+             * set the value of offset.
+             * @param offset
+             */
+            ISharedMemory setOffset(int offset);
 
         }
 
@@ -317,7 +317,7 @@ public interface ITEEClient {
          * Finalize the context and close the connection to TEE after all sessions have been terminated
          * and all shared memory has been released
          */
-        void finalizeContext();
+        void finalizeContext() throws RemoteException;
 
         /**
          * register a block of existing Client Application memory as a block of Shared Memory within the
@@ -330,7 +330,7 @@ public interface ITEEClient {
          * initialize the same shared memory structure concurrently from multiple threads
          */
         ISharedMemory registerSharedMemory(byte[] buffer,
-                                                      ISharedMemory.Flag flags) throws Exception;
+                                                      int flags) throws Exception, RemoteException;
 
         /**
          * allocate a new block of memory as a block of Shared Memory within the scope of the specified
@@ -379,87 +379,154 @@ public interface ITEEClient {
     /**
      * Concurrent accesses caused conflict.
      */
-    class AccessConflictException extends ITEEClient.Exception {}
+    class AccessConflictException extends ITEEClient.Exception {
+        public AccessConflictException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Access privileges are not sufficient
      */
-    class AcessDeniedException extends ITEEClient.Exception {}
+    class AccessDeniedException extends ITEEClient.Exception {
+        public AccessDeniedException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Input data was of invalid format.
      */
-    class BadFormatException extends ITEEClient.Exception {}
+    class BadFormatException extends ITEEClient.Exception {
+        public BadFormatException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Input parameters were invalid.
      */
-    class BadParametersException extends ITEEClient.Exception {}
+    class BadParametersException extends ITEEClient.Exception {
+        public BadParametersException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Operation is not valid in the current state.
      */
-    class BadStateException extends ITEEClient.Exception {}
+    class BadStateException extends ITEEClient.Exception {
+        public BadStateException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The system is busy working on something else.
      */
-    class BusyException extends ITEEClient.Exception {}
+    class BusyException extends ITEEClient.Exception {
+        public BusyException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The operation was cancelled
      */
-    class CancelErrorException extends ITEEClient.Exception {}
+    class CancelErrorException extends ITEEClient.Exception {
+        public CancelErrorException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Communication with a remote party failed.
      */
-    class CommunicationErrorException extends ITEEClient.Exception {}
+    class CommunicationErrorException extends ITEEClient.Exception {
+        public CommunicationErrorException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Too much data for the requested operation was passed.
      */
     class ExcessDataException extends ITEEClient.Exception {
+        public ExcessDataException(String msg){
+            super(msg);
+        }
     }
 
     /**
      * Non-specific cause exception.
      */
-    class GenericErrorException extends ITEEClient.Exception {}
+    class GenericErrorException extends ITEEClient.Exception {
+        public GenericErrorException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The requested data item is not found.
      */
-    class ItemNotFoundException extends ITEEClient.Exception {}
+    class ItemNotFoundException extends ITEEClient.Exception {
+        public ItemNotFoundException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * Expected data was missing.
      */
-    class NoDataException extends ITEEClient.Exception {}
+    class NoDataException extends ITEEClient.Exception {
+        public NoDataException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The requested operation should exist but is not yet implemented.
      */
-    class NotImplementedException extends ITEEClient.Exception {}
+    class NotImplementedException extends ITEEClient.Exception {
+        public NotImplementedException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The requested operation is valid but is not supported in this implementation.
      */
-    class NotSupportedException extends ITEEClient.Exception {}
+    class NotSupportedException extends ITEEClient.Exception {
+        public NotSupportedException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * System ran out of resources.
      */
-    class OutOfMemoryException extends ITEEClient.Exception {}
+    class OutOfMemoryException extends ITEEClient.Exception {
+        public OutOfMemoryException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * A security fault was detected.
      */
-    class SecurityErrorException extends ITEEClient.Exception {}
+    class SecurityErrorException extends ITEEClient.Exception {
+        public SecurityErrorException(String msg){
+            super(msg);
+        }
+    }
 
     /**
      * The supplied buffer is too short for the generated output.
      */
-    class ShortBufferException extends ITEEClient.Exception {}
+    class ShortBufferException extends ITEEClient.Exception {
+        public ShortBufferException(String msg){
+            super(msg);
+        }
+    }
     /******************* end of the client exception definitions ******************************/
 }

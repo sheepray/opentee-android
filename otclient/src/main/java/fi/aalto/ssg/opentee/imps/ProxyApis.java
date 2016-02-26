@@ -10,6 +10,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
+import fi.aalto.ssg.opentee.ITEEClient;
 
 /**
  * This class handles the communication with the service on behalf of the Client Application.
@@ -102,6 +103,17 @@ public class ProxyApis {
         if ( mService != null ){
             mService.teecFinalizeContext();
         }
+    }
+
+    public void teecRegisterSharedMemory(OTSharedMemory otSharedMemory) throws ITEEClient.GenericErrorException, RemoteException {
+        if ( mService == null ){
+            throw new ITEEClient.GenericErrorException("Service unavailable");
+        }
+
+        // call IPC
+        mService.teecRegisterSharedMemory(otSharedMemory);
+        // based on the return code, throw different exceptions if not succeed.
+
     }
 
     public boolean getConnected(){ return this.mConnected; }

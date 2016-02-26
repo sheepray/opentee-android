@@ -2,6 +2,7 @@
 package fi.aalto.ssg.opentee;
 
 // Declare any non-default types here with import statements
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 interface IOTConnectionInterface {
     /**
@@ -14,5 +15,8 @@ interface IOTConnectionInterface {
      int teecInitializeContext(String name);
 
      void teecFinalizeContext();
+
+    // It is sophisticated to pass enum in AIDL.
+     int teecRegisterSharedMemory(inout OTSharedMemory sharedMemory);
 
 }

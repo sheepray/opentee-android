@@ -116,7 +116,7 @@ public class OTGuard {
 
     public void teecFinalizeContext(int callerID){
 
-        if ( this.mOTCallerList.size() == 0 ){
+        if ( mOTCallerList.size() == 0 ){
             Log.d(TAG, "Nothing to finalize.");
             return;
         }

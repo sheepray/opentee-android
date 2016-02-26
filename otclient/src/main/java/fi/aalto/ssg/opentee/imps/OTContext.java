@@ -46,19 +46,15 @@ public class OTContext implements ITEEClient.IContext {
 
 
     @Override
-    public void finalizeContext() {
-        if ( !mInitialized && mProxyApis == null ){
+    public void finalizeContext() throws RemoteException {
+        if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Nothing to finalize");
             return;
         }
 
         if ( mInitialized ) mInitialized = false;
         if ( mProxyApis != null ){
-            try {
-                mProxyApis.teecFinalizeContext();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            mProxyApis.teecFinalizeContext();
             mProxyApis.terminateConnection();
         }
 
@@ -66,8 +62,18 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISharedMemory registerSharedMemory(byte[] buffer, ISharedMemory.Flag flags) throws ITEEClient.Exception {
-        return null;
+    public ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws ITEEClient.Exception, RemoteException {
+        if ( !mInitialized || mProxyApis == null ){
+            Log.i(TAG, "Not ready to register shared memory");
+            return null;
+        }
+        // create a shared memory
+        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags);
+
+        // register the shared memory
+        mProxyApis.teecRegisterSharedMemory(otSharedMemory);
+
+        return otSharedMemory;
     }
 
     @Override

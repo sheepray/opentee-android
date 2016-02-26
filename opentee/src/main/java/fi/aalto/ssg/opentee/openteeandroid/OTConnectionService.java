@@ -8,6 +8,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 public class OTConnectionService extends Service {
     String TAG = "OTConnectionService.Imp";
@@ -38,6 +39,11 @@ public class OTConnectionService extends Service {
         public void teecFinalizeContext() throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to finalize context.");
             mOTGuard.teecFinalizeContext(Binder.getCallingPid());
+        }
+
+        @Override
+        public int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
+            return 0;
         }
     };
 
