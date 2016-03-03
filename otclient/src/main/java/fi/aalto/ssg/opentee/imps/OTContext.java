@@ -5,6 +5,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
@@ -18,6 +20,9 @@ public class OTContext implements ITEEClient.IContext {
     String mTeeName;
     boolean mInitialized;
     ProxyApis mProxyApis = null; // one service connection per context
+    Integer mInitIdVal = 1; // the ID for the first OTSharedMemory is 1.
+
+    List<OTSharedMemory> mSharedMemory = new ArrayList<OTSharedMemory>();
 
     public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
@@ -68,17 +73,23 @@ public class OTContext implements ITEEClient.IContext {
             return null;
         }
         // create a shared memory
-        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags);
+        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags, mInitIdVal);
 
         // register the shared memory
         mProxyApis.teecRegisterSharedMemory(otSharedMemory);
+
+        synchronized(mInitIdVal) {
+            mInitIdVal++;
+        }
 
         return otSharedMemory;
     }
 
     @Override
     public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.Exception {
-
+        //TODO
+        // get the OTSharedMemory based on the id = sharedMemory.getID;
+        // later steps.....
     }
 
     @Override

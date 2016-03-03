@@ -309,6 +309,8 @@ public interface ITEEClient {
              */
             ISharedMemory setOffset(int offset);
 
+            int getID();
+
         }
 
 

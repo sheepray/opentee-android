@@ -5,6 +5,8 @@ import android.content.ContextWrapper;
 import android.telecom.Call;
 import android.util.Log;
 
+import com.google.protobuf.ByteString;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +14,8 @@ import java.util.List;
 
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTReturnCode;
-import fi.aalto.ssg.opentee.imps.TeecConstants;
-import fi.aalto.ssg.opentee.imps.pbdatatypes.PbDataTypes;
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
+import fi.aalto.ssg.opentee.imps.pbdatatypes.GpDataTypes;
 
 
 /**
@@ -91,17 +93,7 @@ public class OTGuard {
 
         }
 
-        /**
-         * caller id identification.
-         */
-        boolean existedCaller = false;
-        for ( OTCaller iOTCaller: this.mOTCallerList){
-            if ( callerID == iOTCaller.getID() ){
-                existedCaller = true;
-            }
-        }
-
-        if ( !existedCaller ) {
+        if ( findCallerById(callerID) == null ) {
             //create new caller identity if not exist.
             Log.i(TAG, "Caller not existed. Create one.");
 
@@ -121,28 +113,62 @@ public class OTGuard {
             return;
         }
 
-        int tmpID;
-        for ( tmpID = 0; tmpID < mOTCallerList.size(); tmpID++){
-            if ( mOTCallerList.get(tmpID).getID() == callerID ){
-                break;
-            }
-        }
-
-        if ( tmpID == mOTCallerList.size() ){
-            Log.d(TAG, "Unknown caller. Context will not be finalized");
+        if ( findCallerById(callerID) == null ){
+            Log.e(TAG, "Unknown caller callerID:" + callerID);
             return;
         }
 
         // remove the caller.
-        mOTCallerList.remove(tmpID);
+        mOTCallerList.remove(callerID);
 
         Log.i(TAG, "context for " + callerID + " is finalized");
 
         if ( mOTCallerList.size() == 0 ){
-            LibteeWrapper.teecFinalizeContext();
-
             Log.i(TAG, "caller list empty now, finalize the context in opentee");
+
+            LibteeWrapper.teecFinalizeContext();
         }
 
+    }
+
+    public int teecRegisterSharedMemory(int callerID, OTSharedMemory otSharedMemory){
+        /**
+         * call Libtee to register shared memory
+         */
+        // serialize the otSharedMemory into byte array.
+        GpDataTypes.TeecSharedMemory.Builder smBuilder = GpDataTypes.TeecSharedMemory.newBuilder();
+
+        try {
+            smBuilder.setMBuffer( ByteString.copyFrom(otSharedMemory.asByteArray()) );
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        }
+
+        smBuilder.setMFlag(otSharedMemory.getFlags());
+        smBuilder.setMID(otSharedMemory.getID());
+        smBuilder.setMIDInJni(otSharedMemory.getIDInJni());
+        smBuilder.setMOffset(otSharedMemory.getOffset());
+        smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
+
+        byte[] smInByteArray = smBuilder.build().toByteArray();
+
+        int return_code = LibteeWrapper.teecRegisterSharedMemory(smInByteArray);
+
+        // upon succeed from Libtee, add the OTSharedMemory into the OTSharedMemory list of the caller.
+        if ( return_code == ITEEClient.TEEC_SUCCESS ){
+            findCallerById(callerID).addSharedMemory(otSharedMemory);
+        }
+
+        return return_code;
+    }
+
+    private OTCaller findCallerById(int callerID){
+        for ( OTCaller caller: mOTCallerList ){
+            if ( caller.getID() == callerID ){
+                return caller;
+            }
+        }
+
+        return null;
     }
 }

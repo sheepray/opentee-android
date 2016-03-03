@@ -13,7 +13,7 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 public class OTConnectionService extends Service {
     String TAG = "OTConnectionService.Imp";
     String mQuote = "You Shall Not Pass!";
-    OTGuard mOTGuard = null;
+    static OTGuard mOTGuard = null; // only need one OTGuard.
 
     public OTConnectionService() {
         super();
