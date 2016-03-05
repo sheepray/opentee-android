@@ -13,13 +13,14 @@ android {
 
         ndk{
             moduleName "libtee"
+            stl "stlport_shared"
         }
     }
 
     publishNonDefault true  // Publish all variants (flavor / build type) of library
 
     sourceSets.main {
-        jni.srcDirs = []    // This prevents the autogeneration of Android.mk
+        jni.srcDirs = []    // This prevents the autogeneration of _Android.mk
         jniLibs.srcDirs 'src/main/libs'
     }
 

@@ -1,5 +1,6 @@
 #include "LibteeWrapper.h"
 #include "tee_client_api.h"
+#include "GPDataTypes.pb.h"
 
 #include <pthread.h>
 #include <stdbool.h>
@@ -58,7 +59,9 @@ void preparationFunc(JNIEnv* env, jstring otSocketFilePathInJava){
     }
 }
 
-
+/**
+ * Initialize Context.
+ */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecInitializeContext
         (JNIEnv* env, jclass jc, jstring teeName, jstring otSocketFilePathInJava){
 
@@ -90,12 +93,30 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_te
 }
 
 /*
- * Class:     fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper
- * Method:    teecFinalizeContext
- * Signature: ()V
+ * Finalize Context.
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecFinalizeContext
         (JNIEnv *env, jclass jc){
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "Finialize Context");
     TEEC_FinalizeContext(&g_contextRecord);
+}
+
+/**
+ * Register Shared Memory.
+ */
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecRegisterSharedMemory
+        (JNIEnv* env, jclass jc, jbyteArray jOTSharedMemory){
+    int l = (*env)->GetArrayLength(env, jOTSharedMemory);
+    unsigned char otSharedMemory[l];
+    //otSharedMemory = (unsigned char *)malloc( l * sizeof(unsigned char));
+    (*env)->GetByteArrayRegion(env, jOTSharedMemory, 0, l, otSharedMemory);
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "Shared Memory %s", otSharedMemory);
+
+    return 0;
 }
 

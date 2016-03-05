@@ -1,19 +1,47 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
+
 /**
  * Caller resource hierarchy.
  */
 public class OTCaller {
-    int mID;
+    String TAG = "OTCaller.class";
 
-    public OTCaller(int id){this.mID = id;}
+    int mID;
+    List<OTSharedMemory> mSharedMemoryList;
+
+    public OTCaller(int id){
+        this.mID = id;
+        this.mSharedMemoryList = new ArrayList<OTSharedMemory>();
+    }
 
     public int getID(){return this.mID;}
 
-    /**
-     * OTSharedMemory children class
-     */
-    class OTSharedMemory{}
+    public void addSharedMemory(OTSharedMemory sharedMemory){
+        if ( sharedMemory != null ){
+            Log.d(TAG, this.mID + " add SharedMemory");
+
+            mSharedMemoryList.add(sharedMemory);
+        }
+    }
+
+    public void removeSharedMemory(OTSharedMemory sharedMemory){
+        if( mSharedMemoryList.remove(sharedMemory) ){
+            Log.d(TAG, this.mID + " remove shared memory succeed");
+        }else{
+            Log.e(TAG, this.mID + " remove shared memory failed");
+        }
+    }
+
+    public List<OTSharedMemory> getSharedMemoryList(){
+        return this.mSharedMemoryList;
+    }
 
     /**
      * OTSession children class

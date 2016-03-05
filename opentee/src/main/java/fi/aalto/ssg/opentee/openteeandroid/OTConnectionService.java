@@ -8,11 +8,12 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 public class OTConnectionService extends Service {
     String TAG = "OTConnectionService.Imp";
     String mQuote = "You Shall Not Pass!";
-    OTGuard mOTGuard = null;
+    static OTGuard mOTGuard = null; // only need one OTGuard.
 
     public OTConnectionService() {
         super();
@@ -38,6 +39,12 @@ public class OTConnectionService extends Service {
         public void teecFinalizeContext() throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to finalize context.");
             mOTGuard.teecFinalizeContext(Binder.getCallingPid());
+        }
+
+        @Override
+        public int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
+            Log.d(TAG, Binder.getCallingPid() + " is calling me to register shared memory.");
+            return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
         }
     };
 

@@ -13,6 +13,8 @@
  */
 package fi.aalto.ssg.opentee.openteeandroid;
 
+import fi.aalto.ssg.opentee.imps.OTSharedMemory;
+
 /**
  * wrapper class for libtee
  */
@@ -35,5 +37,8 @@ public class LibteeWrapper{
                                                                 String otSocketFilePath);
 
     public static synchronized native void teecFinalizeContext();
+
+
+    public static synchronized native int teecRegisterSharedMemory(byte[] otSharedMemory); //TODO: what parameters should be put.
 
 }
