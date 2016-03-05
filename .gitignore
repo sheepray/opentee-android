@@ -15,7 +15,10 @@ test/
 !*.aidl
 !*.xml
 !*.gradle
+!*.mk
+!*.h
 !*.c
+!*.cc
 !*.cpp
 !*.properties
 !*.proto
