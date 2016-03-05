@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // let's create a shared memory;
-        byte[] buffer = new byte[8];
+        byte[] buffer = {
+                's', 's', 'g',
+                'a', 'a', 'l', 't', 'o'};
         ITEEClient.IContext.ISharedMemory sharedMemory = null;
 
         Log.d(TAG, "Create shared memory");

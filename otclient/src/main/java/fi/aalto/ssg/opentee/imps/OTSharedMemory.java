@@ -75,7 +75,7 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         this.mReturnSize = in.readInt();
         this.mOffset = in.readInt();
         this.mID = in.readInt();
-        this.mID = in.readInt();
+        this.mIDInJni = in.readInt();
     }
 
     public static final Parcelable.Creator<OTSharedMemory> CREATOR = new

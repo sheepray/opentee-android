@@ -119,7 +119,7 @@ public class OTGuard {
         }
 
         // remove the caller.
-        mOTCallerList.remove(callerID);
+        mOTCallerList.remove(findCallerById(callerID));
 
         Log.i(TAG, "context for " + callerID + " is finalized");
 
