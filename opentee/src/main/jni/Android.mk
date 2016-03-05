@@ -3,11 +3,9 @@ LOCAL_PATH := $(JNIPATH)
 
 include $(call all-subdir-makefiles)
 
-LOCAL_PATH := $(JNIPATH)
-
 include $(CLEAR_VARS)
 
-local_shared_libraries := libtee libprotobuf
+local_shared_libraries := libtee
 local_cflags :=
 
 ifeq ($(TARGET_ARCH),arm)
@@ -16,12 +14,12 @@ else
 local_ldflags :=
 endif
 
-local_ldlibs :=
+local_ldlibs := -L$(SYSROOT)/usr/lib -lz
 
 local_src_files := LibteeWrapper.c
 
 local_c_includes := $(LOCAL_PATH)/libee/include \
-                    $(LOCAL_PATH)/ \
+                    $(LOCAL_PATH) \
                     external/zlib
 
 #################################################
