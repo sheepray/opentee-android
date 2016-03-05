@@ -1,6 +1,6 @@
 #include "LibteeWrapper.h"
 #include "tee_client_api.h"
-#include "GPDataTypes.pb.h"
+//#include "GPDataTypes.pb.h"
 
 #include <pthread.h>
 #include <stdbool.h>

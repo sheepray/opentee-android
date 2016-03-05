@@ -1,12 +1,12 @@
-JNIPATH := $(call my-dir)
-LOCAL_PATH := $(JNIPATH)
-
+LOCAL_PATH := $(call my-dir)
+MY_PATH := $(LOCAL_PATH)
 include $(call all-subdir-makefiles)
-
 include $(CLEAR_VARS)
 
+LOCAL_PATH := $(MY_PATH)
+
 local_shared_libraries := libtee
-local_cflags :=
+local_cflags := -DANDROID_NDK
 
 ifeq ($(TARGET_ARCH),arm)
 local_ldflags := -Wl,--hash-style=sysv
@@ -14,11 +14,11 @@ else
 local_ldflags :=
 endif
 
-local_ldlibs := -L$(SYSROOT)/usr/lib -lz
+local_ldlibs := -L$(SYSROOT)/usr/lib -lz -llog
 
-local_src_files := LibteeWrapper.c
+local_src_files :=  LibteeWrapper.c
 
-local_c_includes := $(LOCAL_PATH)/libee/include \
+local_c_includes := $(LOCAL_PATH)/libtee/include \
                     $(LOCAL_PATH) \
                     external/zlib
 
@@ -32,7 +32,7 @@ LOCAL_CFLAGS += $(local_cflags)
 LOCAL_LDFLAGS += $(local_ldflags)
 LOCAL_LDLIBS += $(local_ldlibs)
 LOCAL_SHARED_LIBRARIES += libc $(local_shared_libraries)
-LOCAL_MODULE := libteewrapper-jni
+LOCAL_MODULE := nativelibtee-jni
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)
 
@@ -46,6 +46,6 @@ LOCAL_CFLAGS += $(local_cflags)
 LOCAL_LDLIBS += $(local_ldlibs)
 LOCAL_STATIC_LIBRARIES += libc
 LOCAL_SHARED_LIBRARIES += $(local_shared_libraries)
-LOCAL_MODULE := libteewrapper-jni_static
+LOCAL_MODULE := nativelibtee-jni_static
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_STATIC_LIBRARY)

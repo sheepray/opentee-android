@@ -12,15 +12,14 @@ android {
         versionName "1.0"
 
         ndk{
-            moduleName "libtee"
-            stl "stlport_shared"
+            moduleName "nativelibtee"
         }
     }
 
     publishNonDefault true  // Publish all variants (flavor / build type) of library
 
     sourceSets.main {
-        jni.srcDirs = []    // This prevents the autogeneration of _Android.mk
+        jni.srcDirs = []    // This prevents the autogeneration of Android.mk
         jniLibs.srcDirs 'src/main/libs'
     }
 
