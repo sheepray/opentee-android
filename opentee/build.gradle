@@ -19,7 +19,7 @@ android {
     publishNonDefault true  // Publish all variants (flavor / build type) of library
 
     sourceSets.main {
-        jni.srcDirs = []    // This prevents the autogeneration of Android.mk
+        jni.srcDirs = []    // This prevents the autogeneration of _Android.mk
         jniLibs.srcDirs 'src/main/libs'
     }
 
@@ -98,5 +98,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile "com.google.protobuf:protobuf-java:3.0.0-beta-2"
     compile project(':otclient')
 }

@@ -1,8 +1,6 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.telecom.Call;
 import android.util.Log;
 
 import com.google.protobuf.ByteString;
@@ -15,7 +13,6 @@ import java.util.List;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTReturnCode;
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
-import fi.aalto.ssg.opentee.imps.pbdatatypes.GpDataTypes;
 
 
 /**
@@ -80,7 +77,7 @@ public class OTGuard {
 
             Log.e(TAG, "initializeContext teeName: " + teeName + " OT_SOCKET_FILE_PATH:" + otSocketFilePath);
 
-            return_code = LibteeWrapper.teecInitializeContext(teeName, otSocketFilePath);
+            return_code = NativeLibtee.teecInitializeContext(teeName, otSocketFilePath);
 
             Log.e(TAG, " return code " + Integer.toHexString(return_code));
 
@@ -126,7 +123,7 @@ public class OTGuard {
         if ( mOTCallerList.size() == 0 ){
             Log.i(TAG, "caller list empty now, finalize the context in opentee");
 
-            LibteeWrapper.teecFinalizeContext();
+            NativeLibtee.teecFinalizeContext();
         }
 
     }
@@ -136,23 +133,8 @@ public class OTGuard {
          * call Libtee to register shared memory
          */
         // serialize the otSharedMemory into byte array.
-        GpDataTypes.TeecSharedMemory.Builder smBuilder = GpDataTypes.TeecSharedMemory.newBuilder();
 
-        try {
-            smBuilder.setMBuffer( ByteString.copyFrom(otSharedMemory.asByteArray()) );
-        } catch (ITEEClient.Exception e) {
-            e.printStackTrace();
-        }
-
-        smBuilder.setMFlag(otSharedMemory.getFlags());
-        smBuilder.setMID(otSharedMemory.getID());
-        smBuilder.setMIDInJni(otSharedMemory.getIDInJni());
-        smBuilder.setMOffset(otSharedMemory.getOffset());
-        smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
-
-        byte[] smInByteArray = smBuilder.build().toByteArray();
-
-        int return_code = LibteeWrapper.teecRegisterSharedMemory(smInByteArray);
+        int return_code = NativeLibtee.teecRegisterSharedMemory(null);
 
         // upon succeed from Libtee, add the OTSharedMemory into the OTSharedMemory list of the caller.
         if ( return_code == ITEEClient.TEEC_SUCCESS ){

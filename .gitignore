@@ -7,7 +7,6 @@
 
 build
 gradle
-.idea
 .gradle/
 androidTest/
 test/
@@ -20,5 +19,4 @@ test/
 !*.c
 !*.cc
 !*.cpp
-!*.properties
 !*.proto

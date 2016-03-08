@@ -44,7 +44,8 @@ public class OTConnectionService extends Service {
         @Override
         public int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to register shared memory.");
-            return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
+            //return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
+            return 0;
         }
     };
 

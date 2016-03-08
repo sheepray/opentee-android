@@ -17,7 +17,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
     byte[] mBuffer;
     int mFlag;
     int mReturnSize = 0;    // this is used for output.
-    int mOffset = 0;
 
     public OTSharedMemory(byte[] buffer, int flag, int id){
         // just keep the handle.
@@ -46,12 +45,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
     }
 
     @Override
-    public OTSharedMemory setOffset(int offset) {
-        this.mOffset = offset;
-        return this;
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -62,7 +55,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         dest.writeByteArray(this.mBuffer);
         dest.writeInt(this.mFlag);
         dest.writeInt(this.mReturnSize);
-        dest.writeInt(this.mOffset);
         dest.writeInt(this.mID);
         dest.writeInt(this.mIDInJni);
     }
@@ -73,7 +65,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         in.readByteArray(this.mBuffer);
         this.mFlag = in.readInt();
         this.mReturnSize = in.readInt();
-        this.mOffset = in.readInt();
         this.mID = in.readInt();
         this.mIDInJni = in.readInt();
     }
@@ -98,6 +89,4 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
      * Public functions not in the public interface.
      */
     public int getIDInJni(){ return this.mIDInJni; }
-
-    public int getOffset(){ return this.mOffset; }
 }

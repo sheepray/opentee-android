@@ -1,5 +1,5 @@
-LOCAL_PATH := $(call my-dir)
-MY_PATH := $(LOCAL_PATH)
+MY_PATH := $(call my-dir)
+LOCAL_PATH := $(MY_PATH)
 include $(call all-subdir-makefiles)
 include $(CLEAR_VARS)
 

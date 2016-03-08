@@ -89,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
-        sharedMemory.setOffset(offset);
-
         //invoke command.
 
 

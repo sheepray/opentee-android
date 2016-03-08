@@ -45,6 +45,28 @@ public interface ITEEClient {
     };
 
     /**
+     * reference for registered shared memory
+     */
+    class RegisteredMemoryReference extends Parameter{
+        @Override
+        public int getType() {
+            return 0;
+        }
+
+        IContext.ISharedMemory mSharedMemory;
+        int mOffset = 0; // initialized to 0.
+
+
+        public RegisteredMemoryReference(IContext.ISharedMemory sharedMemory){
+            this.mSharedMemory = sharedMemory;
+        }
+
+        public void setOffset(int offset){
+            this.mOffset = offset;
+        }
+    }
+
+    /**
      * This class defines a pair of value which can be passed as a parameter for one Operation.
      */
     class Value extends Parameter{
@@ -302,12 +324,6 @@ public interface ITEEClient {
              * @return the size of the actual output byte array.
              */
             int getReturnSize();
-
-            /**
-             * set the value of offset.
-             * @param offset
-             */
-            ISharedMemory setOffset(int offset);
 
             int getID();
 
