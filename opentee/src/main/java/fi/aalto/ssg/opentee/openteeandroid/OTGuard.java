@@ -134,7 +134,7 @@ public class OTGuard {
          */
         // serialize the otSharedMemory into byte array.
 
-        int return_code = NativeLibtee.teecRegisterSharedMemory(null);
+        int return_code = NativeLibtee.teecRegisterSharedMemory(otSharedMemory);
 
         // upon succeed from Libtee, add the OTSharedMemory into the OTSharedMemory list of the caller.
         if ( return_code == ITEEClient.TEEC_SUCCESS ){

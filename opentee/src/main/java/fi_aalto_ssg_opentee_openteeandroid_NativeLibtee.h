@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInitializeContext
-        (JNIEnv *, jclass, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -21,7 +21,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecFinalizeContext
-        (JNIEnv *, jclass);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: (Lfi/aalto/ssg/opentee/imps/OTSharedMemory;)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRegisterSharedMemory
-        (JNIEnv *, jclass, jobject);
+  (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus
 }

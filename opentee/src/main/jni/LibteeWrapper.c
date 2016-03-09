@@ -62,7 +62,7 @@ void preparationFunc(JNIEnv* env, jstring otSocketFilePathInJava){
 /**
  * Initialize Context.
  */
-JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecInitializeContext
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInitializeContext
         (JNIEnv* env, jclass jc, jstring teeName, jstring otSocketFilePathInJava){
 
     if ( 0 == open_tee_socket_env_set )
@@ -95,7 +95,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_te
 /*
  * Finalize Context.
  */
-JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecFinalizeContext
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecFinalizeContext
         (JNIEnv *env, jclass jc){
     __android_log_print(ANDROID_LOG_INFO,
                         "JNI",
@@ -103,8 +103,20 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_te
     TEEC_FinalizeContext(&g_contextRecord);
 }
 
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
+ * Method:    teecRegisterSharedMemory
+ * Signature: (Lfi/aalto/ssg/opentee/imps/OTSharedMemory;)I
+ */
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRegisterSharedMemory
+        (JNIEnv* env, jclass jc, jobject jo){
+
+    return 0;
+}
+
+
 /**
- * Register Shared Memory.
+ * previous version of Register Shared Memory.
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_LibteeWrapper_teecRegisterSharedMemory
         (JNIEnv* env, jclass jc, jbyteArray jOTSharedMemory){
