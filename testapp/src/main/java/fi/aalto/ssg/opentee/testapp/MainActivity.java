@@ -85,11 +85,10 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // only encrypt msg_to_enc[1:7]
-        int offset = 1;
-
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
         //invoke command.
+
 
 
         try {
