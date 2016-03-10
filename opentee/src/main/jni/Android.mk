@@ -1,4 +1,9 @@
 MY_PATH := $(call my-dir)
+
+ifndef NDK_ROOT
+include external/stlport/libstlport.mk
+endif
+
 LOCAL_PATH := $(MY_PATH)
 include $(call all-subdir-makefiles)
 include $(CLEAR_VARS)
@@ -16,9 +21,10 @@ endif
 
 local_ldlibs := -L$(SYSROOT)/usr/lib -lz -llog
 
-local_src_files :=  LibteeWrapper.c
+local_src_files :=  LibteeWrapper.cpp
 
 local_c_includes := $(LOCAL_PATH)/libtee/include \
+                    $(LOCAL_PATH)/protobuf/src/ \
                     $(LOCAL_PATH) \
                     external/zlib
 
@@ -26,6 +32,7 @@ local_c_includes := $(LOCAL_PATH)/libtee/include \
 # Target dynamic library
 
 include $(CLEAR_VARS)
+LOCAL_CPPFLAGS := -std=c++11
 LOCAL_SRC_FILES := $(local_src_files)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_CFLAGS += $(local_cflags)
