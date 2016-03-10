@@ -1,0 +1,27 @@
+syntax = "proto2";
+package fi.aalto.ssg.opentee.imps.pbdatatypes;
+
+message TeecOperation{
+    required int32 mStarted = 1;
+    required TeecParameter mParams = 2;
+}
+
+message TeecParameter{
+    optional TeecSharedMemory teecSharedMemory = 1;
+    optional TeecValue teecValue = 2;
+}
+
+message TeecSharedMemory{
+    required bytes mBuffer = 1;
+    required int32 mFlag = 2;
+    optional int32 mReturnSize = 3;
+    optional int32 mIDInJni = 4;
+    optional int32 mID = 5;
+}
+
+message TeecValue{
+    required int32 a = 1;
+    required int32 b = 2;
+    required int32 mFlag = 3;
+}
+

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.protobuf.ByteString;
+import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,6 +134,17 @@ public class OTGuard {
          * call Libtee to register shared memory
          */
         // serialize the otSharedMemory into byte array.
+        GPDataTypes.TeecSharedMemory.Builder smBuilder = GPDataTypes.TeecSharedMemory.newBuilder();
+        try {
+            smBuilder.setMBuffer( ByteString.copyFrom( otSharedMemory.asByteArray()) );
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        }
+        smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
+        smBuilder.setMID(otSharedMemory.getID());
+        smBuilder.setMIDInJni(otSharedMemory.getIDInJni());
+        smBuilder.setMFlag(otSharedMemory.getFlags());
+
 
         int return_code = NativeLibtee.teecRegisterSharedMemory(otSharedMemory);
 
