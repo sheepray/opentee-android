@@ -3,6 +3,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := libprotobuf
 
+LOCAL_CPP_EXTENSION := .cc
 LOCAL_SRC_FILES :=\
 	src/google/protobuf/descriptor_database.cc \
 	src/google/protobuf/descriptor.cc \
@@ -46,8 +47,8 @@ ifeq ($(TARGET_ARCH),x86_64)
 										 src/google/protobuf/stubs/atomicops_internals_x86_gcc.cc
 endif
 
-LOCAL_CFLAGS := -D GOOGLE_PROTOBUF_NO_RTTI=1
-LOCAL_CPPFLAGS := -std=c++11
+LOCAL_CFLAGS := -D GOOGLE_PROTOBUF_NO_RTTI=1 #-iquote $(LOCAL_PATH)/src
+LOCAL_CPPFLAGS += -std=c++11
 LOCAL_C_INCLUDES = $(LOCAL_PATH)/src
 
 LOCAL_EXPORT_LDLIBS := -lz

@@ -10,7 +10,7 @@ include $(CLEAR_VARS)
 
 LOCAL_PATH := $(MY_PATH)
 
-local_shared_libraries := libtee
+local_shared_libraries := libtee libgpdatatypes
 local_cflags := -DANDROID_NDK
 
 ifeq ($(TARGET_ARCH),arm)
@@ -19,7 +19,7 @@ else
 local_ldflags :=
 endif
 
-local_ldlibs :=  -lz -llog -L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -lGPDataTypes
+local_ldlibs :=  -lz -llog #-L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -lGPDataTypes
 
 local_src_files :=  LibteeWrapper.cpp
 
