@@ -146,7 +146,7 @@ public class OTGuard {
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
 
-        int return_code = NativeLibtee.teecRegisterSharedMemory(otSharedMemory);
+        int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray());
 
         // upon succeed from Libtee, add the OTSharedMemory into the OTSharedMemory list of the caller.
         if ( return_code == ITEEClient.TEEC_SUCCESS ){

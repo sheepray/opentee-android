@@ -19,7 +19,7 @@ else
 local_ldflags :=
 endif
 
-local_ldlibs := -L$(SYSROOT)/usr/lib -lz -llog
+local_ldlibs := -L$(SYSROOT)/usr/lib -lz -llog -L$(SYSROOT)/usr/local/lib -lprotobuf
 
 local_src_files :=  LibteeWrapper.cpp
 
