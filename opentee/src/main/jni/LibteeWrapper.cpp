@@ -109,7 +109,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         "Shutdown libprotobuf lib and Finialize Context");
 
     // Optional:  Delete all global objects allocated by libprotobuf.
-    google::protobuf::ShutdownProtobufLibrary();
+    //google::protobuf::ShutdownProtobufLibrary();
 
     TEEC_FinalizeContext(&g_contextRecord);
 }
@@ -131,7 +131,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     // Verify that the version of the library that we linked against is
     // compatible with the version of the headers we compiled against.
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
+    //GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // transfer java type shared memory into c type.
     fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory cOTSharedMemory;

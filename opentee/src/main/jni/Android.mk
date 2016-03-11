@@ -19,7 +19,7 @@ else
 local_ldflags :=
 endif
 
-local_ldlibs := -L$(SYSROOT)/usr/lib -lz -llog -L$(SYSROOT)/usr/local/lib -lprotobuf
+local_ldlibs :=  -lz -llog -L$(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/ -lGPDataTypes
 
 local_src_files :=  LibteeWrapper.cpp
 
