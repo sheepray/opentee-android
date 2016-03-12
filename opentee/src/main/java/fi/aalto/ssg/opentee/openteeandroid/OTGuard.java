@@ -116,6 +116,8 @@ public class OTGuard {
             return;
         }
 
+        //TODO: release all resources including shared memory and openning sessions.
+
         // remove the caller.
         mOTCallerList.remove(findCallerById(callerID));
 
@@ -142,7 +144,6 @@ public class OTGuard {
         }
         smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
         smBuilder.setMID(otSharedMemory.getID());
-        smBuilder.setMIDInJni(otSharedMemory.getIDInJni());
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
 

@@ -1,16 +1,20 @@
 #include "LibteeWrapper.h"
-#include "GPDataTypes.pb.h"
+#include "tee_shared_data_types.h"
+#include "gpdatatypes/GPDataTypes.pb.h"
 
 #include <pthread.h>
 #include <stdbool.h>
 #include <android/log.h>
 
-#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/message.h>
+#include <string.h>
+#include <vector>
 
 #define MAX_NUM_SESSION 9
 
-//using namespace google::protobuf;
+using namespace std;
+using namespace google::protobuf;
+using namespace fi::aalto::ssg::opentee::imps::pbdatatypes;
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +25,8 @@ extern "C" {
  * SharedMemory should kept record in the 'OTGuard.java' and it can be passed in and passed out.
  * */
 static TEEC_Context g_contextRecord = {0};
+
+static vector<TEEC_SharedMemory> sharedMemoryList;
 
 static TEEC_Session g_sessionRecord[MAX_NUM_SESSION] = {{0}};
 static bool g_sessionRecordOccupied[MAX_NUM_SESSION] = {false};
@@ -109,9 +115,13 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         "Shutdown libprotobuf lib and Finialize Context");
 
     // Optional:  Delete all global objects allocated by libprotobuf.
-    //google::protobuf::ShutdownProtobufLibrary();
+    google::protobuf::ShutdownProtobufLibrary();
+
+    //clean resources
+    sharedMemoryList.clear();
 
     TEEC_FinalizeContext(&g_contextRecord);
+    g_contextRecord = {0};
 }
 
 /*
@@ -125,28 +135,47 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     uint8_t otSharedMemory[l];
     env->GetByteArrayRegion(jOTSharedMemory, 0, l, (jbyte* )otSharedMemory);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "Shared Memory %s", otSharedMemory);
-
     // Verify that the version of the library that we linked against is
     // compatible with the version of the headers we compiled against.
-    //GOOGLE_PROTOBUF_VERIFY_VERSION;
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // transfer java type shared memory into c type.
-    fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory cOTSharedMemory;
-    //google::protobuf::Message message;
+    Message* message = new TeecSharedMemory;
+    string data(otSharedMemory, otSharedMemory + l);
+    message->ParseFromString(data);
+    const Descriptor* descriptor = message->GetDescriptor();
 
-    //google::protobuf::io::CodedInputStream cInput( (uint8_t*)otSharedMemory, l);
-    //cOTSharedMemory(cInput);
+    const FieldDescriptor* flag_field = descriptor->FindFieldByName("mFlag");
+    const FieldDescriptor* buffer_field = descriptor->FindFieldByName("mBuffer");
 
-    /*
+    const Reflection* relfection = message->GetReflection();
+    uint32_t  mFlag = relfection->GetInt32(*message, flag_field);
+    string mBuffer = relfection->GetString(*message, buffer_field);
+
+    TEEC_SharedMemory cOTSharedMemory = {.buffer = (void *)mBuffer.c_str(),
+                                        .size = strlen(mBuffer.c_str()),
+                                        .flags = mFlag,
+                                        .imp = NULL
+                                        };
+
+    TEEC_Result return_code = TEEC_RegisterSharedMemory(&g_contextRecord, &cOTSharedMemory);
+
     __android_log_print(ANDROID_LOG_INFO,
                         "JNI",
-                        "Shared Memory buffer %x", cOTSharedMemory.mbuffer());
-    */
+                        "flag: %x, buffer:%s, return_code:%x",
+                        mFlag,
+                        mBuffer.c_str(),
+                        return_code
+    );
 
-    return 0;
+    // if register shared memory succeed, add it to the global shared memory array.
+    if ( return_code == TEEC_SUCCESS ){
+        sharedMemoryList.push_back(cOTSharedMemory);
+    }
+
+    delete message;
+
+    return return_code;
 }
 
 

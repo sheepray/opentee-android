@@ -11,6 +11,7 @@ include $(CLEAR_VARS)
 LOCAL_PATH := $(MY_PATH)
 
 local_shared_libraries := libtee libgpdatatypes
+LOCAL_STATIC_LIBRARIES += libprotobuf
 local_cflags := -DANDROID_NDK
 
 ifeq ($(TARGET_ARCH),arm)

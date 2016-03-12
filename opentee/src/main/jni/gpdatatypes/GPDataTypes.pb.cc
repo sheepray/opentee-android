@@ -34,6 +34,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* TeecSharedMemory_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   TeecSharedMemory_reflection_ = NULL;
+const ::google::protobuf::Descriptor* TeecSharedMemoryReference_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  TeecSharedMemoryReference_reflection_ = NULL;
 const ::google::protobuf::Descriptor* TeecValue_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   TeecValue_reflection_ = NULL;
@@ -80,11 +83,10 @@ void protobuf_AssignDesc_GPDataTypes_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TeecParameter));
   TeecSharedMemory_descriptor_ = file->message_type(2);
-  static const int TeecSharedMemory_offsets_[5] = {
+  static const int TeecSharedMemory_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemory, mbuffer_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemory, mflag_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemory, mreturnsize_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemory, midinjni_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemory, mid_),
   };
   TeecSharedMemory_reflection_ =
@@ -98,7 +100,23 @@ void protobuf_AssignDesc_GPDataTypes_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TeecSharedMemory));
-  TeecValue_descriptor_ = file->message_type(3);
+  TeecSharedMemoryReference_descriptor_ = file->message_type(3);
+  static const int TeecSharedMemoryReference_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, parent_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, moffset_),
+  };
+  TeecSharedMemoryReference_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      TeecSharedMemoryReference_descriptor_,
+      TeecSharedMemoryReference::default_instance_,
+      TeecSharedMemoryReference_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(TeecSharedMemoryReference));
+  TeecValue_descriptor_ = file->message_type(4);
   static const int TeecValue_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecValue, a_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecValue, b_),
@@ -134,6 +152,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     TeecSharedMemory_descriptor_, &TeecSharedMemory::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    TeecSharedMemoryReference_descriptor_, &TeecSharedMemoryReference::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     TeecValue_descriptor_, &TeecValue::default_instance());
 }
 
@@ -146,6 +166,8 @@ void protobuf_ShutdownFile_GPDataTypes_2eproto() {
   delete TeecParameter_reflection_;
   delete TeecSharedMemory::default_instance_;
   delete TeecSharedMemory_reflection_;
+  delete TeecSharedMemoryReference::default_instance_;
+  delete TeecSharedMemoryReference_reflection_;
   delete TeecValue::default_instance_;
   delete TeecValue_reflection_;
 }
@@ -165,20 +187,24 @@ void protobuf_AddDesc_GPDataTypes_2eproto() {
     "ry\030\001 \001(\01327.fi.aalto.ssg.opentee.imps.pbd"
     "atatypes.TeecSharedMemory\022C\n\tteecValue\030\002"
     " \001(\01320.fi.aalto.ssg.opentee.imps.pbdatat"
-    "ypes.TeecValue\"f\n\020TeecSharedMemory\022\017\n\007mB"
+    "ypes.TeecValue\"T\n\020TeecSharedMemory\022\017\n\007mB"
     "uffer\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\023\n\013mReturnSiz"
-    "e\030\003 \001(\005\022\020\n\010mIDInJni\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"0"
-    "\n\tTeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022\r\n\005mFl"
-    "ag\030\003 \002(\005", 488);
+    "e\030\003 \001(\005\022\013\n\003mID\030\004 \001(\005\"u\n\031TeecSharedMemory"
+    "Reference\022G\n\006parent\030\001 \002(\01327.fi.aalto.ssg"
+    ".opentee.imps.pbdatatypes.TeecSharedMemo"
+    "ry\022\017\n\007mOffset\030\002 \002(\005\"0\n\tTeecValue\022\t\n\001a\030\001 "
+    "\002(\005\022\t\n\001b\030\002 \002(\005\022\r\n\005mFlag\030\003 \002(\005", 589);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GPDataTypes.proto", &protobuf_RegisterTypes);
   TeecOperation::default_instance_ = new TeecOperation();
   TeecParameter::default_instance_ = new TeecParameter();
   TeecSharedMemory::default_instance_ = new TeecSharedMemory();
+  TeecSharedMemoryReference::default_instance_ = new TeecSharedMemoryReference();
   TeecValue::default_instance_ = new TeecValue();
   TeecOperation::default_instance_->InitAsDefaultInstance();
   TeecParameter::default_instance_->InitAsDefaultInstance();
   TeecSharedMemory::default_instance_->InitAsDefaultInstance();
+  TeecSharedMemoryReference::default_instance_->InitAsDefaultInstance();
   TeecValue::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_GPDataTypes_2eproto);
 }
@@ -747,7 +773,6 @@ void TeecParameter::Swap(TeecParameter* other) {
 const int TeecSharedMemory::kMBufferFieldNumber;
 const int TeecSharedMemory::kMFlagFieldNumber;
 const int TeecSharedMemory::kMReturnSizeFieldNumber;
-const int TeecSharedMemory::kMIDInJniFieldNumber;
 const int TeecSharedMemory::kMIDFieldNumber;
 #endif  // !_MSC_VER
 
@@ -773,7 +798,6 @@ void TeecSharedMemory::SharedCtor() {
   mbuffer_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   mflag_ = 0;
   mreturnsize_ = 0;
-  midinjni_ = 0;
   mid_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -823,7 +847,7 @@ void TeecSharedMemory::Clear() {
     ::memset(&first, 0, n);                                \
   } while (0)
 
-  if (_has_bits_[0 / 32] & 31) {
+  if (_has_bits_[0 / 32] & 15) {
     ZR_(mflag_, mid_);
     if (has_mbuffer()) {
       if (mbuffer_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
@@ -887,28 +911,13 @@ bool TeecSharedMemory::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(32)) goto parse_mIDInJni;
+        if (input->ExpectTag(32)) goto parse_mID;
         break;
       }
 
-      // optional int32 mIDInJni = 4;
+      // optional int32 mID = 4;
       case 4: {
         if (tag == 32) {
-         parse_mIDInJni:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &midinjni_)));
-          set_has_midinjni();
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(40)) goto parse_mID;
-        break;
-      }
-
-      // optional int32 mID = 5;
-      case 5: {
-        if (tag == 40) {
          parse_mID:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -962,14 +971,9 @@ void TeecSharedMemory::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->mreturnsize(), output);
   }
 
-  // optional int32 mIDInJni = 4;
-  if (has_midinjni()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->midinjni(), output);
-  }
-
-  // optional int32 mID = 5;
+  // optional int32 mID = 4;
   if (has_mid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->mid(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->mid(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -999,14 +1003,9 @@ void TeecSharedMemory::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->mreturnsize(), target);
   }
 
-  // optional int32 mIDInJni = 4;
-  if (has_midinjni()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->midinjni(), target);
-  }
-
-  // optional int32 mID = 5;
+  // optional int32 mID = 4;
   if (has_mid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->mid(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->mid(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1042,14 +1041,7 @@ int TeecSharedMemory::ByteSize() const {
           this->mreturnsize());
     }
 
-    // optional int32 mIDInJni = 4;
-    if (has_midinjni()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->midinjni());
-    }
-
-    // optional int32 mID = 5;
+    // optional int32 mID = 4;
     if (has_mid()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -1092,9 +1084,6 @@ void TeecSharedMemory::MergeFrom(const TeecSharedMemory& from) {
     if (from.has_mreturnsize()) {
       set_mreturnsize(from.mreturnsize());
     }
-    if (from.has_midinjni()) {
-      set_midinjni(from.midinjni());
-    }
     if (from.has_mid()) {
       set_mid(from.mid());
     }
@@ -1125,7 +1114,6 @@ void TeecSharedMemory::Swap(TeecSharedMemory* other) {
     std::swap(mbuffer_, other->mbuffer_);
     std::swap(mflag_, other->mflag_);
     std::swap(mreturnsize_, other->mreturnsize_);
-    std::swap(midinjni_, other->midinjni_);
     std::swap(mid_, other->mid_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -1138,6 +1126,278 @@ void TeecSharedMemory::Swap(TeecSharedMemory* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = TeecSharedMemory_descriptor_;
   metadata.reflection = TeecSharedMemory_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int TeecSharedMemoryReference::kParentFieldNumber;
+const int TeecSharedMemoryReference::kMOffsetFieldNumber;
+#endif  // !_MSC_VER
+
+TeecSharedMemoryReference::TeecSharedMemoryReference()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+}
+
+void TeecSharedMemoryReference::InitAsDefaultInstance() {
+  parent_ = const_cast< ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory*>(&::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::default_instance());
+}
+
+TeecSharedMemoryReference::TeecSharedMemoryReference(const TeecSharedMemoryReference& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+}
+
+void TeecSharedMemoryReference::SharedCtor() {
+  _cached_size_ = 0;
+  parent_ = NULL;
+  moffset_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+TeecSharedMemoryReference::~TeecSharedMemoryReference() {
+  // @@protoc_insertion_point(destructor:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  SharedDtor();
+}
+
+void TeecSharedMemoryReference::SharedDtor() {
+  if (this != default_instance_) {
+    delete parent_;
+  }
+}
+
+void TeecSharedMemoryReference::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* TeecSharedMemoryReference::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return TeecSharedMemoryReference_descriptor_;
+}
+
+const TeecSharedMemoryReference& TeecSharedMemoryReference::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_GPDataTypes_2eproto();
+  return *default_instance_;
+}
+
+TeecSharedMemoryReference* TeecSharedMemoryReference::default_instance_ = NULL;
+
+TeecSharedMemoryReference* TeecSharedMemoryReference::New() const {
+  return new TeecSharedMemoryReference;
+}
+
+void TeecSharedMemoryReference::Clear() {
+  if (_has_bits_[0 / 32] & 3) {
+    if (has_parent()) {
+      if (parent_ != NULL) parent_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::Clear();
+    }
+    moffset_ = 0;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool TeecSharedMemoryReference::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_parent()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_mOffset;
+        break;
+      }
+
+      // required int32 mOffset = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_mOffset:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &moffset_)));
+          set_has_moffset();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  return false;
+#undef DO_
+}
+
+void TeecSharedMemoryReference::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+  if (has_parent()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->parent(), output);
+  }
+
+  // required int32 mOffset = 2;
+  if (has_moffset()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->moffset(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+}
+
+::google::protobuf::uint8* TeecSharedMemoryReference::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+  if (has_parent()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->parent(), target);
+  }
+
+  // required int32 mOffset = 2;
+  if (has_moffset()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->moffset(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
+  return target;
+}
+
+int TeecSharedMemoryReference::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+    if (has_parent()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->parent());
+    }
+
+    // required int32 mOffset = 2;
+    if (has_moffset()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->moffset());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void TeecSharedMemoryReference::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const TeecSharedMemoryReference* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const TeecSharedMemoryReference*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void TeecSharedMemoryReference::MergeFrom(const TeecSharedMemoryReference& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_parent()) {
+      mutable_parent()->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::MergeFrom(from.parent());
+    }
+    if (from.has_moffset()) {
+      set_moffset(from.moffset());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void TeecSharedMemoryReference::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TeecSharedMemoryReference::CopyFrom(const TeecSharedMemoryReference& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TeecSharedMemoryReference::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  if (has_parent()) {
+    if (!this->parent().IsInitialized()) return false;
+  }
+  return true;
+}
+
+void TeecSharedMemoryReference::Swap(TeecSharedMemoryReference* other) {
+  if (other != this) {
+    std::swap(parent_, other->parent_);
+    std::swap(moffset_, other->moffset_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata TeecSharedMemoryReference::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = TeecSharedMemoryReference_descriptor_;
+  metadata.reflection = TeecSharedMemoryReference_reflection_;
   return metadata;
 }
 

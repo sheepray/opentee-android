@@ -15,8 +15,12 @@ message TeecSharedMemory{
     required bytes mBuffer = 1;
     required int32 mFlag = 2;
     optional int32 mReturnSize = 3;
-    optional int32 mIDInJni = 4;
-    optional int32 mID = 5;
+    optional int32 mID = 4;
+}
+
+message TeecSharedMemoryReference{
+    required TeecSharedMemory parent = 1;
+    required int32  mOffset = 2;
 }
 
 message TeecValue{
