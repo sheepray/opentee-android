@@ -46,7 +46,11 @@ public class ProxyApis {
             mService = IOTConnectionInterface.Stub.asInterface(service);
 
             //after connected, call initializeContext.
-            teecInitializeContext();
+            try {
+                teecInitializeContext();
+            } catch (ITEEClient.Exception e) {
+                e.printStackTrace();
+            }
 
             synchronized (mLock) {
                 // release the lock from another thread.
@@ -80,7 +84,7 @@ public class ProxyApis {
         }
     }
 
-    public ProxyApis teecInitializeContext() {
+    public ProxyApis teecInitializeContext() throws ITEEClient.Exception {
         int return_code = 0;
         try {
             return_code = mService.teecInitializeContext(mTeeName);
@@ -88,13 +92,11 @@ public class ProxyApis {
             e.printStackTrace();
         }
 
-        /*
-            if ( return_code != TeecResult.TEEC_SUCCESS){
-                throw new TeecConnectionException(Integer.toString(return_code));
-            }
-        */
-
         Log.d(TAG, "Return code from OT: " + Integer.toHexString(return_code));
+
+        if ( return_code != OTReturnCode.TEEC_SUCCESS ){
+            throwExceptionBasedOnReturnCode(return_code);
+        }
 
         return this;
     }
@@ -112,7 +114,6 @@ public class ProxyApis {
 
         // call IPC
         int return_code = mService.teecRegisterSharedMemory(otSharedMemory);
-        // based on the return code, throw different exceptions if not succeed.
 
         Log.d(TAG, "teecRegisterSharedMemory return code: " + return_code);
 
