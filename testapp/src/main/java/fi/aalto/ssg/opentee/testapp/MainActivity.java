@@ -87,9 +87,17 @@ public class MainActivity extends AppCompatActivity {
         // only encrypt msg_to_enc[1:7]
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
-        //invoke command.
+        // invoke command.
 
 
+        // release shared memory
+        try {
+            ctx.releaseSharedMemory(sharedMemory);
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
         try {
             ctx.finalizeContext();

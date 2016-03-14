@@ -19,4 +19,6 @@ interface IOTConnectionInterface {
     // It is sophisticated to pass enum in AIDL.
      int teecRegisterSharedMemory(inout OTSharedMemory sharedMemory);
 
+     void teecReleaseSharedMemory(int smId);
+
 }

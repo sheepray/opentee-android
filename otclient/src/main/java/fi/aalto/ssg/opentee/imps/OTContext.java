@@ -7,6 +7,7 @@ import android.util.Log;
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
@@ -20,11 +21,13 @@ public class OTContext implements ITEEClient.IContext {
     String mTeeName;
     boolean mInitialized;
     ProxyApis mProxyApis = null; // one service connection per context
+    Random smIdGenerator;
 
     List<OTSharedMemory> mSharedMemory = new ArrayList<OTSharedMemory>();
 
     public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
+        this.smIdGenerator = new Random();
 
         /**
          * connect to the OpenTEE
@@ -71,8 +74,11 @@ public class OTContext implements ITEEClient.IContext {
             Log.i(TAG, "Not ready to register shared memory");
             return null;
         }
+
+        int smId = generateSmId();
+
         // create a shared memory
-        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags);
+        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags, smId);
 
         // register the shared memory
         mProxyApis.teecRegisterSharedMemory(otSharedMemory);
@@ -84,10 +90,17 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.Exception {
-        //TODO
-        // get the OTSharedMemory based on the id = sharedMemory.getID;
-        // later steps.....
+    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.Exception, RemoteException {
+        if ( !mInitialized || mProxyApis == null ){
+            Log.i(TAG, "Not ready to release shared memory");
+            return;
+        }
+
+        // tell remote tee to release the shared memory.
+        mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
+
+        // remove it from shared memory list.
+        mSharedMemory.remove(sharedMemory);
     }
 
     @Override
@@ -98,5 +111,11 @@ public class OTContext implements ITEEClient.IContext {
     @Override
     public void requestCancellation(ITEEClient.Operation teecOperation) {
 
+    }
+
+    private int generateSmId(){
+        int id = smIdGenerator.nextInt(500);
+        Log.i(TAG, "generating shared memory id:" + id);
+        return id;
     }
 }

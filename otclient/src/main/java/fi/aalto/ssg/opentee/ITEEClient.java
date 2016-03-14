@@ -324,6 +324,8 @@ public interface ITEEClient {
              * @return the size of the actual output byte array.
              */
             int getReturnSize();
+
+            int getId();
         }
 
 
@@ -364,7 +366,7 @@ public interface ITEEClient {
          * which is used by a pending operation or
          * attempting to relaes the same Shared Memory structure concureently from multiple threads.
          */
-        void releaseSharedMemory(ISharedMemory sharedMemory) throws Exception;
+        void releaseSharedMemory(ISharedMemory sharedMemory) throws Exception, RemoteException;
 
         /**
          * this API opens a session within the context which is already built.

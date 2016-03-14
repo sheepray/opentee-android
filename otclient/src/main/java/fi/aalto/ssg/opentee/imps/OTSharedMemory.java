@@ -12,14 +12,16 @@ import fi.aalto.ssg.opentee.ITEEClient;
  * this class implements the ISharedMemory interface
  */
 public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcelable {
+    int mId;
     byte[] mBuffer;
     int mFlag;
     int mReturnSize = 0;    // this is used for output.
 
-    public OTSharedMemory(byte[] buffer, int flag){
+    public OTSharedMemory(byte[] buffer, int flag, int id){
         // just keep the handle.
         this.mBuffer = buffer;
         this.mFlag = flag;
+        this.mId = id;
     }
 
     public OTSharedMemory(Parcel in){
@@ -42,6 +44,11 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
     }
 
     @Override
+    public int getId() {
+        return this.mId;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -52,6 +59,7 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         dest.writeByteArray(this.mBuffer);
         dest.writeInt(this.mFlag);
         dest.writeInt(this.mReturnSize);
+        dest.writeInt(this.mId);
     }
 
     public void readFromParcel(Parcel in){
@@ -60,6 +68,7 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         in.readByteArray(this.mBuffer);
         this.mFlag = in.readInt();
         this.mReturnSize = in.readInt();
+        this.mId = in.readInt();
     }
 
     public static final Parcelable.Creator<OTSharedMemory> CREATOR = new
@@ -72,4 +81,8 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
                     return new OTSharedMemory[size];
                 }
             };
+
+    public int getID(){
+        return this.mId;
+    }
 }

@@ -126,6 +126,14 @@ public class ProxyApis {
 
     }
 
+    public void teecReleaseSharedMemory(int smId) throws ITEEClient.GenericErrorException, RemoteException {
+        if ( mService == null ){
+            throw new ITEEClient.GenericErrorException("Service unavailable");
+        }
+
+        mService.teecReleaseSharedMemory(smId);
+    }
+
     public static void throwExceptionBasedOnReturnCode(int return_code) throws ITEEClient.Exception{
 
         if ( return_code == OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT ){

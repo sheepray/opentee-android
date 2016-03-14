@@ -47,6 +47,13 @@ public class OTConnectionService extends Service {
             return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
             //return 0;
         }
+        @Override
+        public void teecReleaseSharedMemory(int smId){
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to release shared memory with id:"
+                    + smId);
+            mOTGuard.teecReleaseSharedMemory(Binder.getCallingPid(), smId);
+        }
     };
 
     @Override

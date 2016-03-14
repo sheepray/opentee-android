@@ -21,10 +21,26 @@ extern "C" {
 #endif
 #include "tee_client_api.h"
 
-typedef struct{
-    TEEC_SharedMemory sharedMemory;
-    int smId;
-}TEEC_SharedMemoryWithId;
+class TEEC_SharedMemoryWithId{
+private:
+    TEEC_SharedMemory mSharedMemory;
+    int mSmId;
+public:
+    TEEC_SharedMemoryWithId(TEEC_SharedMemory sm, int id){
+        mSharedMemory = sm;
+        mSmId = id;
+    }
+
+    int getId(){
+        return mSmId;
+    }
+
+    TEEC_SharedMemory getSharedMemory(){
+        return mSharedMemory;
+    }
+
+};
+TEEC_SharedMemoryWithId NULLSharedMemoryWithId({0}, 0);
 
 /*
  * Global Var. All contexts and sessions should be kept record in here.
@@ -41,6 +57,27 @@ static pthread_mutex_t session_lock;
 
 int open_tee_socket_env_set = 0;
 
+TEEC_SharedMemoryWithId findSharedMemoryById(int smId){
+    for ( auto& sm : sharedMemoryWithIdList ){
+        if ( sm.getId() == smId ){
+            __android_log_print(ANDROID_LOG_INFO,
+                                "[JNI] findSharedMemoryById",
+                                "shared memory with id:%d found.", smId);
+
+            return sm;
+        }
+    }
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "[JNI] findSharedMemoryById",
+                        "shared memory with id:%d not found.", smId);
+    return NULLSharedMemoryWithId;
+}
+
+bool compareSharedMemoryWithId(TEEC_SharedMemoryWithId sm1, TEEC_SharedMemoryWithId sm2){
+    if ( sm1.getId() == sm2.getId()) return true;
+    return false;
+}
 
 void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
     /**
@@ -176,7 +213,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     // if register shared memory succeed, add it to the global shared memory array.
     if ( return_code == TEEC_SUCCESS ){
-        TEEC_SharedMemoryWithId sm = {.sharedMemory = cOTSharedMemory, .smId = jSmId};
+        TEEC_SharedMemoryWithId sm(cOTSharedMemory, jSmId);
         sharedMemoryWithIdList.push_back(sm);
     }
 
@@ -185,6 +222,18 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     return return_code;
 }
 
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
+        (JNIEnv* env, jclass jc, jint jsmId){
+    TEEC_SharedMemoryWithId smWithId = findSharedMemoryById(jsmId);
+    if ( compareSharedMemoryWithId( NULLSharedMemoryWithId, smWithId) ) return;
+
+    TEEC_SharedMemory sm = smWithId.getSharedMemory();
+    TEEC_ReleaseSharedMemory(&sm);
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "%d is released.", jsmId);
+}
 
 #ifdef __cplusplus
 }

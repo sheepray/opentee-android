@@ -32,11 +32,51 @@ public class OTCaller {
     }
 
     public void removeSharedMemory(OTSharedMemory sharedMemory){
+        if ( mSharedMemoryList.size() == 0 ) {
+            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
+            return;
+        }
+
         if( mSharedMemoryList.remove(sharedMemory) ){
             Log.d(TAG, this.mID + " remove shared memory succeed");
         }else{
             Log.e(TAG, this.mID + " remove shared memory failed");
         }
+    }
+
+    public void removeSharedMemoryBySmId(int smId){
+        if ( mSharedMemoryList.size() == 0 ) {
+            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
+            return;
+        }
+
+        for (OTSharedMemory sm: mSharedMemoryList){
+            if ( sm.getID() == smId ){
+                Log.d(TAG, smId + " found and removed.");
+
+                mSharedMemoryList.remove(sm);
+                break;
+            }
+        }
+    }
+
+    public OTSharedMemory getSharedMemoryBySmId(int smId){
+        if ( mSharedMemoryList.size() == 0 ) {
+            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
+            return null;
+        }
+
+        for (OTSharedMemory sm: mSharedMemoryList){
+            if ( sm.getID() == smId ){
+                Log.d(TAG, smId + " found.");
+
+                return sm;
+            }
+        }
+
+        Log.d(TAG, smId + " not found.");
+
+        return null;
     }
 
     public List<OTSharedMemory> getSharedMemoryList(){
