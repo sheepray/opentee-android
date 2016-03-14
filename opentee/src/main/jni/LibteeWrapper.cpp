@@ -20,13 +20,19 @@ using namespace fi::aalto::ssg::opentee::imps::pbdatatypes;
 extern "C" {
 #endif
 #include "tee_client_api.h"
+
+typedef struct{
+    TEEC_SharedMemory sharedMemory;
+    int smId;
+}TEEC_SharedMemoryWithId;
+
 /*
  * Global Var. All contexts and sessions should be kept record in here.
  * SharedMemory should kept record in the 'OTGuard.java' and it can be passed in and passed out.
  * */
 static TEEC_Context g_contextRecord = {0};
 
-static vector<TEEC_SharedMemory> sharedMemoryList;
+static vector<TEEC_SharedMemoryWithId> sharedMemoryWithIdList;
 
 static TEEC_Session g_sessionRecord[MAX_NUM_SESSION] = {{0}};
 static bool g_sessionRecordOccupied[MAX_NUM_SESSION] = {false};
@@ -118,7 +124,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     google::protobuf::ShutdownProtobufLibrary();
 
     //clean resources
-    sharedMemoryList.clear();
+    sharedMemoryWithIdList.clear();
 
     TEEC_FinalizeContext(&g_contextRecord);
     g_contextRecord = {0};
@@ -130,7 +136,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: (Lfi/aalto/ssg/opentee/imps/OTSharedMemory;)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRegisterSharedMemory
-        (JNIEnv *env, jclass jc, jbyteArray jOTSharedMemory) {
+        (JNIEnv *env, jclass jc, jbyteArray jOTSharedMemory, jint jSmId) {
     int l = env->GetArrayLength(jOTSharedMemory);
     uint8_t otSharedMemory[l];
     env->GetByteArrayRegion(jOTSharedMemory, 0, l, (jbyte* )otSharedMemory);
@@ -170,7 +176,8 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     // if register shared memory succeed, add it to the global shared memory array.
     if ( return_code == TEEC_SUCCESS ){
-        sharedMemoryList.push_back(cOTSharedMemory);
+        TEEC_SharedMemoryWithId sm = {.sharedMemory = cOTSharedMemory, .smId = jSmId};
+        sharedMemoryWithIdList.push_back(sm);
     }
 
     delete message;

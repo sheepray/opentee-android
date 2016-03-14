@@ -9,7 +9,9 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTReturnCode;
@@ -23,14 +25,20 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 public class OTGuard {
     String TAG = "OTGuard";
     String mQuote;
-    List<OTCaller> mOTCallerList = new ArrayList<OTCaller>();
+    List<OTCaller> mOTCallerList;
     boolean mConnectedToOT = false;
     Context mContext;
     String mTeeName;
+    HashMap<OTSharedMemory, Integer> smIDMap;
+    Random smIdGenerator;
 
     public OTGuard(String quote, Context context){
         this.mQuote = quote;
         this.mContext = context;
+
+        this.mOTCallerList = new ArrayList<OTCaller>();
+        this.smIDMap = new HashMap<>();
+        this.smIdGenerator = new Random();
 
         Log.e(TAG, this.mQuote);
     }
@@ -142,15 +150,22 @@ public class OTGuard {
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();
         }
+
+        int tmpSmID = generateSharedMemoryId();
         smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
+        int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray(),
+                                                                tmpSmID);
 
-        int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray());
-
-        // upon succeed from Libtee, add the OTSharedMemory into the OTSharedMemory list of the caller.
+        // upon succeed from Libtee:
         if ( return_code == ITEEClient.TEEC_SUCCESS ){
+            // add the OTSharedMemory into the OTSharedMemory list of the caller
             findCallerById(callerID).addSharedMemory(otSharedMemory);
+
+            // add the OTSharedMemory along with the signed id to smIDMap to keep track of shared memory
+            // between OTGuard and JNI layer.
+            smIDMap.put(otSharedMemory, tmpSmID);
         }
 
         return return_code;
@@ -164,5 +179,13 @@ public class OTGuard {
         }
 
         return null;
+    }
+
+    private int generateSharedMemoryId(){
+        int id = smIdGenerator.nextInt(1000);
+
+        Log.d(TAG, "Generating memory id:" + id);
+
+        return id;
     }
 }

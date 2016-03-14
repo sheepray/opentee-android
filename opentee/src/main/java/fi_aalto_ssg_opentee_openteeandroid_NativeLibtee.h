@@ -26,10 +26,18 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
  * Method:    teecRegisterSharedMemory
- * Signature: ([B)I
+ * Signature: ([BI)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRegisterSharedMemory
-  (JNIEnv *, jclass, jbyteArray);
+  (JNIEnv *, jclass, jbyteArray, jint);
+
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
+ * Method:    teecReleaseSharedMemory
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
+  (JNIEnv *, jclass, jint);
 
 #ifdef __cplusplus
 }

@@ -77,6 +77,9 @@ public class OTContext implements ITEEClient.IContext {
         // register the shared memory
         mProxyApis.teecRegisterSharedMemory(otSharedMemory);
 
+        // add the registered shared memory to mSharedMemory list.
+        mSharedMemory.add(otSharedMemory);
+
         return otSharedMemory;
     }
 

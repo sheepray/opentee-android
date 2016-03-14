@@ -39,7 +39,7 @@ public class NativeLibtee {
     public static synchronized native void teecFinalizeContext();
 
 
-    public static synchronized native int teecRegisterSharedMemory(byte[] otSharedMemory);
+    public static synchronized native int teecRegisterSharedMemory(byte[] otSharedMemory, int smId);
 
 
     public static synchronized native void teecReleaseSharedMemory(int sharedMemoryID);
