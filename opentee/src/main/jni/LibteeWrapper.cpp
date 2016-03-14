@@ -57,6 +57,27 @@ static pthread_mutex_t session_lock;
 
 int open_tee_socket_env_set = 0;
 
+//test code.
+void printSharedMemoryList(){
+    if ( sharedMemoryWithIdList.size() == 0 ){
+        __android_log_print(ANDROID_LOG_INFO,
+                            "[JNI] TEST",
+                            "shared memory with id list is empty");
+        return;
+    }
+
+    for(auto& smWithId: sharedMemoryWithIdList){
+        TEEC_SharedMemory sm = smWithId.getSharedMemory();
+
+        __android_log_print(ANDROID_LOG_INFO,
+                            "[JNI] TEST",
+                            "shared memory id:%d flag:%d buffer:%s",
+                            smWithId.getId(),
+                            sm.flags,
+                            sm.buffer);
+    }
+}
+
 TEEC_SharedMemoryWithId findSharedMemoryById(int smId){
     for ( auto& sm : sharedMemoryWithIdList ){
         if ( sm.getId() == smId ){
@@ -72,6 +93,22 @@ TEEC_SharedMemoryWithId findSharedMemoryById(int smId){
                         "[JNI] findSharedMemoryById",
                         "shared memory with id:%d not found.", smId);
     return NULLSharedMemoryWithId;
+}
+
+bool removeSharedMemoryById(int smId){
+    for ( vector<TEEC_SharedMemoryWithId>::iterator s = sharedMemoryWithIdList.begin();
+          s != sharedMemoryWithIdList.end(); s++ ){
+        if ( s->getId() == smId ){
+            // remove allocated buffer for shared memory
+            TEEC_SharedMemory sm = s->getSharedMemory();
+            free(sm.buffer);
+
+            sharedMemoryWithIdList.erase(s);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool compareSharedMemoryWithId(TEEC_SharedMemoryWithId sm1, TEEC_SharedMemoryWithId sm2){
@@ -200,6 +237,8 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                                         .flags = mFlag,
                                         .imp = NULL
                                         };
+    cOTSharedMemory.buffer = (void* )malloc(cOTSharedMemory.size * sizeof(uint8_t));
+    strcpy((char*)(cOTSharedMemory.buffer), mBuffer.c_str());
 
     TEEC_Result return_code = TEEC_RegisterSharedMemory(&g_contextRecord, &cOTSharedMemory);
 
@@ -217,6 +256,9 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
         sharedMemoryWithIdList.push_back(sm);
     }
 
+    //test code.
+    printSharedMemoryList();
+
     delete message;
 
     return return_code;
@@ -224,15 +266,29 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
         (JNIEnv* env, jclass jc, jint jsmId){
+    //test code.
+    printSharedMemoryList();
+
     TEEC_SharedMemoryWithId smWithId = findSharedMemoryById(jsmId);
     if ( compareSharedMemoryWithId( NULLSharedMemoryWithId, smWithId) ) return;
 
     TEEC_SharedMemory sm = smWithId.getSharedMemory();
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "%s is to be released.", sm.buffer);
+
     TEEC_ReleaseSharedMemory(&sm);
 
     __android_log_print(ANDROID_LOG_INFO,
                         "JNI",
                         "%d is released.", jsmId);
+
+    // remove shared memory from shared memory list.
+    removeSharedMemoryById(jsmId);
+
+    //test code.
+    printSharedMemoryList();
 }
 
 #ifdef __cplusplus

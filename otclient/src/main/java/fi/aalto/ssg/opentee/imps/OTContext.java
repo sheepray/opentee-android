@@ -97,7 +97,7 @@ public class OTContext implements ITEEClient.IContext {
         }
 
         // tell remote tee to release the shared memory.
-        mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
+        if ( sharedMemory != null ) mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
 
         // remove it from shared memory list.
         mSharedMemory.remove(sharedMemory);
