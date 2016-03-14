@@ -12,16 +12,14 @@ import fi.aalto.ssg.opentee.ITEEClient;
  * this class implements the ISharedMemory interface
  */
 public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcelable {
-    int mID;
     byte[] mBuffer;
     int mFlag;
     int mReturnSize = 0;    // this is used for output.
 
-    public OTSharedMemory(byte[] buffer, int flag, int id){
+    public OTSharedMemory(byte[] buffer, int flag){
         // just keep the handle.
         this.mBuffer = buffer;
         this.mFlag = flag;
-        this.mID = id;
     }
 
     public OTSharedMemory(Parcel in){
@@ -54,7 +52,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         dest.writeByteArray(this.mBuffer);
         dest.writeInt(this.mFlag);
         dest.writeInt(this.mReturnSize);
-        dest.writeInt(this.mID);
     }
 
     public void readFromParcel(Parcel in){
@@ -63,7 +60,6 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
         in.readByteArray(this.mBuffer);
         this.mFlag = in.readInt();
         this.mReturnSize = in.readInt();
-        this.mID = in.readInt();
     }
 
     public static final Parcelable.Creator<OTSharedMemory> CREATOR = new
@@ -76,9 +72,4 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
                     return new OTSharedMemory[size];
                 }
             };
-
-    @Override
-    public int getID(){
-        return this.mID;
-    }
 }

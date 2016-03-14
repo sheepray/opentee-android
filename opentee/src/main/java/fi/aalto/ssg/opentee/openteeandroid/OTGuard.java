@@ -143,7 +143,6 @@ public class OTGuard {
             e.printStackTrace();
         }
         smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
-        smBuilder.setMID(otSharedMemory.getID());
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
 

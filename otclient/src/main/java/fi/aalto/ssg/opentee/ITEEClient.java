@@ -324,9 +324,6 @@ public interface ITEEClient {
              * @return the size of the actual output byte array.
              */
             int getReturnSize();
-
-            int getID();
-
         }
 
 

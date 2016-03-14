@@ -20,7 +20,6 @@ public class OTContext implements ITEEClient.IContext {
     String mTeeName;
     boolean mInitialized;
     ProxyApis mProxyApis = null; // one service connection per context
-    Integer mInitIdVal = 1; // the ID for the first OTSharedMemory is 1.
 
     List<OTSharedMemory> mSharedMemory = new ArrayList<OTSharedMemory>();
 
@@ -73,14 +72,10 @@ public class OTContext implements ITEEClient.IContext {
             return null;
         }
         // create a shared memory
-        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags, mInitIdVal);
+        OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags);
 
         // register the shared memory
         mProxyApis.teecRegisterSharedMemory(otSharedMemory);
-
-        synchronized(mInitIdVal) {
-            mInitIdVal++;
-        }
 
         return otSharedMemory;
     }
