@@ -7,8 +7,11 @@ message TeecOperation{
 }
 
 message TeecParameter{
-    optional TeecSharedMemory teecSharedMemory = 1;
-    optional TeecValue teecValue = 2;
+    enum Type { sm = 1; val = 2;}
+
+    required Type type = 1;
+    optional repeated TeecSharedMemory teecSharedMemory = 2;
+    optional repeated TeecValue teecValue = 3;
 }
 
 message TeecSharedMemory{
