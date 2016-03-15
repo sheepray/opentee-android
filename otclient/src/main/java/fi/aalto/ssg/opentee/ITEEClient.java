@@ -45,10 +45,24 @@ public interface ITEEClient {
      * excluding exceptions defined by Android.
      */
     class Exception extends java.lang.Exception {
+        ReturnOriginCode mReturnOriginCode;
+
         public Exception() { super(); }
+        public Exception(ReturnOriginCode returnOriginCode){
+            super();
+            mReturnOriginCode = returnOriginCode;
+        }
         public Exception(String message) { super(message); }
+        public Exception(String message, ReturnOriginCode returnOriginCode) {
+            super(message);
+            mReturnOriginCode = returnOriginCode;
+        }
         public Exception(String message, Throwable cause) { super(message, cause); }
         public Exception(Throwable cause) { super(cause); }
+
+        public ReturnOriginCode getReturnOrigin(){
+            return this.mReturnOriginCode;
+        }
     }
 
     /**
@@ -293,7 +307,7 @@ public interface ITEEClient {
              *
              * @param commandId command identifier that is agreed with the Trusted Application
              * @param operation
-             * @param returnOriginCode return origin enum value.
+             //* @param returnOriginCode return origin enum value.
              * @throws Exception throws program error including:
              * 1. session not initialized;
              * 2. calling with invalid content in the teecOperation structure
@@ -302,8 +316,8 @@ public interface ITEEClient {
              * 4. using the same operation structure concurrently for multiple operations
              */
             void teecInvokeCommand(int commandId,
-                                   Operation operation,
-                                   ReturnOriginCode returnOriginCode
+                                   Operation operation
+                                   //,ReturnOriginCode returnOriginCode
             ) throws Exception;
 
             /**
@@ -391,15 +405,15 @@ public interface ITEEClient {
          * @param connectionMethod the method of connection to use.
          * @param connectionData any necessary data for connectionMethod.
          * @param teecOperation operations to perform.
-         * @param returnOriginCode return origin enum value.
+         //* @param returnOriginCode return origin enum value.
          * @return an ITeecSession instance.
          * @throws Exception
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
                               Integer connectionData,
-                              Operation teecOperation,
-                              ReturnOriginCode returnOriginCode
+                              Operation teecOperation
+                              //ReturnOriginCode returnOriginCode
                               ) throws Exception;
 
 
