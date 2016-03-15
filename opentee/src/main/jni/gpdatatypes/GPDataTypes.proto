@@ -3,15 +3,15 @@ package fi.aalto.ssg.opentee.imps.pbdatatypes;
 
 message TeecOperation{
     required int32 mStarted = 1;
-    required TeecParameter mParams = 2;
+    required repeated TeecParameter mParams = 2;
 }
 
 message TeecParameter{
     enum Type { sm = 1; val = 2;}
 
     required Type type = 1;
-    optional repeated TeecSharedMemory teecSharedMemory = 2;
-    optional repeated TeecValue teecValue = 3;
+    optional TeecSharedMemory teecSharedMemory = 2;
+    optional TeecValue teecValue = 3;
 }
 
 message TeecSharedMemory{
