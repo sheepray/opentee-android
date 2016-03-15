@@ -19,7 +19,7 @@ public class OTContext implements ITEEClient.IContext {
     String TAG = "OTContext";
 
     String mTeeName;
-    boolean mInitialized;
+    boolean mInitialized = false;
     ProxyApis mProxyApis = null; // one service connection per context
     Random smIdGenerator;
 
@@ -104,7 +104,10 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData, ITEEClient.Operation teecOperation) throws ITEEClient.Exception {
+    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData,
+                                ITEEClient.Operation teecOperation) throws ITEEClient.Exception {
+
+
         return null;
     }
 

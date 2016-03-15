@@ -140,52 +140,52 @@ public class ProxyApis {
             throw new ITEEClient.AccessConflictException("Access conflict.");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_ACCESS_DENIED ){
-            throw new ITEEClient.AccessConflictException("Access denied.");
+            throw new ITEEClient.AccessDeniedException("Access denied.");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_BAD_FORMAT ){
-            throw new ITEEClient.AccessConflictException("Bad format");
+            throw new ITEEClient.BadFormatException("Bad format");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_BAD_PARAMETERS ){
-            throw new ITEEClient.AccessConflictException("Bad parameters.");
+            throw new ITEEClient.BadParametersException("Bad parameters.");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_BAD_STATE ){
-            throw new ITEEClient.AccessConflictException("Bad state");
+            throw new ITEEClient.BadStateException("Bad state");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_BUSY ){
-            throw new ITEEClient.AccessConflictException("Busy");
+            throw new ITEEClient.BusyException("Busy");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_CANCEL ){
-            throw new ITEEClient.AccessConflictException("Cancel");
+            throw new ITEEClient.CancelErrorException("Cancel");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_COMMUNICATION ){
-            throw new ITEEClient.AccessConflictException("Communication error");
+            throw new ITEEClient.CommunicationErrorException("Communication error");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_EXCESS_DATA ){
-            throw new ITEEClient.AccessConflictException("Excess data");
+            throw new ITEEClient.ExcessDataException("Excess data");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_GENERIC ){
-            throw new ITEEClient.AccessConflictException("Generic error");
+            throw new ITEEClient.GenericErrorException("Generic error");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND ){
-            throw new ITEEClient.AccessConflictException("Item not found");
+            throw new ITEEClient.ItemNotFoundException("Item not found");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_NO_DATA ){
-            throw new ITEEClient.AccessConflictException("Not data provided");
+            throw new ITEEClient.NoDataException("Not data provided");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED ){
-            throw new ITEEClient.AccessConflictException("Not impelemented");
+            throw new ITEEClient.NotImplementedException("Not impelemented");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_NOT_SUPPORTED ){
-            throw new ITEEClient.AccessConflictException("Not supported");
+            throw new ITEEClient.NotSupportedException("Not supported");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY ){
-            throw new ITEEClient.AccessConflictException("Out of memory");
+            throw new ITEEClient.OutOfMemoryException("Out of memory");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_SECURITY ){
-            throw new ITEEClient.AccessConflictException("Security check failed");
+            throw new ITEEClient.SecurityErrorException("Security check failed");
         }
         else if ( return_code == OTReturnCode.TEEC_ERROR_SHORT_BUFFER ){
-            throw new ITEEClient.AccessConflictException("Short buffer");
+            throw new ITEEClient.ShortBufferException("Short buffer");
         }
         else{
             throw new ITEEClient.Exception("Unknown error");
