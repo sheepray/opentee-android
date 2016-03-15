@@ -23,7 +23,8 @@ public class OTContext implements ITEEClient.IContext {
     ProxyApis mProxyApis = null; // one service connection per context
     Random smIdGenerator;
 
-    List<OTSharedMemory> mSharedMemory = new ArrayList<OTSharedMemory>();
+    List<OTSharedMemory> mSharedMemory = new ArrayList<>();
+    List<OTSession> mSessions = new ArrayList<>();
 
     public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
@@ -104,8 +105,15 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod, Integer connectionData,
-                                ITEEClient.Operation teecOperation) throws ITEEClient.Exception {
+    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod,
+                                Integer connectionData,
+                                ITEEClient.Operation teecOperation,
+                                ITEEClient.ReturnOriginCode returnOriginCode) throws ITEEClient.Exception {
+        if ( !mInitialized || mProxyApis == null ){
+            Log.i(TAG, "Not ready to open session");
+            return null;
+        }
+
 
 
         return null;

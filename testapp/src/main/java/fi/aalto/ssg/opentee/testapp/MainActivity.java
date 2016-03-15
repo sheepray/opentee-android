@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTClient;
@@ -87,8 +88,17 @@ public class MainActivity extends AppCompatActivity {
         // only encrypt msg_to_enc[1:7]
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
+        // open session
+        UUID uuid = new UUID(0x12345678, 0x87654321);
+        /*
+        ctx.openSession(uuid,
+                ITEEClient.IContext.ConnectionMethod.LoginPublic,   // public authentication
+                );
+                */
         // invoke command.
 
+
+        // close session
 
         // release shared memory
         try {

@@ -14,7 +14,21 @@ public interface ITEEClient {
      * Other value for return value is wrapped into different exceptions.
      *
      */
-    static int TEEC_SUCCESS = 0;
+    int TEEC_SUCCESS = 0;
+
+    /**
+     * return origin code
+     */
+    enum ReturnOriginCode{
+        TEEC_ORIGIN_API(0x00000001),
+        TEEC_ORIGIN_COMMS(0x00000002),
+        TEEC_ORIGIN_TEE(0x00000003),
+        TEEC_ORIGIN_TA(0x00000004);
+
+        int id;
+        ReturnOriginCode(int id){this.id = id;}
+        int getId(){return this.id;};
+    }
 
     /**
      * initialize context.
@@ -279,6 +293,7 @@ public interface ITEEClient {
              *
              * @param commandId command identifier that is agreed with the Trusted Application
              * @param operation
+             * @param returnOriginCode return origin enum value.
              * @throws Exception throws program error including:
              * 1. session not initialized;
              * 2. calling with invalid content in the teecOperation structure
@@ -287,7 +302,9 @@ public interface ITEEClient {
              * 4. using the same operation structure concurrently for multiple operations
              */
             void teecInvokeCommand(int commandId,
-                                          Operation operation) throws Exception;
+                                   Operation operation,
+                                   ReturnOriginCode returnOriginCode
+            ) throws Exception;
 
             /**
              * close a session.
@@ -374,13 +391,16 @@ public interface ITEEClient {
          * @param connectionMethod the method of connection to use.
          * @param connectionData any necessary data for connectionMethod.
          * @param teecOperation operations to perform.
+         * @param returnOriginCode return origin enum value.
          * @return an ITeecSession instance.
          * @throws Exception
          */
         ISession openSession (final UUID uuid,
-                                             ConnectionMethod connectionMethod,
-                                             Integer connectionData,
-                                             Operation teecOperation) throws Exception;
+                              ConnectionMethod connectionMethod,
+                              Integer connectionData,
+                              Operation teecOperation,
+                              ReturnOriginCode returnOriginCode
+                              ) throws Exception;
 
 
         /**
