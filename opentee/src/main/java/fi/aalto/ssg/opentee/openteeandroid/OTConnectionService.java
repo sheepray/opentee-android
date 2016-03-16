@@ -33,18 +33,21 @@ public class OTConnectionService extends Service {
         @Override
         public int teecInitializeContext(String teeName) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to initialize context.");
+
             return mOTGuard.initializeContext(Binder.getCallingPid(), teeName);
         }
 
         @Override
         public void teecFinalizeContext() throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to finalize context.");
+
             mOTGuard.teecFinalizeContext(Binder.getCallingPid());
         }
 
         @Override
         public int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to register shared memory.");
+
             return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
             //return 0;
         }
@@ -54,17 +57,35 @@ public class OTConnectionService extends Service {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to release shared memory with id:"
                     + smId);
-            mOTGuard.teecReleaseSharedMemory(Binder.getCallingPid(), smId);
+
+            mOTGuard.teecReleaseSharedMemory(Binder.getCallingPid(),
+                    smId);
         }
 
         @Override
         public int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData) throws RemoteException {
-            return 0;
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to open session without operation.");
+
+            return mOTGuard.teecOpenSession(Binder.getCallingPid(),
+                    sid,
+                    parcelUuid.getUuid(),
+                    connMethod,
+                    connData,
+                    null);
         }
 
         @Override
         public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation) throws RemoteException {
-            return 0;
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to open session with operations.");
+
+            return mOTGuard.teecOpenSession(Binder.getCallingPid(),
+                    sid,
+                    parcelUuid.getUuid(),
+                    connMethod,
+                    connData,
+                    teecOperation);
         }
     };
 

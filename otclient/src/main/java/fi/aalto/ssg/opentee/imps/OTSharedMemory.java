@@ -82,7 +82,4 @@ public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcel
                 }
             };
 
-    public int getID(){
-        return this.mId;
-    }
 }

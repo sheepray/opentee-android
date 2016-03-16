@@ -80,6 +80,22 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        byte[] buffer2 = {
+                'o', 'p', 'e', 'n',
+                't', 'e', 'e'};
+        ITEEClient.IContext.ISharedMemory sharedMemory2 = null;
+
+        Log.d(TAG, "Create shared memory 2");
+
+        try {
+            sharedMemory2 = ctx.registerSharedMemory(buffer2,
+                    ITEEClient.IContext.ISharedMemory.TEEC_MEM_INPUT);
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         byte[] msg_to_enc = {
                 0x1, 0x2, 0x3, 0x4,
                 0x5, 0x6, 0x7, 0x8
@@ -111,6 +127,14 @@ public class MainActivity extends AppCompatActivity {
         // close session
 
         // release shared memory
+        try {
+            ctx.releaseSharedMemory(sharedMemory2);
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         try {
             ctx.releaseSharedMemory(sharedMemory);
         } catch (ITEEClient.Exception e) {

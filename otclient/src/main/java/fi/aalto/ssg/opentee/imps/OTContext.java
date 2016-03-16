@@ -220,14 +220,37 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     private int generateSmId(){
-        int id = smIdGenerator.nextInt(500);
+        int id;
+        do{
+            id = smIdGenerator.nextInt(50000);
+        }while(occupiedSmId(id));
+
         Log.i(TAG, "generating shared memory id:" + id);
         return id;
     }
 
+    private boolean occupiedSmId(int id){
+        for(OTSharedMemory sm: mSharedMemory ){
+            if ( sm.getId() == id ) return true;
+        }
+        return false;
+    }
+
     private int generateSessionId(){
-        int id = smIdGenerator.nextInt(5000);
+        // reuse the random generator of shared memory.
+        int id;
+        do{
+            id = smIdGenerator.nextInt(50000);
+        }while(occupiedSid(id));
+
         Log.i(TAG, "generating session id:" + id);
         return id;
+    }
+
+    private boolean occupiedSid(int id){
+        for( OTSession s: mSessions ){
+            if( s.getSessionId() == id ) return true;
+        }
+        return false;
     }
 }

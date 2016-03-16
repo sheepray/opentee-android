@@ -14,11 +14,13 @@ public class OTCaller {
     String TAG = "OTCaller.class";
 
     int mID;
-    List<OTSharedMemory> mSharedMemoryList;
+    List<OTSharedMemory> mSharedMemoryList; // reuse the OTSharedMemory class.
+    List<OTCallerSession> mSessionList;
 
     public OTCaller(int id){
         this.mID = id;
-        this.mSharedMemoryList = new ArrayList<OTSharedMemory>();
+        this.mSharedMemoryList = new ArrayList<>();
+        this.mSessionList = new ArrayList<>();
     }
 
     public int getID(){return this.mID;}
@@ -30,6 +32,8 @@ public class OTCaller {
             mSharedMemoryList.add(sharedMemory);
         }
     }
+
+    public void addSession(){}
 
     public void removeSharedMemory(OTSharedMemory sharedMemory){
         if ( mSharedMemoryList.size() == 0 ) {
@@ -51,7 +55,7 @@ public class OTCaller {
         }
 
         for (OTSharedMemory sm: mSharedMemoryList){
-            if ( sm.getID() == smId ){
+            if ( sm.getId() == smId ){
                 Log.d(TAG, smId + " found and removed.");
 
                 mSharedMemoryList.remove(sm);
@@ -67,7 +71,7 @@ public class OTCaller {
         }
 
         for (OTSharedMemory sm: mSharedMemoryList){
-            if ( sm.getID() == smId ){
+            if ( sm.getId() == smId ){
                 Log.d(TAG, smId + " found.");
 
                 return sm;
@@ -86,7 +90,7 @@ public class OTCaller {
     /**
      * OTSession children class
      */
-    class OTSession{}
+    class OTCallerSession{}
 
     //TODO: more children classes shall be added based on implementation.
 }
