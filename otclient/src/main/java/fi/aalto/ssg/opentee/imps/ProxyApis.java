@@ -6,11 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.os.RemoteException;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * This class handles the communication with the service on behalf of the Client Application.
@@ -132,6 +138,44 @@ public class ProxyApis {
         }
 
         mService.teecReleaseSharedMemory(smId);
+    }
+
+    public int teecOpenSession(int sessionId,
+                               UUID uuid,
+                               ITEEClient.IContext.ConnectionMethod connectionMethod,
+                               int connectionData,
+                               byte[] opInArray) throws ITEEClient.Exception, RemoteException {
+        if ( mService == null ){
+            throw new ITEEClient.GenericErrorException("Service unavailable");
+        }
+
+        /**
+         * IPC open session call.
+         */
+        int rc;
+        if (opInArray == null){
+            rc = mService.teecOpenSessionWithoutOp(sessionId,
+                    new ParcelUuid(uuid),
+                    connectionMethod.ordinal(),
+                    connectionData);
+        }else{
+            rc = mService.teecOpenSession(sessionId,
+                    new ParcelUuid(uuid),
+                    connectionMethod.ordinal(),
+                    connectionData,
+                    opInArray);
+        }
+
+        /**
+         * dealing with return code.
+         */
+        if ( rc == OTReturnCode.TEEC_SUCCESS){
+            return rc;
+        }else{
+            throwExceptionBasedOnReturnCode(rc);
+        }
+
+        return 0;
     }
 
     public static void throwExceptionBasedOnReturnCode(int return_code) throws ITEEClient.Exception{

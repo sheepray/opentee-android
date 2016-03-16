@@ -3,6 +3,8 @@ package fi.aalto.ssg.opentee;
 import android.content.Context;
 import android.os.RemoteException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,6 +71,15 @@ public interface ITEEClient {
      * Abstract class for Value, TempMemoryReference and RegisteredMemoryReference.
      */
     abstract class Parameter{
+        public enum  Type{
+            TEEC_PTYPE_VALUE(0x0000000),
+            TEEC_PTYPE_SMR(0x00000001); // shared memory reference type code.
+
+            int id;
+            Type(int id){this.id = id;}
+            public int getId(){return this.id;};
+        }
+
         public abstract int getType();
     };
 
@@ -78,47 +89,60 @@ public interface ITEEClient {
     class RegisteredMemoryReference extends Parameter{
         @Override
         public int getType() {
-            return 0;
+            return Type.TEEC_PTYPE_SMR.getId();
         }
 
         IContext.ISharedMemory mSharedMemory;
         int mOffset = 0; // initialized to 0.
 
-
+        /**
+         * public constructor for registered memory reference.
+         * @param sharedMemory
+         */
         public RegisteredMemoryReference(IContext.ISharedMemory sharedMemory){
             this.mSharedMemory = sharedMemory;
+        }
+
+        public IContext.ISharedMemory getSharedMemory(){
+            return this.mSharedMemory;
         }
 
         public void setOffset(int offset){
             this.mOffset = offset;
         }
+
+        public int getOffset(){return this.mOffset;}
     }
 
     /**
      * This class defines a pair of value which can be passed as a parameter for one Operation.
      */
     class Value extends Parameter{
-        enum  Type{
+        public enum  Flag{
             TEEC_VALUE_INPUT(0x0000000),
             TEEC_VALUE_OUTPUT(0x00000001),
             TEEC_VALUE_INOUT(0x00000002);
 
             int id;
-            Type(int id){this.id = id;}
-            int getId(){return this.id;};
+            Flag(int id){this.id = id;}
+            public int getId(){return this.id;};
         }
 
+        Flag mFlag;
         int mA;
         int mB;
-        Type mType;
 
         /**
          *
-         * @param type only accept TEEC_VALUE_INPUT, TEEC_VALUE_OUTPUT and TEEC_VALUE_INOUT
+         * @param flag only accept TEEC_VALUE_INPUT, TEEC_VALUE_OUTPUT and TEEC_VALUE_INOUT
          * @param a
          * @param b
          */
-        public Value(Type type, int a, int b){}
+        public Value(Flag flag, int a, int b){
+            this.mFlag = flag;
+            this.mA = a;
+            this.mB = b;
+        }
 
         /**
          * get method for private member A.
@@ -133,11 +157,19 @@ public interface ITEEClient {
         public int getB(){return this.mB;}
 
         /**
+         * get method for flags
+         * @return Value.Flag enum
+         */
+        public Flag getFlag(){
+            return this.mFlag;
+        }
+
+        /**
          * get method for the type of the parameter.
          * @return
          */
         @Override
-        public int getType() {return this.mType.getId();}
+        public int getType() {return Type.TEEC_PTYPE_VALUE.getId();}
     }
 
     /**
@@ -180,7 +212,7 @@ public interface ITEEClient {
      * a reference to pre-registered or allocated memory.
      */
     /*
-    class RegisteredMemoryReference extends MemoryReference {
+    class RegisteredMemoryReference extends Parameter {
         Type mType;
         ITEEClient.IContext.ISharedMemory mParent;
         int mOffset;
@@ -209,7 +241,7 @@ public interface ITEEClient {
      */
     class Operation {
         int started = 0;
-        ITEEClient.Parameter[] params;
+        List<Parameter> params = new ArrayList<>();
 
         /**
          * Public constructor for no Parameter
@@ -264,6 +296,14 @@ public interface ITEEClient {
                          ITEEClient.Parameter parameter2,
                          ITEEClient.Parameter parameter3,
                          ITEEClient.Parameter parameter4){}
+
+        public int getStarted(){
+            return this.started;
+        }
+
+        public List<Parameter> getParams(){
+            return this.params;
+        }
     }
 
 
@@ -411,10 +451,10 @@ public interface ITEEClient {
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
-                              Integer connectionData,
+                              int connectionData,
                               Operation teecOperation
                               //ReturnOriginCode returnOriginCode
-                              ) throws Exception;
+                              ) throws Exception, RemoteException;
 
 
         /**

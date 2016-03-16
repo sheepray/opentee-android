@@ -90,11 +90,21 @@ public class MainActivity extends AppCompatActivity {
 
         // open session
         UUID uuid = new UUID(0x12345678, 0x87654321);
-        /*
-        ctx.openSession(uuid,
-                ITEEClient.IContext.ConnectionMethod.LoginPublic,   // public authentication
-                );
-                */
+        ITEEClient.IContext.ISession session = null;
+
+        try {
+            session = ctx.openSession(uuid,
+                    ITEEClient.IContext.ConnectionMethod.LoginPublic,   // public authentication
+                    0,   // no login data
+                    null
+                    );
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+
+            Log.e(TAG, "Return origin: " + e.getReturnOrigin());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         // invoke command.
 
 

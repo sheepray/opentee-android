@@ -3,14 +3,14 @@ package fi.aalto.ssg.opentee.imps.pbdatatypes;
 
 message TeecOperation{
     required int32 mStarted = 1;
-    required repeated TeecParameter mParams = 2;
+    repeated TeecParameter mParams = 2;
 }
 
 message TeecParameter{
-    enum Type { sm = 1; val = 2;}
+    enum Type { smr = 1; val = 2;}
 
     required Type type = 1;
-    optional TeecSharedMemory teecSharedMemory = 2;
+    optional TeecSharedMemoryReference teecSharedMemoryReference = 2;
     optional TeecValue teecValue = 3;
 }
 
@@ -22,16 +22,16 @@ message TeecSharedMemory{
 }
 
 message TeecSharedMemoryReference{
-    required TeecSharedMemory parent = 1;
+    required int32 parentId = 1;
     required int32  mOffset = 2;
 }
 
 message TeecValue{
-    enum Type{ TEEC_VALUE_INPUT = 0x0000000; TEEC_VALUE_OUTPUT = 0x00000001; TEEC_VALUE_INOUT= 0x00000002;}
+    enum Flag{ TEEC_VALUE_INPUT = 0x0000000; TEEC_VALUE_OUTPUT = 0x00000001; TEEC_VALUE_INOUT= 0x00000002;}
 
     required int32 a = 1;
     required int32 b = 2;
-    required Type mFlag = 3;
+    required Flag mFlag = 3;
 
 }
 

@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * This class implements the IContext interface
@@ -66,6 +67,11 @@ public class OTContext implements ITEEClient.IContext {
             mProxyApis.terminateConnection();
         }
 
+        //clear up resources.
+        mSharedMemory.clear();
+        mSessions.clear();
+        mProxyApis = null;
+
         Log.i(TAG, "context finalized and connection terminated");
     }
 
@@ -105,18 +111,107 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISession openSession(UUID uuid, ConnectionMethod connectionMethod,
-                                Integer connectionData,
-                                ITEEClient.Operation teecOperation,
-                                ITEEClient.ReturnOriginCode returnOriginCode) throws ITEEClient.Exception {
+    public ISession openSession(UUID uuid,
+                                ConnectionMethod connectionMethod,
+                                int connectionData,
+                                ITEEClient.Operation teecOperation) throws ITEEClient.Exception, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
         }
 
+        // sid is used to identify different sessions of one context in the OTGuard.
+        int sid = generateSessionId();
+
+        /**
+         * parse teecOperation into byte array using protocol buffer.
+         */
+        byte[] opInArray = null;
+        if ( teecOperation != null ){
+            GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder();
+
+            if (teecOperation.getParams() != null){
+                /**
+                 * determine which type of parameter to parse.
+                 */
+                int paraType = teecOperation.getParams().get(0).getType();
+
+                Log.d(TAG, "Found " + paraType);
+
+                if ( paraType == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId() ){
+                    // it is class Value.
+                    List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
+
+                    for ( ITEEClient.Parameter param: parameterList ){
+                        GPDataTypes.TeecValue.Builder builder = GPDataTypes.TeecValue.newBuilder();
+                        ITEEClient.Value val = (ITEEClient.Value)param;
+
+                        builder.setA(val.getA());
+                        builder.setB(val.getB());
+
+                        int valFlagInInt = val.getFlag().getId();
+                        if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_INPUT.getId() ){
+                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_INPUT);
+                        }
+                        else if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_OUTPUT.getId() ){
+                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_OUTPUT);
+                        }
+                        else if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_INOUT.getId() ){
+                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_INOUT);
+                        }
+
+                        GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
+                        paramBuilder.setType(GPDataTypes.TeecParameter.Type.val);
+                        paramBuilder.setTeecValue(builder.build());
+                        toBuilder.addMParams(paramBuilder.build());
+                    }
+                }
+                else if ( paraType == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId() ){
+                    // it is registered memory reference.
+                    // transfer the shared memory from public interface to implementation version.
+                    // aka identify the shared memory from the public interface and pass its id instead.
+
+                    List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
+
+                    for ( ITEEClient.Parameter param: parameterList ){
+                        GPDataTypes.TeecSharedMemoryReference.Builder builder
+                                = GPDataTypes.TeecSharedMemoryReference.newBuilder();
+                        ITEEClient.RegisteredMemoryReference rmr
+                                = (ITEEClient.RegisteredMemoryReference)param;
+
+                        // find the id for the shared memory in rmr.
+                        builder.setParentId(rmr.getSharedMemory().getId());
+                        builder.setMOffset(rmr.getOffset());
+
+                        GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
+                        paramBuilder.setType(GPDataTypes.TeecParameter.Type.smr);
+                        paramBuilder.setTeecSharedMemoryReference(builder.build());
+                        toBuilder.addMParams(paramBuilder.build());
+                    }
+                }else{
+                    Log.e(TAG, "Unsupported Operation type. Set the operation to null");
+                }
+
+            }
+
+            toBuilder.setMStarted(teecOperation.getStarted());
+            opInArray = toBuilder.build().toByteArray();
+        }
 
 
-        return null;
+        int rc = mProxyApis.teecOpenSession(sid,
+                uuid,
+                connectionMethod,
+                connectionData,
+                opInArray);
+
+        OTSession otSession = null;
+        if ( rc == OTReturnCode.TEEC_SUCCESS ){
+            otSession = new OTSession(sid, mProxyApis);
+            mSessions.add(otSession);
+        }
+
+        return otSession;
     }
 
     @Override
@@ -127,6 +222,12 @@ public class OTContext implements ITEEClient.IContext {
     private int generateSmId(){
         int id = smIdGenerator.nextInt(500);
         Log.i(TAG, "generating shared memory id:" + id);
+        return id;
+    }
+
+    private int generateSessionId(){
+        int id = smIdGenerator.nextInt(5000);
+        Log.i(TAG, "generating session id:" + id);
         return id;
     }
 }

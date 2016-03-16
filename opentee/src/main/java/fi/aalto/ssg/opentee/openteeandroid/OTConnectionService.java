@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -47,12 +48,23 @@ public class OTConnectionService extends Service {
             return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
             //return 0;
         }
+
         @Override
         public void teecReleaseSharedMemory(int smId){
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to release shared memory with id:"
                     + smId);
             mOTGuard.teecReleaseSharedMemory(Binder.getCallingPid(), smId);
+        }
+
+        @Override
+        public int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData) throws RemoteException {
+            return 0;
+        }
+
+        @Override
+        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation) throws RemoteException {
+            return 0;
         }
     };
 
