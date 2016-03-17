@@ -204,7 +204,23 @@ public class OTGuard {
     }
 
     public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes){
-        return 0;
+        // known caller?
+        if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
+
+        int retCode = -1;
+        ReturnOriginWrapper retOrigin = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
+
+        // generate sid for JNI layer.
+
+        // replace the memory reference id with the id in JNI if the operation is referencing
+        // registered memory.
+
+        // upon success add session to that caller.
+        if(retCode == OTReturnCode.TEEC_SUCCESS) {
+            findCallerById(callerId).addSession(new OTCaller.OTCallerSession(sid));
+        }
+
+        return retCode;
     }
 
     private OTCaller findCallerById(int callerId){

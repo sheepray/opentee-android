@@ -22,8 +22,8 @@ interface IOTConnectionInterface {
     void teecReleaseSharedMemory(int smId);
 
     // open session without operation.
-    int teecOpenSessionWithoutOp(int sid, in ParcelUuid parcelUuid, int connMethod, int connData);
+    int teecOpenSessionWithoutOp(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, out int[] retOrigin);
 
-    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout byte[] teecOperation);
+    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout byte[] teecOperation, out int[] retOrigin);
 
 }

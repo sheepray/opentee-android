@@ -63,7 +63,7 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData) throws RemoteException {
+        public int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData, int[] retOrigin) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to open session without operation.");
 
@@ -76,7 +76,7 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation) throws RemoteException {
+        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to open session with operations.");
 

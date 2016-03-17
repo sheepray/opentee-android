@@ -27,9 +27,9 @@ public interface ITEEClient {
         TEEC_ORIGIN_TEE(0x00000003),
         TEEC_ORIGIN_TA(0x00000004);
 
-        int id;
-        ReturnOriginCode(int id){this.id = id;}
-        int getId(){return this.id;};
+        private int mId;
+        ReturnOriginCode(int id){this.mId = id;}
+        public int getId(){return this.mId;};
     }
 
     /**
@@ -471,8 +471,10 @@ public interface ITEEClient {
      * Concurrent accesses caused conflict.
      */
     class AccessConflictException extends ITEEClient.Exception {
-        public AccessConflictException(String msg){
-            super(msg);
+        public AccessConflictException(String msg){ super(msg);}
+
+        public AccessConflictException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -483,6 +485,10 @@ public interface ITEEClient {
         public AccessDeniedException(String msg){
             super(msg);
         }
+
+        public AccessDeniedException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -491,6 +497,10 @@ public interface ITEEClient {
     class BadFormatException extends ITEEClient.Exception {
         public BadFormatException(String msg){
             super(msg);
+        }
+
+        public BadFormatException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -501,6 +511,9 @@ public interface ITEEClient {
         public BadParametersException(String msg){
             super(msg);
         }
+        public BadParametersException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -509,6 +522,9 @@ public interface ITEEClient {
     class BadStateException extends ITEEClient.Exception {
         public BadStateException(String msg){
             super(msg);
+        }
+        public BadStateException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -519,6 +535,9 @@ public interface ITEEClient {
         public BusyException(String msg){
             super(msg);
         }
+        public BusyException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -527,6 +546,9 @@ public interface ITEEClient {
     class CancelErrorException extends ITEEClient.Exception {
         public CancelErrorException(String msg){
             super(msg);
+        }
+        public CancelErrorException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -537,6 +559,9 @@ public interface ITEEClient {
         public CommunicationErrorException(String msg){
             super(msg);
         }
+        public CommunicationErrorException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -545,6 +570,9 @@ public interface ITEEClient {
     class ExcessDataException extends ITEEClient.Exception {
         public ExcessDataException(String msg){
             super(msg);
+        }
+        public ExcessDataException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -555,6 +583,9 @@ public interface ITEEClient {
         public GenericErrorException(String msg){
             super(msg);
         }
+        public GenericErrorException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -563,6 +594,9 @@ public interface ITEEClient {
     class ItemNotFoundException extends ITEEClient.Exception {
         public ItemNotFoundException(String msg){
             super(msg);
+        }
+        public ItemNotFoundException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -573,6 +607,9 @@ public interface ITEEClient {
         public NoDataException(String msg){
             super(msg);
         }
+        public NoDataException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -581,6 +618,9 @@ public interface ITEEClient {
     class NotImplementedException extends ITEEClient.Exception {
         public NotImplementedException(String msg){
             super(msg);
+        }
+        public NotImplementedException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -591,6 +631,9 @@ public interface ITEEClient {
         public NotSupportedException(String msg){
             super(msg);
         }
+        public NotSupportedException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
@@ -599,6 +642,9 @@ public interface ITEEClient {
     class OutOfMemoryException extends ITEEClient.Exception {
         public OutOfMemoryException(String msg){
             super(msg);
+        }
+        public OutOfMemoryException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
 
@@ -609,14 +655,65 @@ public interface ITEEClient {
         public SecurityErrorException(String msg){
             super(msg);
         }
+        public SecurityErrorException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
     }
 
     /**
      * The supplied buffer is too short for the generated output.
      */
-    class ShortBufferException extends ITEEClient.Exception {
+    class ShortBufferException extends Exception {
         public ShortBufferException(String msg){
             super(msg);
+        }
+        public ShortBufferException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
+    }
+
+    /**
+     * An external event has caused a User Interface operation to be aborted.
+     */
+    class ExternalCancelException extends Exception{
+        public ExternalCancelException(String msg){
+            super(msg);
+        }
+        public ExternalCancelException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
+    }
+
+    /**
+     * Internal TEE error - document for completeness.
+     */
+    class OverflowException extends Exception{
+        public OverflowException(String msg){
+            super(msg);
+        }
+        public OverflowException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
+    }
+
+    /**
+     * The Trusted Application has terminated.
+     */
+    class TargetDeadException extends Exception{
+        public TargetDeadException(String msg){
+            super(msg);
+        }
+        public TargetDeadException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
+        }
+    }
+
+    class NoStorageSpaceException extends Exception{
+        public NoStorageSpaceException(String msg){
+            super(msg);
+        }
+        public NoStorageSpaceException(String msg, ReturnOriginCode retOrigin){
+            super(msg, retOrigin);
         }
     }
     /******************* end of the client exception definitions ******************************/

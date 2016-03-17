@@ -150,15 +150,7 @@ public class OTContext implements ITEEClient.IContext {
                         builder.setB(val.getB());
 
                         int valFlagInInt = val.getFlag().getId();
-                        if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_INPUT.getId() ){
-                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_INPUT);
-                        }
-                        else if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_OUTPUT.getId() ){
-                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_OUTPUT);
-                        }
-                        else if ( valFlagInInt == ITEEClient.Value.Flag.TEEC_VALUE_INOUT.getId() ){
-                            builder.setMFlag(GPDataTypes.TeecValue.Flag.TEEC_VALUE_INOUT);
-                        }
+                        builder.setMFlag(GPDataTypes.TeecValue.Flag.values()[valFlagInInt]);
 
                         GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
                         paramBuilder.setType(GPDataTypes.TeecParameter.Type.val);
@@ -199,17 +191,15 @@ public class OTContext implements ITEEClient.IContext {
         }
 
 
-        int rc = mProxyApis.teecOpenSession(sid,
+        mProxyApis.teecOpenSession(sid,
                 uuid,
                 connectionMethod,
                 connectionData,
                 opInArray);
 
-        OTSession otSession = null;
-        if ( rc == OTReturnCode.TEEC_SUCCESS ){
-            otSession = new OTSession(sid, mProxyApis);
-            mSessions.add(otSession);
-        }
+        // upon success
+        OTSession otSession =  new OTSession(sid, mProxyApis);
+        mSessions.add(otSession);
 
         return otSession;
     }

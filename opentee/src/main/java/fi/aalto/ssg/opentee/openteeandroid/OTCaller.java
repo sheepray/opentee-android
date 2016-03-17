@@ -43,15 +43,6 @@ public class OTCaller {
         }
     }
 
-    public void removeSharedMemory(OTSharedMemory sharedMemory){
-        if ( mSharedMemoryList.size() == 0 ) {
-            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
-            return;
-        }
-
-        mSharedMemoryList.remove(sharedMemory.getId());
-    }
-
     public void removeSharedMemoryBySmId(int smId){
         if ( mSharedMemoryList.size() == 0 ) {
             Log.e(TAG, "SharedMemoryList empty, nothing to remove");
@@ -82,7 +73,7 @@ public class OTCaller {
     /**
      * OTSession children class
      */
-    class OTCallerSession{
+    public static class OTCallerSession{
         int mSid;
 
         public OTCallerSession(int sid){
