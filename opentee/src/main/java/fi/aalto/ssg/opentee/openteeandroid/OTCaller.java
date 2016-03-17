@@ -3,7 +3,9 @@ package fi.aalto.ssg.opentee.openteeandroid;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
@@ -14,26 +16,32 @@ public class OTCaller {
     String TAG = "OTCaller.class";
 
     int mID;
-    List<OTSharedMemory> mSharedMemoryList; // reuse the OTSharedMemory class.
-    List<OTCallerSession> mSessionList;
+    Map<Integer, OTSharedMemory> mSharedMemoryList; // <smid, sharedMemory>reuse the OTSharedMemory class.
+    Map<Integer, OTCallerSession> mSessionList; // <sid, session>
 
     public OTCaller(int id){
         this.mID = id;
-        this.mSharedMemoryList = new ArrayList<>();
-        this.mSessionList = new ArrayList<>();
+        this.mSharedMemoryList = new HashMap<>();
+        this.mSessionList = new HashMap<>();
     }
 
     public int getID(){return this.mID;}
 
     public void addSharedMemory(OTSharedMemory sharedMemory){
         if ( sharedMemory != null ){
-            Log.d(TAG, this.mID + " add SharedMemory");
+            Log.d(TAG, this.mID + " added SharedMemory");
 
-            mSharedMemoryList.add(sharedMemory);
+            mSharedMemoryList.put(sharedMemory.getId(), sharedMemory);
         }
     }
 
-    public void addSession(){}
+    public void addSession(OTCallerSession session){
+        if ( session != null ){
+            Log.d(TAG, this.mID + " opened session");
+
+            mSessionList.put(session.getSid(), session);
+        }
+    }
 
     public void removeSharedMemory(OTSharedMemory sharedMemory){
         if ( mSharedMemoryList.size() == 0 ) {
@@ -41,11 +49,7 @@ public class OTCaller {
             return;
         }
 
-        if( mSharedMemoryList.remove(sharedMemory) ){
-            Log.d(TAG, this.mID + " remove shared memory succeed");
-        }else{
-            Log.e(TAG, this.mID + " remove shared memory failed");
-        }
+        mSharedMemoryList.remove(sharedMemory.getId());
     }
 
     public void removeSharedMemoryBySmId(int smId){
@@ -54,14 +58,16 @@ public class OTCaller {
             return;
         }
 
-        for (OTSharedMemory sm: mSharedMemoryList){
-            if ( sm.getId() == smId ){
-                Log.d(TAG, smId + " found and removed.");
+        mSharedMemoryList.remove(smId);
+    }
 
-                mSharedMemoryList.remove(sm);
-                break;
-            }
+    public void removeSessionBySid(int sid){
+        if( mSessionList.size() == 0 ){
+            Log.e(TAG, "Session list is empty, nothing to remove");
+            return;
         }
+
+        mSessionList.remove(sid);
     }
 
     public OTSharedMemory getSharedMemoryBySmId(int smId){
@@ -70,27 +76,24 @@ public class OTCaller {
             return null;
         }
 
-        for (OTSharedMemory sm: mSharedMemoryList){
-            if ( sm.getId() == smId ){
-                Log.d(TAG, smId + " found.");
-
-                return sm;
-            }
-        }
-
-        Log.d(TAG, smId + " not found.");
-
-        return null;
-    }
-
-    public List<OTSharedMemory> getSharedMemoryList(){
-        return this.mSharedMemoryList;
+        return mSharedMemoryList.get(smId);
     }
 
     /**
      * OTSession children class
      */
-    class OTCallerSession{}
+    class OTCallerSession{
+        int mSid;
+
+        public OTCallerSession(int sid){
+            this.mSid = sid;
+        }
+
+        public int getSid(){
+            return this.mSid;
+        }
+
+    }
 
     //TODO: more children classes shall be added based on implementation.
 }
