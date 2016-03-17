@@ -106,13 +106,19 @@ public class MainActivity extends AppCompatActivity {
 
         // open session
         UUID uuid = new UUID(0x12345678, 0x87654321);
+        int started = 0;
+        ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory);
+        rmrOne.setOffset(1);
+        ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2);
+        rmrTwo.setOffset(0);
+        ITEEClient.Operation op = new ITEEClient.Operation(started, rmrOne, rmrTwo);
         ITEEClient.ISession session = null;
 
         try {
             session = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,   // public authentication
                     0,   // no login data
-                    null
+                    op
                     );
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();

@@ -10,6 +10,13 @@
 #include <string.h>
 #include <vector>
 
+/*
+#ifdef ANDROID
+#  define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#  define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#endif
+*/
+
 #define MAX_NUM_SESSION 9
 
 using namespace std;

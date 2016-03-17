@@ -130,7 +130,7 @@ public class OTContext implements ITEEClient.IContext {
         if ( teecOperation != null ){
             GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder();
 
-            if (teecOperation.getParams() != null){
+            if (teecOperation.getParams() != null && teecOperation.getParams().size() > 0){
                 /**
                  * determine which type of parameter to parse.
                  */

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
@@ -203,17 +205,79 @@ public class OTGuard {
         caller.removeSharedMemoryBySmId(smId);
     }
 
-    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes){
+    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
+        //(worked)test code;
+        //retOrigin[0] = 3;
+
         int retCode = -1;
-        ReturnOriginWrapper retOrigin = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
+        ReturnOriginWrapper retOriginFromJni = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
 
         // generate sid for JNI layer.
+        int sidForJni = generateSessionId();
 
-        // replace the memory reference id with the id in JNI if the operation is referencing
-        // registered memory.
+        // recreate the shared memory reference by replacing the memory reference id with the id in
+        // JNI if the operation is referencing registered memory.
+        if ( opsInBytes != null ){
+            // make a deep copy of it in case the binder copy it back. Because it is just memory reference.
+            // there is no need to copy the reference back.
+            //byte[] opsInBytesCopy = opsInBytes.clone();//Arrays.copyOf(opsInBytes, opsInBytes.length);
+
+            GPDataTypes.TeecOperation.Builder opBuilder = GPDataTypes.TeecOperation.newBuilder();
+            try {
+                opBuilder.mergeFrom(opsInBytes);
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+
+                return OTReturnCode.TEEC_ERROR_BAD_PARAMETERS;
+            }
+
+            GPDataTypes.TeecOperation op = opBuilder.build();
+            if ( op.getMParamsCount() != 0 && op.getMParams(0).getType() == GPDataTypes.TeecParameter.Type.smr){
+                // the parameter is shared memory reference. Replace the id of shared memory from
+                // to the corresponding shared memory id in JNI.
+                GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder(op);
+
+                for(GPDataTypes.TeecParameter para: op.getMParamsList()){
+                    GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
+                    int idSmJni = findIdInJniById(smrPara.getParentId());
+
+                    //TODO: replace the id in here.
+                    GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
+                            GPDataTypes.TeecSharedMemoryReference.newBuilder(smrPara);
+                    smrParaWithReplacedIdBuilder.setParentId(idSmJni);
+
+                    GPDataTypes.TeecParameter.Builder tpBuilder = GPDataTypes.TeecParameter.newBuilder(para);
+                    tpBuilder.setTeecSharedMemoryReference(smrParaWithReplacedIdBuilder.build());
+
+                    toBuilder.removeMParams(0);
+                    GPDataTypes.TeecParameter tmpParam = tpBuilder.build();
+                    toBuilder.addMParams(tmpParam);
+
+                    Log.d(TAG,
+                            "Using shared memory reference in operation. Replace the id "
+                                    + smrPara.getParentId()
+                                    + " of shared memory to the id "
+                                    + tmpParam.getTeecSharedMemoryReference().getParentId()
+                                    + " in jni.");
+                }
+
+                // recreate TeecOperation after pid changed.
+                GPDataTypes.TeecOperation newOp = toBuilder.build();
+
+                //TODO: call teecOpenSession(...) with new byte array of ops;
+
+            }else{
+                // the parameter must be Value.
+                //TODO: call teecOpenSession(...);
+                //TODO: remember to copy the byte array back to opsInBytes to sync.
+            }
+
+        }
+
+        //TODO: dealing with no operation.
 
         // upon success add session to that caller.
         if(retCode == OTReturnCode.TEEC_SUCCESS) {
@@ -244,7 +308,7 @@ public class OTGuard {
             id = smIdGenerator.nextInt(50000); // assume the maximum allowed  num of this generator is 50000.
         }while(occupiedSmId(id));
 
-        Log.d(TAG, "Generating memory id:" + id);
+        Log.d(TAG, "Generating memory id for both OTGuard and JNI:" + id);
 
         return id;
     }
@@ -258,6 +322,8 @@ public class OTGuard {
         do{
             id = smIdGenerator.nextInt(50000); // reuse the shared memory id random number generator.
         }while(occupiedSid(id));
+
+        Log.d(TAG, "Generating session id for both OTGuard and JNI:" + id);
 
         return id;
     }

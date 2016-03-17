@@ -311,7 +311,9 @@ public interface ITEEClient {
          * Public constructor for no Parameter
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          */
-        public Operation(int started){}
+        public Operation(int started){
+            this.started = started;
+        }
 
 
         /**
@@ -320,7 +322,10 @@ public interface ITEEClient {
          * @param parameter carry the parameters for this Operation.
          */
         public Operation(int started,
-                         ITEEClient.Parameter parameter){}
+                         ITEEClient.Parameter parameter){
+            this.started = started;
+            params.add(parameter);
+        }
 
 
         /**
@@ -331,7 +336,11 @@ public interface ITEEClient {
          */
         public Operation(int started,
                          ITEEClient.Parameter parameter1,
-                         ITEEClient.Parameter parameter2){}
+                         ITEEClient.Parameter parameter2){
+            this.started = started;
+            params.add(parameter1);
+            params.add(parameter2);
+        }
 
 
         /**
@@ -344,7 +353,12 @@ public interface ITEEClient {
         public Operation(int started,
                          ITEEClient.Parameter parameter1,
                          ITEEClient.Parameter parameter2,
-                         ITEEClient.Parameter parameter3){}
+                         ITEEClient.Parameter parameter3){
+            this.started = started;
+            params.add(parameter1);
+            params.add(parameter2);
+            params.add(parameter3);
+        }
 
 
         /**
@@ -359,7 +373,13 @@ public interface ITEEClient {
                          ITEEClient.Parameter parameter1,
                          ITEEClient.Parameter parameter2,
                          ITEEClient.Parameter parameter3,
-                         ITEEClient.Parameter parameter4){}
+                         ITEEClient.Parameter parameter4){
+            this.started = started;
+            params.add(parameter1);
+            params.add(parameter2);
+            params.add(parameter3);
+            params.add(parameter4);
+        }
 
         public int getStarted(){
             return this.started;

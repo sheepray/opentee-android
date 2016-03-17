@@ -176,7 +176,7 @@ public class ProxyApis {
         /**
          * dealing with return code.
          */
-        if ( rc != OTReturnCode.TEEC_SUCCESS && rc >= 0x0000001 && rc <= 0xFFFEFFFF ){
+        if ( rc != OTReturnCode.TEEC_SUCCESS ){
             // throw exceptions with return origin.
             throwExceptionWithReturnOrigin(rc, retOrigin[0]);
         }
@@ -291,6 +291,9 @@ public class ProxyApis {
     public boolean getConnected(){ return this.mConnected; }
 
     private static ITEEClient.ReturnOriginCode intToReturnOrigin(int roInt){
+        int len = ITEEClient.ReturnOriginCode.values().length;
+        if( len <= roInt || roInt <= 0) return null;
+
         return ITEEClient.ReturnOriginCode.values()[roInt - 1];
     }
 }
