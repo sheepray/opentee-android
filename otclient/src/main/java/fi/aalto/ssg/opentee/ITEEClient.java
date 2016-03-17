@@ -11,6 +11,70 @@ import java.util.UUID;
  * Public interface as main entrances of APIs for developer.
  */
 public interface ITEEClient {
+
+    /**
+     * Session interface.
+     */
+    interface ISession {
+
+        /**
+         *
+         * @param commandId command identifier that is agreed with the Trusted Application
+         * @param operation
+        //* @param returnOriginCode return origin enum value.
+         * @throws java.lang.Exception throws program error including:
+         * 1. session not initialized;
+         * 2. calling with invalid content in the teecOperation structure
+         * 3. encoding Registered Memory Reference which refer to Shared Memory blocks allocated or
+         * registered within the scope of a different TEE Context
+         * 4. using the same operation structure concurrently for multiple operations
+         */
+        void teecInvokeCommand(int commandId,
+                               Operation operation
+                               //,ReturnOriginCode returnOriginCode
+        ) throws java.lang.Exception;
+
+        /**
+         * close a session.
+         * @throws java.lang.Exception throws program error includes calling with a session while still has
+         * commands running, attempting to close the same Session concurrently from multiple threads and
+         * attempting to close the same Session more than once.
+         */
+        void teecCloseSession()throws Exception;
+    }
+
+
+    /**
+     * SharedMemory interface. OTSharedMemory implements this interface.
+     */
+    interface ISharedMemory {
+        int TEEC_MEM_INPUT = 0x00000001;
+        int TEEC_MEM_OUTPUT = 0x00000002;
+
+        /**
+         * get the flag of the shared memory.
+         * @return the flags of ISharedMemory.
+         */
+        int getFlags();
+
+        /**
+         * get the content of the buffer.
+         * @return an byte array reference.
+         * @throws java.lang.Exception error if not allowed to get buffer
+         */
+        byte[] asByteArray() throws Exception;
+
+        /**
+         * get the size of the output from Trusted Application if there is such an output.
+         * @return the size of the actual output byte array.
+         */
+        int getReturnSize();
+
+        int getId();
+    }
+
+
+
     /**
      * the return value for TEEC_SUCCESS.
      * Other value for return value is wrapped into different exceptions.
@@ -92,18 +156,18 @@ public interface ITEEClient {
             return Type.TEEC_PTYPE_SMR.getId();
         }
 
-        IContext.ISharedMemory mSharedMemory;
+        ISharedMemory mSharedMemory;
         int mOffset = 0; // initialized to 0.
 
         /**
          * public constructor for registered memory reference.
          * @param sharedMemory
          */
-        public RegisteredMemoryReference(IContext.ISharedMemory sharedMemory){
+        public RegisteredMemoryReference(ISharedMemory sharedMemory){
             this.mSharedMemory = sharedMemory;
         }
 
-        public IContext.ISharedMemory getSharedMemory(){
+        public ISharedMemory getSharedMemory(){
             return this.mSharedMemory;
         }
 
@@ -214,7 +278,7 @@ public interface ITEEClient {
     /*
     class RegisteredMemoryReference extends Parameter {
         Type mType;
-        ITEEClient.IContext.ISharedMemory mParent;
+        ITEEClient.ISharedMemory mParent;
         int mOffset;
 
         enum Type{
@@ -229,7 +293,7 @@ public interface ITEEClient {
         }
 
         public RegisteredMemoryReference(Type type,
-                                         ITEEClient.IContext.ISharedMemory parent,
+                                         ITEEClient.ISharedMemory parent,
                                          int offset){}
         @Override
         public int getType() {return this.mType.getId();}
@@ -335,68 +399,6 @@ public interface ITEEClient {
 
             int val;
             ConnectionMethod(int val){this.val = val;}
-        }
-
-
-        /**
-         * Session interface.
-         */
-        interface ISession {
-
-            /**
-             *
-             * @param commandId command identifier that is agreed with the Trusted Application
-             * @param operation
-             //* @param returnOriginCode return origin enum value.
-             * @throws Exception throws program error including:
-             * 1. session not initialized;
-             * 2. calling with invalid content in the teecOperation structure
-             * 3. encoding Registered Memory Reference which refer to Shared Memory blocks allocated or
-             * registered within the scope of a different TEE Context
-             * 4. using the same operation structure concurrently for multiple operations
-             */
-            void teecInvokeCommand(int commandId,
-                                   Operation operation
-                                   //,ReturnOriginCode returnOriginCode
-            ) throws Exception;
-
-            /**
-             * close a session.
-             * @throws Exception throws program error includes calling with a session while still has
-             * commands running, attempting to close the same Session concurrently from multiple threads and
-             * attempting to close the same Session more than once.
-             */
-            void teecCloseSession()throws Exception;
-        }
-
-
-        /**
-         * SharedMemory interface. OTSharedMemory implements this interface.
-         */
-        interface ISharedMemory {
-            int TEEC_MEM_INPUT = 0x00000001;
-            int TEEC_MEM_OUTPUT = 0x00000002;
-
-            /**
-             * get the flag of the shared memory.
-             * @return the flags of ISharedMemory.
-             */
-            int getFlags();
-
-            /**
-             * get the content of the buffer.
-             * @return an byte array reference.
-             * @throws Exception error if not allowed to get buffer
-             */
-            byte[] asByteArray() throws Exception;
-
-            /**
-             * get the size of the output from Trusted Application if there is such an output.
-             * @return the size of the actual output byte array.
-             */
-            int getReturnSize();
-
-            int getId();
         }
 
 

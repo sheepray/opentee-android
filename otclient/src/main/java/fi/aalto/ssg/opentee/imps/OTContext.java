@@ -76,7 +76,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws ITEEClient.Exception, RemoteException {
+    public ITEEClient.ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws ITEEClient.Exception, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to register shared memory");
             return null;
@@ -97,7 +97,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public void releaseSharedMemory(ISharedMemory sharedMemory) throws ITEEClient.Exception, RemoteException {
+    public void releaseSharedMemory(ITEEClient.ISharedMemory sharedMemory) throws ITEEClient.Exception, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to release shared memory");
             return;
@@ -111,7 +111,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ISession openSession(UUID uuid,
+    public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
                                 ITEEClient.Operation teecOperation) throws ITEEClient.Exception, RemoteException {

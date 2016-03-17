@@ -5,7 +5,7 @@ import fi.aalto.ssg.opentee.ITEEClient;
 /**
  * This class implements the ISession interface.
  */
-public class OTSession implements ITEEClient.IContext.ISession {
+public class OTSession implements ITEEClient.ISession {
     //session identifier
     int mSessionId;
     ProxyApis mProxyApis = null;

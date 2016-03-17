@@ -11,7 +11,7 @@ import fi.aalto.ssg.opentee.ITEEClient;
 /**
  * this class implements the ISharedMemory interface
  */
-public class OTSharedMemory implements ITEEClient.IContext.ISharedMemory, Parcelable {
+public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     int mId;
     byte[] mBuffer;
     int mFlag;

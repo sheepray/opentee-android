@@ -67,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
         byte[] buffer = {
                 's', 's', 'g',
                 'a', 'a', 'l', 't', 'o'};
-        ITEEClient.IContext.ISharedMemory sharedMemory = null;
+        ITEEClient.ISharedMemory sharedMemory = null;
 
         Log.d(TAG, "Create shared memory");
 
         try {
             sharedMemory = ctx.registerSharedMemory(buffer,
-                    ITEEClient.IContext.ISharedMemory.TEEC_MEM_INPUT | ITEEClient.IContext.ISharedMemory.TEEC_MEM_OUTPUT);
+                    ITEEClient.ISharedMemory.TEEC_MEM_INPUT | ITEEClient.ISharedMemory.TEEC_MEM_OUTPUT);
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();
         } catch (RemoteException e) {
@@ -83,13 +83,13 @@ public class MainActivity extends AppCompatActivity {
         byte[] buffer2 = {
                 'o', 'p', 'e', 'n',
                 't', 'e', 'e'};
-        ITEEClient.IContext.ISharedMemory sharedMemory2 = null;
+        ITEEClient.ISharedMemory sharedMemory2 = null;
 
         Log.d(TAG, "Create shared memory 2");
 
         try {
             sharedMemory2 = ctx.registerSharedMemory(buffer2,
-                    ITEEClient.IContext.ISharedMemory.TEEC_MEM_INPUT);
+                    ITEEClient.ISharedMemory.TEEC_MEM_INPUT);
         } catch (ITEEClient.Exception e) {
             e.printStackTrace();
         } catch (RemoteException e) {
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         // open session
         UUID uuid = new UUID(0x12345678, 0x87654321);
-        ITEEClient.IContext.ISession session = null;
+        ITEEClient.ISession session = null;
 
         try {
             session = ctx.openSession(uuid,
