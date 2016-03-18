@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
         // open session
-        UUID uuid = new UUID(0x12345678, 0x87654321);
+        UUID uuid = new UUID(0x1234567887654321L, 0x8765432112345678L);
         int started = 0;
         ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory);
         rmrOne.setOffset(1);

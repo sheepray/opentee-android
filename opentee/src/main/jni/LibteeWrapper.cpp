@@ -298,6 +298,75 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     printSharedMemoryList();
 }
 
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
+        (JNIEnv* env, jclass jc, jint sid, jobject uuid, jint connMethod, jint connData, jbyteArray opInBytes, jobject returnOrigin){
+    /*
+     * Data structure transfer
+     * */
+    /* UUID uuid to TEEC_UUID */
+    jclass jcUuid = env->GetObjectClass(uuid);
+    jmethodID jmGetLeastSignificantBits = env->GetMethodID(jcUuid,
+                                                           "getLeastSignificantBits", // method name.
+                                                           "()J" // input void, return long.
+                                                            );
+    jmethodID jmGetMostSignificantBits = env->GetMethodID(jcUuid,
+                                                           "getMostSignificantBits", // method name.
+                                                           "()J" // input void, return long.
+    );
+
+    if( jmGetLeastSignificantBits == 0 || jmGetMostSignificantBits == 0){
+        // set return origin TEEC_ORIGIN_API.
+        jclass jcRetOrigin = env->GetObjectClass(returnOrigin);
+        jfieldID jfROC = env->GetFieldID(jcRetOrigin, "mReturnOrigin", "I");
+        env->SetIntField(returnOrigin, jfROC, TEEC_ORIGIN_API);
+
+        return TEEC_ERROR_BAD_PARAMETERS;
+    }
+
+    long long lsBits, msBits;
+    lsBits = msBits = 0;
+    lsBits = env->CallLongMethod(uuid, jmGetLeastSignificantBits);
+    msBits = env->CallLongMethod(uuid, jmGetMostSignificantBits);
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "uuid:%llx %llx.", msBits, lsBits);
+
+    TEEC_UUID teec_uuid = { .timeLow = (uint32_t)lsBits,
+                            .timeMid = (uint16_t)(lsBits >> 32),
+                            .timeHiAndVersion = lsBits >> 48};
+    memcpy(teec_uuid.clockSeqAndNode, &msBits, sizeof(msBits));
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
+                        teec_uuid.timeLow,
+                        teec_uuid.timeMid,
+                        teec_uuid.timeHiAndVersion);
+    for(int i = 0; i < 8; i++){
+        __android_log_print(ANDROID_LOG_INFO,
+                            "JNI",
+                            "%x",
+                            teec_uuid.clockSeqAndNode[i]);
+    }
+
+    // teec_uuid construction done.
+
+    /* Parse opInBytes */
+
+    /**
+     * call TEEC_OpenSession.
+     */
+
+    /**
+     * Prepare the variables to return.
+     */
+
+    return 0;
+}
+
+
+
 #ifdef __cplusplus
 }
 #endif

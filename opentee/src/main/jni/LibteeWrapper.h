@@ -39,6 +39,14 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
         (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
+ * Method:    teecOpenSession
+ * Signature: (ILjava/util/UUID;II[BLfi/aalto/ssg/opentee/openteeandroid/ReturnOriginWrapper;)I
+ */
+JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
+        (JNIEnv *, jclass, jint, jobject, jint, jint, jbyteArray, jobject);
+
 #ifdef __cplusplus
 }
 #endif

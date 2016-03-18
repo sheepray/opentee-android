@@ -10,4 +10,6 @@ public class ReturnOriginWrapper {
     public ReturnOriginWrapper(int ro){
         this.mReturnOrigin = ro;
     }
+
+    public int getReturnOrigin(){return this.mReturnOrigin;}
 }

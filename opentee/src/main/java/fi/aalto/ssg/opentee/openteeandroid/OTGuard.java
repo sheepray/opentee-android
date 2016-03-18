@@ -197,8 +197,11 @@ public class OTGuard {
 
         if ( smIdInJni != null ){
             // found the id in jni.
-            Log.d(TAG, smId + " found in jni with id:" + smIdInJni );
+            Log.d(TAG, smId + " found in jni with id:" + smIdInJni);
             NativeLibtee.teecReleaseSharedMemory(smIdInJni);
+
+            // remove the shared memory in current context.
+            smIDMap.remove(smIdInJni);
         }
 
         // remove shared memory from caller.
@@ -209,9 +212,6 @@ public class OTGuard {
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
-        //(worked)test code;
-        //retOrigin[0] = 3;
-
         int retCode = -1;
         ReturnOriginWrapper retOriginFromJni = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
 
@@ -220,6 +220,7 @@ public class OTGuard {
 
         // recreate the shared memory reference by replacing the memory reference id with the id in
         // JNI if the operation is referencing registered memory.
+        boolean isValueInOp = false;
         if ( opsInBytes != null ){
             // make a deep copy of it in case the binder copy it back. Because it is just memory reference.
             // there is no need to copy the reference back.
@@ -244,7 +245,7 @@ public class OTGuard {
                     GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
                     int idSmJni = findIdInJniById(smrPara.getParentId());
 
-                    //TODO: replace the id in here.
+                    //replace the id in here.
                     GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
                             GPDataTypes.TeecSharedMemoryReference.newBuilder(smrPara);
                     smrParaWithReplacedIdBuilder.setParentId(idSmJni);
@@ -266,18 +267,34 @@ public class OTGuard {
 
                 // recreate TeecOperation after pid changed.
                 GPDataTypes.TeecOperation newOp = toBuilder.build();
-
-                //TODO: call teecOpenSession(...) with new byte array of ops;
-
-            }else{
-                // the parameter must be Value.
-                //TODO: call teecOpenSession(...);
-                //TODO: remember to copy the byte array back to opsInBytes to sync.
+                opsInBytes = newOp.toByteArray();
             }
-
+            else {
+                // the parameter must be Value.
+                isValueInOp = true;
+            }
         }
 
-        //TODO: dealing with no operation.
+        // call the teecOpenSession in native libtee.
+        retCode = NativeLibtee.teecOpenSession(sidForJni,
+                uuid,
+                connMethod,
+                connData,
+                opsInBytes,
+                retOriginFromJni);
+
+        if(isValueInOp){
+            // check the flag of the Value. If it has OUTPUT flag, sync the content of Value back to
+            // Client Application. Each Value might have different flags (some might have OUTPUT flag
+            // while other might not). We just simply copy the bytes back. It is the duty of Jni layer
+            // to copy the content back. So checking corresponding flags should be done in the Jni layer.
+            //TODO: remember to copy the byte array back to opsInBytes to sync.
+        }
+
+        //TODO: copy back the returnOrigin.
+        //(worked)test code;
+        //retOrigin[0] = 3;
+        retOrigin[0] = retOriginFromJni.getReturnOrigin();
 
         // upon success add session to that caller.
         if(retCode == OTReturnCode.TEEC_SUCCESS) {
