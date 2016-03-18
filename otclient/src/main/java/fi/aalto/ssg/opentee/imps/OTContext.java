@@ -174,6 +174,7 @@ public class OTContext implements ITEEClient.IContext {
                         // find the id for the shared memory in rmr.
                         builder.setParentId(rmr.getSharedMemory().getId());
                         builder.setMOffset(rmr.getOffset());
+                        builder.setMFlag(GPDataTypes.TeecSharedMemoryReference.Flag.values()[rmr.getFlag().ordinal()]);
 
                         GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
                         paramBuilder.setType(GPDataTypes.TeecParameter.Type.smr);

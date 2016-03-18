@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         // open session
         UUID uuid = new UUID(0x1234567887654321L, 0x8765432112345678L);
         int started = 0;
-        ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory);
+        ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT);
         rmrOne.setOffset(1);
-        ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2);
+        ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT);
         rmrTwo.setOffset(0);
         ITEEClient.Operation op = new ITEEClient.Operation(started, rmrOne, rmrTwo);
         ITEEClient.ISession session = null;

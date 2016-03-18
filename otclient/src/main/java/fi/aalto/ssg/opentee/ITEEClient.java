@@ -151,6 +151,15 @@ public interface ITEEClient {
      * reference for registered shared memory
      */
     class RegisteredMemoryReference extends Parameter{
+        public enum Flag{
+            TEEC_MEMREF_INPUT(0x0000000),
+            TEEC_MEMREF_OUTPUT(0x00000001),
+            TEEC_MEMREF_INOUT(0x00000002);
+
+            int id;
+            Flag(int id){this.id = id;}
+        }
+
         @Override
         public int getType() {
             return Type.TEEC_PTYPE_SMR.getId();
@@ -158,13 +167,15 @@ public interface ITEEClient {
 
         ISharedMemory mSharedMemory;
         int mOffset = 0; // initialized to 0.
+        Flag mFlag;
 
         /**
          * public constructor for registered memory reference.
          * @param sharedMemory
          */
-        public RegisteredMemoryReference(ISharedMemory sharedMemory){
+        public RegisteredMemoryReference(ISharedMemory sharedMemory, Flag flag){
             this.mSharedMemory = sharedMemory;
+            this.mFlag = flag;
         }
 
         public ISharedMemory getSharedMemory(){
@@ -176,6 +187,8 @@ public interface ITEEClient {
         }
 
         public int getOffset(){return this.mOffset;}
+
+        public Flag getFlag(){return this.mFlag;}
     }
 
     /**

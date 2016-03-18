@@ -1,5 +1,6 @@
 #include "LibteeWrapper.h"
 #include "tee_shared_data_types.h"
+#include "LibteeeWrapperConstants.h"
 #include "gpdatatypes/GPDataTypes.pb.h"
 
 #include <pthread.h>
@@ -266,6 +267,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     //test code.
     printSharedMemoryList();
 
+    free(cOTSharedMemory.buffer);
     delete message;
 
     return return_code;
@@ -349,11 +351,155 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                             "%x",
                             teec_uuid.clockSeqAndNode[i]);
     }
-
     // teec_uuid construction done.
 
     /* Parse opInBytes */
+    // get length.
+    int l = env->GetArrayLength(opInBytes);
+    // buffer to receive the byte array.
+    uint8_t* opInBytesBuffer = (uint8_t *)malloc(l*sizeof(uint8_t));
+    // store the byte array into buffer.
+    env->GetByteArrayRegion(opInBytes, 0, l, (jbyte*)opInBytesBuffer);
+    // create a string to store this buffer.
+    string opsInString(opInBytesBuffer, opInBytesBuffer + l);
 
+
+    /* real step to create the operation from the string created above. */
+    Message* opCreatorMsg = new TeecOperation;
+    opCreatorMsg->ParseFromString(opsInString);
+
+
+    /*
+    // the hard way to parse TeecOperation.
+    const Descriptor* descriptor = opCreatorMsg->GetDescriptor();
+
+    const FieldDescriptor* started_field = descriptor->FindFieldByName("mStarted");
+    const FieldDescriptor* params_field = descriptor->FindFieldByName("mParams");
+
+    if(started_field == NULL || params_field == NULL){
+        // set return origin TEEC_ORIGIN_API.
+        jclass jcRetOrigin = env->GetObjectClass(returnOrigin);
+        jfieldID jfROC = env->GetFieldID(jcRetOrigin, "mReturnOrigin", "I");
+        env->SetIntField(returnOrigin, jfROC, TEEC_ORIGIN_API);
+
+        return TEEC_ERROR_BAD_PARAMETERS;
+    }
+
+    const Reflection* reflection = opCreatorMsg->GetReflection();
+    uint32_t started = reflection->GetInt32(*opCreatorMsg, started_field);
+    //uint32_t numOfParams = reflection->FieldSize(*opCreatorMsg, params_field);
+    //TeecParameter = reflection->GetString(*opCreatorMsg, params_field);
+
+    // test code
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "started %d. num of params:", started);
+*/
+    // the easy way to parse TeecOperation.
+    TEEC_Operation teec_operation = {0};
+
+    TeecOperation op;
+    op.ParseFromString(opsInString);
+
+    __android_log_print(ANDROID_LOG_INFO,
+                        "JNI",
+                        "started %d. num of params:%d %d", op.mstarted(), op.mparams_size(),
+                        sizeof(TEEC_NONE) / sizeof(uint8_t));
+
+    // set started field.
+    teec_operation.started = op.mstarted();
+
+    // get paramTypes and set the params array.
+    uint32_t paramTypesArray[] = {TEEC_NONE, TEEC_NONE, TEEC_NONE, TEEC_NONE};
+    for(int i = 0; i < op.mparams_size(); i++){
+        const TeecParameter param = op.mparams(i);
+        TEEC_Parameter teec_parameter = {0};
+        if( param.has_teecsharedmemoryreference() ){
+            // param is TEEC_RegisteredMemoryReference.
+            const TeecSharedMemoryReference rmr = param.teecsharedmemoryreference();
+            TEEC_RegisteredMemoryReference teec_rmr = {0};
+
+            // get TEEC_SharedMemory.
+            int smId = rmr.parentid();
+            TEEC_SharedMemoryWithId smWithId = findSharedMemoryById(smId);
+            TEEC_SharedMemory sm = smWithId.getSharedMemory();
+            teec_rmr.parent = &sm;
+
+            // get size.
+            //int size = strlen();
+
+            // get offset.
+            int offset = rmr.moffset();
+            teec_rmr.offset = offset;
+
+            // set type.
+            if(rmr.moffset() > 0){
+                // using part of the memory.
+                switch(rmr.mflag()){
+                    case JavaConstants::MEMREF_INPUT:
+                        paramTypesArray[i] = TEEC_MEMREF_PARTIAL_INPUT;
+                        break;
+                    case JavaConstants::MEMREF_OUTPUT:
+                        paramTypesArray[i] = TEEC_MEMREF_PARTIAL_OUTPUT;
+                        break;
+                    case JavaConstants::MEMREF_INOUT:
+                        paramTypesArray[i] = TEEC_MEMREF_PARTIAL_INOUT;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else{
+                // using while memory.
+                paramTypesArray[i] = TEEC_MEMREF_WHOLE;
+            }
+
+            teec_parameter.memref = teec_rmr;
+        }
+        else if(param.has_teecvalue()){
+            // param is TEEC_Value.
+            const TeecValue value = param.teecvalue();
+            TEEC_Value teec_value = {0};
+            teec_value.a = value.a();
+            teec_value.b = value.b();
+
+            teec_parameter.value = teec_value;
+
+            // set the flag based on the flag value from java layer.
+            switch ( value.mflag() ){
+                case JavaConstants::VALUE_INPUT:
+                    paramTypesArray[i] = TEEC_VALUE_INPUT;
+                    break;
+                case JavaConstants::VALUE_OUTPUT:
+                    paramTypesArray[i] = TEEC_VALUE_OUTPUT;
+                    break;
+                case JavaConstants::VALUE_INOUT:
+                    paramTypesArray[i] = TEEC_VALUE_INOUT;
+                    break;
+                default:
+                    break;
+            }
+
+        }else{
+            __android_log_print(ANDROID_LOG_INFO,
+                                "JNI",
+                                "Incorrect param. Ignore it.");
+            continue;
+        }
+
+        // add created teec_parameter into the parameter array.
+        teec_operation.params[i] = teec_parameter;
+    }
+
+    // set paramTypes field.
+    teec_operation.paramTypes = TEEC_PARAM_TYPES(paramTypesArray[0],
+                                                 paramTypesArray[1],
+                                                 paramTypesArray[2],
+                                                 paramTypesArray[3]);
+
+    // clean allocated resources.
+    delete opCreatorMsg;
+    free(opInBytesBuffer);
     /**
      * call TEEC_OpenSession.
      */
@@ -363,6 +509,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
      */
 
     return 0;
+
 }
 
 

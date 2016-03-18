@@ -236,12 +236,14 @@ public class OTGuard {
             }
 
             GPDataTypes.TeecOperation op = opBuilder.build();
-            if ( op.getMParamsCount() != 0 && op.getMParams(0).getType() == GPDataTypes.TeecParameter.Type.smr){
-                // the parameter is shared memory reference. Replace the id of shared memory from
-                // to the corresponding shared memory id in JNI.
-                GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder(op);
 
-                for(GPDataTypes.TeecParameter para: op.getMParamsList()){
+            GPDataTypes.TeecOperation.Builder toBuilder = opBuilder;
+
+            boolean modified = false;
+            for(GPDataTypes.TeecParameter para: op.getMParamsList()){
+                if (op.getMParams(0).getType() == GPDataTypes.TeecParameter.Type.smr) {
+                    // the parameter is shared memory reference. Replace the id of shared memory from
+                    // to the corresponding shared memory id in JNI.
                     GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
                     int idSmJni = findIdInJniById(smrPara.getParentId());
 
@@ -263,16 +265,19 @@ public class OTGuard {
                                     + " of shared memory to the id "
                                     + tmpParam.getTeecSharedMemoryReference().getParentId()
                                     + " in jni.");
+                    modified = true;
+                }else {
+                    // the parameter must be Value.
+                    isValueInOp = true;
                 }
+            }
 
+            if(modified) {
                 // recreate TeecOperation after pid changed.
                 GPDataTypes.TeecOperation newOp = toBuilder.build();
                 opsInBytes = newOp.toByteArray();
             }
-            else {
-                // the parameter must be Value.
-                isValueInOp = true;
-            }
+
         }
 
         // call the teecOpenSession in native libtee.
