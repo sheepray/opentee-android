@@ -17,8 +17,9 @@ message TeecParameter{
 message TeecSharedMemory{
     required bytes mBuffer = 1;
     required int32 mFlag = 2;
-    optional int32 mReturnSize = 3;
-    optional int32 mID = 4;
+    required int32 size = 3;
+    optional int32 mReturnSize = 4;
+    optional int32 mID = 5;
 }
 
 message TeecSharedMemoryReference{

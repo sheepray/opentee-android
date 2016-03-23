@@ -1706,20 +1706,29 @@ public final class GPDataTypes {
     int getMFlag();
 
     /**
-     * <code>optional int32 mReturnSize = 3;</code>
+     * <code>required int32 size = 3;</code>
+     */
+    boolean hasSize();
+    /**
+     * <code>required int32 size = 3;</code>
+     */
+    int getSize();
+
+    /**
+     * <code>optional int32 mReturnSize = 4;</code>
      */
     boolean hasMReturnSize();
     /**
-     * <code>optional int32 mReturnSize = 3;</code>
+     * <code>optional int32 mReturnSize = 4;</code>
      */
     int getMReturnSize();
 
     /**
-     * <code>optional int32 mID = 4;</code>
+     * <code>optional int32 mID = 5;</code>
      */
     boolean hasMID();
     /**
-     * <code>optional int32 mID = 4;</code>
+     * <code>optional int32 mID = 5;</code>
      */
     int getMID();
   }
@@ -1787,11 +1796,16 @@ public final class GPDataTypes {
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              mReturnSize_ = input.readInt32();
+              size_ = input.readInt32();
               break;
             }
             case 32: {
               bitField0_ |= 0x00000008;
+              mReturnSize_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
               mID_ = input.readInt32();
               break;
             }
@@ -1865,31 +1879,46 @@ public final class GPDataTypes {
       return mFlag_;
     }
 
-    public static final int MRETURNSIZE_FIELD_NUMBER = 3;
-    private int mReturnSize_;
+    public static final int SIZE_FIELD_NUMBER = 3;
+    private int size_;
     /**
-     * <code>optional int32 mReturnSize = 3;</code>
+     * <code>required int32 size = 3;</code>
      */
-    public boolean hasMReturnSize() {
+    public boolean hasSize() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 mReturnSize = 3;</code>
+     * <code>required int32 size = 3;</code>
+     */
+    public int getSize() {
+      return size_;
+    }
+
+    public static final int MRETURNSIZE_FIELD_NUMBER = 4;
+    private int mReturnSize_;
+    /**
+     * <code>optional int32 mReturnSize = 4;</code>
+     */
+    public boolean hasMReturnSize() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 mReturnSize = 4;</code>
      */
     public int getMReturnSize() {
       return mReturnSize_;
     }
 
-    public static final int MID_FIELD_NUMBER = 4;
+    public static final int MID_FIELD_NUMBER = 5;
     private int mID_;
     /**
-     * <code>optional int32 mID = 4;</code>
+     * <code>optional int32 mID = 5;</code>
      */
     public boolean hasMID() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional int32 mID = 4;</code>
+     * <code>optional int32 mID = 5;</code>
      */
     public int getMID() {
       return mID_;
@@ -1898,6 +1927,7 @@ public final class GPDataTypes {
     private void initFields() {
       mBuffer_ = com.google.protobuf.ByteString.EMPTY;
       mFlag_ = 0;
+      size_ = 0;
       mReturnSize_ = 0;
       mID_ = 0;
     }
@@ -1915,6 +1945,10 @@ public final class GPDataTypes {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasSize()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -1929,10 +1963,13 @@ public final class GPDataTypes {
         output.writeInt32(2, mFlag_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(3, mReturnSize_);
+        output.writeInt32(3, size_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, mID_);
+        output.writeInt32(4, mReturnSize_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(5, mID_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1953,11 +1990,15 @@ public final class GPDataTypes {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, mReturnSize_);
+          .computeInt32Size(3, size_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, mID_);
+          .computeInt32Size(4, mReturnSize_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, mID_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2080,10 +2121,12 @@ public final class GPDataTypes {
         bitField0_ = (bitField0_ & ~0x00000001);
         mFlag_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        mReturnSize_ = 0;
+        size_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        mID_ = 0;
+        mReturnSize_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        mID_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -2123,9 +2166,13 @@ public final class GPDataTypes {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.mReturnSize_ = mReturnSize_;
+        result.size_ = size_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.mReturnSize_ = mReturnSize_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.mID_ = mID_;
         result.bitField0_ = to_bitField0_;
@@ -2150,6 +2197,9 @@ public final class GPDataTypes {
         if (other.hasMFlag()) {
           setMFlag(other.getMFlag());
         }
+        if (other.hasSize()) {
+          setSize(other.getSize());
+        }
         if (other.hasMReturnSize()) {
           setMReturnSize(other.getMReturnSize());
         }
@@ -2166,6 +2216,10 @@ public final class GPDataTypes {
           return false;
         }
         if (!hasMFlag()) {
+          
+          return false;
+        }
+        if (!hasSize()) {
           
           return false;
         }
@@ -2258,33 +2312,65 @@ public final class GPDataTypes {
         return this;
       }
 
-      private int mReturnSize_ ;
+      private int size_ ;
       /**
-       * <code>optional int32 mReturnSize = 3;</code>
+       * <code>required int32 size = 3;</code>
        */
-      public boolean hasMReturnSize() {
+      public boolean hasSize() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional int32 mReturnSize = 3;</code>
+       * <code>required int32 size = 3;</code>
+       */
+      public int getSize() {
+        return size_;
+      }
+      /**
+       * <code>required int32 size = 3;</code>
+       */
+      public Builder setSize(int value) {
+        bitField0_ |= 0x00000004;
+        size_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 size = 3;</code>
+       */
+      public Builder clearSize() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        size_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int mReturnSize_ ;
+      /**
+       * <code>optional int32 mReturnSize = 4;</code>
+       */
+      public boolean hasMReturnSize() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 mReturnSize = 4;</code>
        */
       public int getMReturnSize() {
         return mReturnSize_;
       }
       /**
-       * <code>optional int32 mReturnSize = 3;</code>
+       * <code>optional int32 mReturnSize = 4;</code>
        */
       public Builder setMReturnSize(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         mReturnSize_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 mReturnSize = 3;</code>
+       * <code>optional int32 mReturnSize = 4;</code>
        */
       public Builder clearMReturnSize() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         mReturnSize_ = 0;
         onChanged();
         return this;
@@ -2292,31 +2378,31 @@ public final class GPDataTypes {
 
       private int mID_ ;
       /**
-       * <code>optional int32 mID = 4;</code>
+       * <code>optional int32 mID = 5;</code>
        */
       public boolean hasMID() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional int32 mID = 4;</code>
+       * <code>optional int32 mID = 5;</code>
        */
       public int getMID() {
         return mID_;
       }
       /**
-       * <code>optional int32 mID = 4;</code>
+       * <code>optional int32 mID = 5;</code>
        */
       public Builder setMID(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         mID_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 mID = 4;</code>
+       * <code>optional int32 mID = 5;</code>
        */
       public Builder clearMID() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         mID_ = 0;
         onChanged();
         return this;
@@ -3732,19 +3818,20 @@ public final class GPDataTypes {
       "bdatatypes.TeecSharedMemoryReference\022C\n\t" +
       "teecValue\030\003 \001(\01320.fi.aalto.ssg.opentee.i",
       "mps.pbdatatypes.TeecValue\"\030\n\004Type\022\007\n\003smr" +
-      "\020\001\022\007\n\003val\020\002\"T\n\020TeecSharedMemory\022\017\n\007mBuff" +
-      "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\023\n\013mReturnSize\030\003" +
-      " \001(\005\022\013\n\003mID\030\004 \001(\005\"\342\001\n\031TeecSharedMemoryRe" +
-      "ference\022\020\n\010parentId\030\001 \002(\005\022\017\n\007mOffset\030\002 \002" +
-      "(\005\022T\n\005mFlag\030\003 \002(\0162E.fi.aalto.ssg.opentee" +
-      ".imps.pbdatatypes.TeecSharedMemoryRefere" +
-      "nce.Flag\"L\n\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\000\022" +
-      "\026\n\022TEEC_MEMREF_OUTPUT\020\001\022\025\n\021TEEC_MEMREF_I" +
-      "NOUT\020\002\"\262\001\n\tTeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002",
-      "(\005\022D\n\005mFlag\030\003 \002(\01625.fi.aalto.ssg.opentee" +
-      ".imps.pbdatatypes.TeecValue.Flag\"I\n\004Flag" +
-      "\022\024\n\020TEEC_VALUE_INPUT\020\000\022\025\n\021TEEC_VALUE_OUT" +
-      "PUT\020\001\022\024\n\020TEEC_VALUE_INOUT\020\002"
+      "\020\001\022\007\n\003val\020\002\"b\n\020TeecSharedMemory\022\017\n\007mBuff" +
+      "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n" +
+      "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\342\001\n\031Teec" +
+      "SharedMemoryReference\022\020\n\010parentId\030\001 \002(\005\022" +
+      "\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag\030\003 \002(\0162E.fi.aal" +
+      "to.ssg.opentee.imps.pbdatatypes.TeecShar" +
+      "edMemoryReference.Flag\"L\n\004Flag\022\025\n\021TEEC_M" +
+      "EMREF_INPUT\020\000\022\026\n\022TEEC_MEMREF_OUTPUT\020\001\022\025\n" +
+      "\021TEEC_MEMREF_INOUT\020\002\"\262\001\n\tTeecValue\022\t\n\001a\030",
+      "\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag\030\003 \002(\01625.fi.aal" +
+      "to.ssg.opentee.imps.pbdatatypes.TeecValu" +
+      "e.Flag\"I\n\004Flag\022\024\n\020TEEC_VALUE_INPUT\020\000\022\025\n\021" +
+      "TEEC_VALUE_OUTPUT\020\001\022\024\n\020TEEC_VALUE_INOUT\020" +
+      "\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3775,7 +3862,7 @@ public final class GPDataTypes {
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemory_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemory_descriptor,
-        new String[] { "MBuffer", "MFlag", "MReturnSize", "MID", });
+        new String[] { "MBuffer", "MFlag", "Size", "MReturnSize", "MID", });
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemoryReference_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemoryReference_fieldAccessorTable = new

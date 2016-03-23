@@ -48,6 +48,8 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
         return this.mId;
     }
 
+    public int getSize(){return mBuffer.length;}
+
     @Override
     public int describeContents() {
         return 0;

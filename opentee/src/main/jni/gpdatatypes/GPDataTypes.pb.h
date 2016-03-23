@@ -397,17 +397,24 @@ class TeecSharedMemory : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 mflag() const;
   inline void set_mflag(::google::protobuf::int32 value);
 
-  // optional int32 mReturnSize = 3;
+  // required int32 size = 3;
+  inline bool has_size() const;
+  inline void clear_size();
+  static const int kSizeFieldNumber = 3;
+  inline ::google::protobuf::int32 size() const;
+  inline void set_size(::google::protobuf::int32 value);
+
+  // optional int32 mReturnSize = 4;
   inline bool has_mreturnsize() const;
   inline void clear_mreturnsize();
-  static const int kMReturnSizeFieldNumber = 3;
+  static const int kMReturnSizeFieldNumber = 4;
   inline ::google::protobuf::int32 mreturnsize() const;
   inline void set_mreturnsize(::google::protobuf::int32 value);
 
-  // optional int32 mID = 4;
+  // optional int32 mID = 5;
   inline bool has_mid() const;
   inline void clear_mid();
-  static const int kMIDFieldNumber = 4;
+  static const int kMIDFieldNumber = 5;
   inline ::google::protobuf::int32 mid() const;
   inline void set_mid(::google::protobuf::int32 value);
 
@@ -417,6 +424,8 @@ class TeecSharedMemory : public ::google::protobuf::Message {
   inline void clear_has_mbuffer();
   inline void set_has_mflag();
   inline void clear_has_mflag();
+  inline void set_has_size();
+  inline void clear_has_size();
   inline void set_has_mreturnsize();
   inline void clear_has_mreturnsize();
   inline void set_has_mid();
@@ -428,6 +437,7 @@ class TeecSharedMemory : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::std::string* mbuffer_;
   ::google::protobuf::int32 mflag_;
+  ::google::protobuf::int32 size_;
   ::google::protobuf::int32 mreturnsize_;
   ::google::protobuf::int32 mid_;
   friend void  protobuf_AddDesc_GPDataTypes_2eproto();
@@ -961,15 +971,39 @@ inline void TeecSharedMemory::set_mflag(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory.mFlag)
 }
 
-// optional int32 mReturnSize = 3;
-inline bool TeecSharedMemory::has_mreturnsize() const {
+// required int32 size = 3;
+inline bool TeecSharedMemory::has_size() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void TeecSharedMemory::set_has_mreturnsize() {
+inline void TeecSharedMemory::set_has_size() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void TeecSharedMemory::clear_has_mreturnsize() {
+inline void TeecSharedMemory::clear_has_size() {
   _has_bits_[0] &= ~0x00000004u;
+}
+inline void TeecSharedMemory::clear_size() {
+  size_ = 0;
+  clear_has_size();
+}
+inline ::google::protobuf::int32 TeecSharedMemory::size() const {
+  // @@protoc_insertion_point(field_get:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory.size)
+  return size_;
+}
+inline void TeecSharedMemory::set_size(::google::protobuf::int32 value) {
+  set_has_size();
+  size_ = value;
+  // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory.size)
+}
+
+// optional int32 mReturnSize = 4;
+inline bool TeecSharedMemory::has_mreturnsize() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void TeecSharedMemory::set_has_mreturnsize() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void TeecSharedMemory::clear_has_mreturnsize() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void TeecSharedMemory::clear_mreturnsize() {
   mreturnsize_ = 0;
@@ -985,15 +1019,15 @@ inline void TeecSharedMemory::set_mreturnsize(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory.mReturnSize)
 }
 
-// optional int32 mID = 4;
+// optional int32 mID = 5;
 inline bool TeecSharedMemory::has_mid() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void TeecSharedMemory::set_has_mid() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void TeecSharedMemory::clear_has_mid() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void TeecSharedMemory::clear_mid() {
   mid_ = 0;

@@ -167,6 +167,7 @@ public class OTGuard {
 
         int tmpSmID = generateSharedMemoryId();
         smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
+        smBuilder.setSize(otSharedMemory.getSize());
         smBuilder.setMID(otSharedMemory.getId());
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
