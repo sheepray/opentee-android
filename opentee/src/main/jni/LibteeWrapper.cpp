@@ -11,12 +11,12 @@
 #include <string.h>
 #include <vector>
 
-/*
 #ifdef ANDROID
-#  define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#  define LOG_TAG "[JNI]"
 #  define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#  define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#  define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #endif
-*/
 
 #define MAX_NUM_SESSION 9
 
@@ -69,38 +69,31 @@ int open_tee_socket_env_set = 0;
 //test code.
 void printSharedMemoryList(){
     if ( sharedMemoryWithIdList.size() == 0 ){
-        __android_log_print(ANDROID_LOG_INFO,
-                            "[JNI] TEST",
-                            "shared memory with id list is empty");
+        LOGI("%s: shared memory with id list is empty", __FUNCTION__);
         return;
     }
 
     for(auto& smWithId: sharedMemoryWithIdList){
         TEEC_SharedMemory* sm = smWithId.getSharedMemory();
 
-        __android_log_print(ANDROID_LOG_INFO,
-                            "[JNI] TEST",
-                            "shared memory id:%d, size:%d, flag:%d buffer:%s",
-                            smWithId.getId(),
-                            sm->size,
-                            sm->flags,
-                            sm->buffer);
+        LOGI("%s: shared memory id:%d, size:%d, flag:%d buffer:%s",
+             __FUNCTION__,
+             smWithId.getId(),
+             sm->size,
+             sm->flags,
+             sm->buffer);
     }
 }
 
 TEEC_SharedMemoryWithId* findSharedMemoryById(int smId){
     for (auto&sm : sharedMemoryWithIdList ){
         if ( sm.getId() == smId ){
-            __android_log_print(ANDROID_LOG_INFO,
-                                "[JNI] findSharedMemoryById",
-                                "shared memory with id:%d found.", smId);
+            LOGI("%s: shared memory with id:%d found.", __FUNCTION__, smId);
             return &sm;
         }
     }
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "[JNI] findSharedMemoryById",
-                        "shared memory with id:%d not found.", smId);
+    LOGI("%s: shared memory with id:%d not found.", __FUNCTION__, smId);
     return &NULLSharedMemoryWithId;
 }
 
@@ -132,9 +125,7 @@ void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
     char *tmpEnv = getenv("OPENTEE_SOCKET_FILE_PATH");
 
     if (NULL == tmpEnv) {
-        __android_log_print(ANDROID_LOG_ERROR,
-                            "preparationFunc",
-                            "OPENTEE_SOCKET_FILE_PATH not set. Try to overwrite.");
+        LOGE("%s: OPENTEE_SOCKET_FILE_PATH not set. Try to overwrite.", __FUNCTION__);
 
         const char *otSocketFilePath = env->GetStringUTFChars(otSocketFilePathInJava, 0);
 
@@ -144,21 +135,14 @@ void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
         env->ReleaseStringUTFChars(otSocketFilePathInJava, otSocketFilePath);
 
         if (return_code == 0) {
-            __android_log_print(ANDROID_LOG_INFO,
-                                "preparationFunc",
-                                "Set socket env val succeed.");
+            LOGI("%s: Set socket env val succeed.", __FUNCTION__);
             open_tee_socket_env_set = 1;
         } else {
-            __android_log_print(ANDROID_LOG_ERROR,
-                                "preparationFunc",
-                                "Set socket env val failed");
+            LOGE("%s: Set socket env val failed", __FUNCTION__);
         }
     }
     else {
-        __android_log_print(ANDROID_LOG_INFO,
-                            "preparationFunc",
-                            "%s is already set.",
-                            tmpEnv);
+        LOGI("%s: %s is already set.", __FUNCTION__, tmpEnv);
     }
 }
 /**
@@ -199,9 +183,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecFinalizeContext
         (JNIEnv *env, jclass jc) {
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "Shutdown libprotobuf lib and Finialize Context");
+    LOGI("%s: Shutdown libprotobuf lib and Finialize Context", __FUNCTION__);
 
     // Optional:  Delete all global objects allocated by libprotobuf.
     google::protobuf::ShutdownProtobufLibrary();
@@ -254,13 +236,11 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     TEEC_Result return_code = TEEC_RegisterSharedMemory(&g_contextRecord, &cOTSharedMemory);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "flag: %x, buffer:%s, return_code:%x",
-                        mFlag,
-                        mBuffer.c_str(),
-                        return_code
-    );
+    LOGI("%s: flag: %x, buffer:%s, return_code:%x",
+         __FUNCTION__,
+         mFlag,
+         mBuffer.c_str(),
+         return_code);
 
     // if register shared memory succeed, add it to the global shared memory array.
     if ( return_code == TEEC_SUCCESS ){
@@ -287,15 +267,11 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     TEEC_SharedMemory* sm = smWithId->getSharedMemory();
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "%s is to be released.", sm->buffer);
+    LOGI("%s: %s is to be released.", __FUNCTION__, sm->buffer);
 
     TEEC_ReleaseSharedMemory(sm);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "%d is released.", jsmId);
+    LOGI("%s: %d is released.", __FUNCTION__, jsmId);
 
     // remove shared memory from shared memory list.
     removeSharedMemoryById(jsmId);
@@ -306,23 +282,18 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
 //test code
 void flagFunc(){
-    __android_log_print(ANDROID_LOG_ERROR,
-                        "JNI",
-                        "I am here.");
+    LOGI("JNI", "HELLO");
+    LOGE("%s: I am here.", __FUNCTION__);
 }
 
 //test code
 void printSharedMemory(TEEC_SharedMemory* sm){
-    __android_log_print(ANDROID_LOG_ERROR,
-                        "JNI",
-                        "%s: buffer:%s, flag:%x, size:%d", __FUNCTION__, sm->buffer, sm->flags, sm->size);
+    LOGE("%s: buffer:%s, flag:%x, size:%d", __FUNCTION__, sm->buffer, sm->flags, sm->size);
 }
 
 //test code
 void printTeecOperation(TEEC_Operation* op){
-    __android_log_print(ANDROID_LOG_ERROR,
-                        "JNI",
-                        "%s: started:%d, paraType:%x", __FUNCTION__, op->started, op->paramTypes);
+    LOGE("%s: started:%d, paraType:%x", __FUNCTION__, op->started, op->paramTypes);
 
     for(int i = 0; i < 2; i++){
         TEEC_SharedMemory* sm = op->params[i].memref.parent;
@@ -361,26 +332,21 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     lsBits = env->CallLongMethod(uuid, jmGetLeastSignificantBits);
     msBits = env->CallLongMethod(uuid, jmGetMostSignificantBits);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "uuid:%llx %llx.", msBits, lsBits);
+    LOGI("%s: uuid:%llx %llx.", __FUNCTION__, msBits, lsBits);
 
     TEEC_UUID teec_uuid = { .timeLow = (uint32_t)lsBits,
                             .timeMid = (uint16_t)(lsBits >> 32),
                             .timeHiAndVersion = lsBits >> 48};
     memcpy(teec_uuid.clockSeqAndNode, &msBits, sizeof(msBits));
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
+    LOGI("%s: timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
+                        __FUNCTION__,
                         teec_uuid.timeLow,
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
+
     for(int i = 0; i < 8; i++){
-        __android_log_print(ANDROID_LOG_INFO,
-                            "JNI",
-                            "%x",
-                            teec_uuid.clockSeqAndNode[i]);
+        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
     }
     // teec_uuid construction done.
 
@@ -430,10 +396,11 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     TeecOperation op;
     op.ParseFromString(opsInString);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "started %d. num of params:%d %d", op.mstarted(), op.mparams_size(),
-                        sizeof(TEEC_NONE) / sizeof(uint8_t));
+    LOGI( "%s: started %d. num of params:%d %d", __FUNCTION__,
+          op.mstarted(),
+          op.mparams_size(),
+          sizeof(TEEC_NONE) / sizeof(uint8_t));
+
     // set started field.
     teec_operation.started = op.mstarted();
 
@@ -509,9 +476,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
             }
 
         }else{
-            __android_log_print(ANDROID_LOG_INFO,
-                                "JNI",
-                                "Incorrect param. Ignore it.");
+            LOGE("%s: Incorrect param. Ignore it.", __FUNCTION__);
             continue;
         }
 
@@ -554,7 +519,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
      */
     free(opInBytesBuffer);
 
-    return 0;
+    return teec_ret;
 
 }
 
