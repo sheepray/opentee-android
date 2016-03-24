@@ -88,21 +88,20 @@ void printSharedMemoryList(){
     }
 }
 
-TEEC_SharedMemoryWithId findSharedMemoryById(int smId){
-    for ( auto& sm : sharedMemoryWithIdList ){
+TEEC_SharedMemoryWithId* findSharedMemoryById(int smId){
+    for (auto&sm : sharedMemoryWithIdList ){
         if ( sm.getId() == smId ){
             __android_log_print(ANDROID_LOG_INFO,
                                 "[JNI] findSharedMemoryById",
                                 "shared memory with id:%d found.", smId);
-
-            return sm;
+            return &sm;
         }
     }
 
     __android_log_print(ANDROID_LOG_INFO,
                         "[JNI] findSharedMemoryById",
                         "shared memory with id:%d not found.", smId);
-    return NULLSharedMemoryWithId;
+    return &NULLSharedMemoryWithId;
 }
 
 bool removeSharedMemoryById(int smId){
@@ -121,8 +120,8 @@ bool removeSharedMemoryById(int smId){
     return false;
 }
 
-bool compareSharedMemoryWithId(TEEC_SharedMemoryWithId sm1, TEEC_SharedMemoryWithId sm2){
-    if ( sm1.getId() == sm2.getId()) return true;
+bool compareSharedMemoryWithId(TEEC_SharedMemoryWithId* sm1, TEEC_SharedMemoryWithId* sm2){
+    if ( sm1->getId() == sm2->getId()) return true;
     return false;
 }
 
@@ -283,10 +282,10 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     //test code.
     printSharedMemoryList();
 
-    TEEC_SharedMemoryWithId smWithId = findSharedMemoryById(jsmId);
-    if ( compareSharedMemoryWithId( NULLSharedMemoryWithId, smWithId) ) return;
+    TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(jsmId);
+    if ( compareSharedMemoryWithId( &NULLSharedMemoryWithId, smWithId) ) return;
 
-    TEEC_SharedMemory* sm = smWithId.getSharedMemory();
+    TEEC_SharedMemory* sm = smWithId->getSharedMemory();
 
     __android_log_print(ANDROID_LOG_INFO,
                         "JNI",
@@ -320,13 +319,13 @@ void printSharedMemory(TEEC_SharedMemory* sm){
 }
 
 //test code
-void printTeecOperation(TEEC_Operation op){
+void printTeecOperation(TEEC_Operation* op){
     __android_log_print(ANDROID_LOG_ERROR,
                         "JNI",
-                        "%s: started:%d, paraType:%x", __FUNCTION__, op.started, op.paramTypes);
+                        "%s: started:%d, paraType:%x", __FUNCTION__, op->started, op->paramTypes);
 
     for(int i = 0; i < 2; i++){
-        TEEC_SharedMemory* sm = op.params[i].memref.parent;
+        TEEC_SharedMemory* sm = op->params[i].memref.parent;
         printSharedMemory(sm);
     }
 }
@@ -426,7 +425,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         "started %d. num of params:", started);
 */
     // the easy way to parse TeecOperation.
-    TEEC_Operation teec_operation = {0};
+    TEEC_Operation teec_operation;// = {0};
 
     TeecOperation op;
     op.ParseFromString(opsInString);
@@ -443,24 +442,23 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     for(int i = 0; i < op.mparams_size(); i++){
         const TeecParameter param = op.mparams(i);
-        TEEC_Parameter teec_parameter = {0};
+        //TEEC_Parameter teec_parameter = {0};
         if( param.has_teecsharedmemoryreference() ){
             // param is TEEC_RegisteredMemoryReference.
             const TeecSharedMemoryReference rmr = param.teecsharedmemoryreference();
-            TEEC_RegisteredMemoryReference teec_rmr = {0};
+            //TEEC_RegisteredMemoryReference teec_rmr = {0};
 
             // get TEEC_SharedMemory.
             int smId = rmr.parentid();
-            TEEC_SharedMemoryWithId smWithId = findSharedMemoryById(smId);
-            TEEC_SharedMemory* sm = smWithId.getSharedMemory();
-            teec_rmr.parent = sm;
+            TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(smId);
+            TEEC_SharedMemory* sm = smWithId->getSharedMemory();
+            teec_operation.params[i].memref.parent = sm;
 
             // get size.
-            teec_rmr.size = sm->size;
+            teec_operation.params[i].memref.size = sm->size;
 
             // get offset.
-            int offset = rmr.moffset();
-            teec_rmr.offset = offset;
+            teec_operation.params[i].memref.offset = rmr.moffset();
 
             // set type.
             if(rmr.moffset() > 0){
@@ -484,16 +482,16 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                 paramTypesArray[i] = TEEC_MEMREF_WHOLE;
             }
 
-            teec_parameter.memref = teec_rmr;
+            //teec_operation.params[i].memref = teec_rmr;
         }
         else if(param.has_teecvalue()){
             // param is TEEC_Value.
             const TeecValue value = param.teecvalue();
-            TEEC_Value teec_value = {0};
-            teec_value.a = value.a();
-            teec_value.b = value.b();
+            //TEEC_Value teec_value = {0};
+            teec_operation.params[i].value.a = value.a();
+            teec_operation.params[i].value.b = value.b();
 
-            teec_parameter.value = teec_value;
+            //teec_operation.params[i].value = teec_value;
 
             // set the flag based on the flag value from java layer.
             switch ( value.mflag() ){
@@ -518,10 +516,11 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
         }
 
         // add created teec_parameter into the parameter array.
-        teec_operation.params[i] = teec_parameter;
+        //teec_operation.params[i] = teec_parameter;
+        //memcpy(&teec_operation.params[i], &teec_parameter, sizeof(TEEC_Parameter));
     }
-
     // set paramTypes field.
+
     teec_operation.paramTypes = TEEC_PARAM_TYPES(paramTypesArray[0],
                                                  paramTypesArray[1],
                                                  paramTypesArray[2],
@@ -530,25 +529,21 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     TEEC_Session teec_session = {0};
     uint32_t teec_ret_ori = 0;
 
-    //test code
-    flagFunc();
-    printTeecOperation(teec_operation);
+    printTeecOperation(&teec_operation);
 
-    /**
-     * call TEEC_OpenSession.
-     */
+/**
+ * call TEEC_OpenSession.
+ */
     TEEC_Result teec_ret = TEEC_OpenSession(
             &g_contextRecord,
             &teec_session,
             &teec_uuid,
             (uint32_t)connMethod,
             &connData,
+            //NULL,
             &teec_operation,
             &teec_ret_ori
     );
-
-    //test code
-    flagFunc();
 
     /**
      * Prepare the variables to return.
