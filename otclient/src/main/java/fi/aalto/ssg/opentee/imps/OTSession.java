@@ -20,13 +20,13 @@ public class OTSession implements ITEEClient.ISession {
     }
 
     @Override
-    public void teecInvokeCommand(int commandId, ITEEClient.Operation operation) throws ITEEClient.Exception {
+    public void invokeCommand(int commandId, ITEEClient.Operation operation) throws ITEEClient.Exception {
         //TODO: remmebr to update the mReturnOriginCode field when return.
         //TODO: also remember the mReturnCode field.
     }
 
     @Override
-    public void teecCloseSession() throws ITEEClient.Exception {
+    public void closeSession() throws ITEEClient.Exception {
 
     }
 }

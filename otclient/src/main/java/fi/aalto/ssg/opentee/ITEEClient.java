@@ -13,96 +13,114 @@ import java.util.UUID;
 public interface ITEEClient {
 
     /**
-     * Session interface.
+     * The session interface provides the invokeCommand operation. This interface can be only
+     * obtained by calling openSession function within a valid context.
      */
     interface ISession {
 
         /**
+         * Sending a request to the connected Trusted Application with agreed commandId and parameters.
          *
-         * @param commandId command identifier that is agreed with the Trusted Application
-         * @param operation
-        //* @param returnOriginCode return origin enum value.
-         * @throws java.lang.Exception throws program error including:
-         * 1. session not initialized;
-         * 2. calling with invalid content in the teecOperation structure
-         * 3. encoding Registered Memory Reference which refer to Shared Memory blocks allocated or
-         * registered within the scope of a different TEE Context
-         * 4. using the same operation structure concurrently for multiple operations
+         * @param commandId command identifier that is agreed with the Trusted Application.
+         * @param operation parameters for the command to invoke.
+         * @throws Exception throws program error including:<br>
+         * 1. calling with invalid content in the teecOperation structure;<br>
+         * 2. using the same operation structure concurrently for multiple operations.
          */
-        void teecInvokeCommand(int commandId,
-                               Operation operation
-                               //,ReturnOriginCode returnOriginCode
-        ) throws java.lang.Exception;
+        void invokeCommand(int commandId, Operation operation) throws Exception;
 
         /**
-         * close a session.
-         * @throws java.lang.Exception throws program error includes calling with a session while still has
-         * commands running, attempting to close the same Session concurrently from multiple threads and
+         * Close the connection to the remote Trusted Application.
+         * @throws Exception throws program error including:<br>
+         * 1. calling with a session while still has commands running;<br>
+         * 2. attempting to close the same Session concurrently from multiple threads and
          * attempting to close the same Session more than once.
          */
-        void teecCloseSession()throws Exception;
+        void closeSession()throws Exception;
     }
 
 
     /**
-     * SharedMemory interface. OTSharedMemory implements this interface.
+     * SharedMemory interface provides operations on shared memory. This interface can be only obtained
+     * by calling registerSharedMemory function within a valid context.
      */
     interface ISharedMemory {
+        /**
+         * This value indicates the I/O direction of the shared memory is input for Trusted Application.
+         */
         int TEEC_MEM_INPUT = 0x00000001;
+        /**
+         * This value indicates the I/O direction of the shared memory is output for Trusted Application.
+         */
         int TEEC_MEM_OUTPUT = 0x00000002;
 
         /**
-         * get the flag of the shared memory.
+         * Get the I/O direction of the shared memory.
          * @return the flags of ISharedMemory.
          */
         int getFlags();
 
         /**
-         * get the content of the buffer.
+         * Get the content of the shared memory.
          * @return an byte array reference.
-         * @throws java.lang.Exception error if not allowed to get buffer
+         * @throws Exception if failed to get the shared memory.
          */
         byte[] asByteArray() throws Exception;
 
         /**
-         * get the size of the output from Trusted Application if there is such an output.
-         * @return the size of the actual output byte array.
+         * Get the size of the output from Trusted Application if there is such an output.
+         * @return the actual size of the output byte array.
          */
         int getReturnSize();
 
+        /**
+         * Get the id of the shared memory.
+         * @return the id of the shared memory.
+         */
         int getId();
     }
 
 
 
     /**
-     * the return value for TEEC_SUCCESS.
-     * Other value for return value is wrapped into different exceptions.
-     *
+     * The return value for TEEC_SUCCESS.
      */
     int TEEC_SUCCESS = 0;
 
     /**
-     * return origin code
+     * Return origin code enum which indicates the origin when an exception is throwed.
      */
     enum ReturnOriginCode{
+        /**
+         * The exception is originated within the TEE Client API implementation.
+         */
         TEEC_ORIGIN_API(0x00000001),
+        /**
+         * The exception is originated within the underlying communications stack linking the Rich
+         * OS with the TEE.
+         */
         TEEC_ORIGIN_COMMS(0x00000002),
+        /**
+         * The exception is originated within the common TEE code.
+         */
         TEEC_ORIGIN_TEE(0x00000003),
+        /**
+         * The exception is originated within the Trusted Application.
+         */
         TEEC_ORIGIN_TA(0x00000004);
 
         private int mId;
         ReturnOriginCode(int id){this.mId = id;}
-        public int getId(){return this.mId;};
+        //public int getId(){return this.mId;};
     }
 
     /**
-     * initialize context.
+     * Initialize a context to a TEE.
      * @param teeName the name of remote TEE.
      * @param context Android application context.
      * @return IContext interface.
-     * @throws Exception
-     * @throws RemoteException
+     * @throws Exception when try to initialize the same context more than once within a single thread.
+     * @throws RemoteException when connection disconnected with the remote TEE.
      */
     IContext initializeContext(String teeName, Context context) throws Exception, RemoteException;
 
@@ -111,6 +129,9 @@ public interface ITEEClient {
      * excluding exceptions defined by Android.
      */
     class Exception extends java.lang.Exception {
+        /**
+         * The field indicates the return origin which cause this exception.
+         */
         ReturnOriginCode mReturnOriginCode;
 
         public Exception() { super(); }
@@ -126,18 +147,31 @@ public interface ITEEClient {
         public Exception(String message, Throwable cause) { super(message, cause); }
         public Exception(Throwable cause) { super(cause); }
 
+        /**
+         * Get the return origin.
+         * @return The return origin code.
+         */
         public ReturnOriginCode getReturnOrigin(){
             return this.mReturnOriginCode;
         }
     }
 
     /**
-     * Abstract class for Value, TempMemoryReference and RegisteredMemoryReference.
+     * Abstract class for Value and RegisteredMemoryReference.
      */
     abstract class Parameter{
+        /**
+         * The enum to indicates the type of the Parameter.
+         */
         public enum  Type{
+            /**
+             * This Parameter is a Value.
+             */
             TEEC_PTYPE_VALUE(0x0000000),
-            TEEC_PTYPE_SMR(0x00000001); // shared memory reference type code.
+            /**
+             * This Parameter is a RegisteredMemoryReference.
+             */
+            TEEC_PTYPE_SMR(0x00000001);
 
             int id;
             Type(int id){this.id = id;}
@@ -148,12 +182,27 @@ public interface ITEEClient {
     };
 
     /**
-     * reference for registered shared memory
+     * Reference for registered shared memory.
      */
     class RegisteredMemoryReference extends Parameter{
+        /**
+         * Flag enum indicates the I/O direction of the referenced registered shared memory.
+         */
         public enum Flag{
+            /**
+             * The I/O direction of the referenced registered shared memory is input for
+             * Trusted Application.
+             */
             TEEC_MEMREF_INPUT(0x0000000),
+            /**
+             * The I/O direction of the referenced registered shared memory is output for
+             * Trusted Application.
+             */
             TEEC_MEMREF_OUTPUT(0x00000001),
+            /**
+             * The I/O directions of the referenced registered shared memory are both input and output
+             * for Trusted Application.
+             */
             TEEC_MEMREF_INOUT(0x00000002);
 
             int id;
@@ -170,18 +219,30 @@ public interface ITEEClient {
         Flag mFlag;
 
         /**
-         * public constructor for registered memory reference.
+         * Create a registered memory reference with a valid ISharedMemory interface and a
+         * flag to indicate the I/O direction for this memory reference. The flag is only valid when
+         * the corresponding shared memory also has such a flag.
          * @param sharedMemory
+         * @param flag
          */
         public RegisteredMemoryReference(ISharedMemory sharedMemory, Flag flag){
             this.mSharedMemory = sharedMemory;
             this.mFlag = flag;
         }
 
+        /**
+         * Get the referenced registered shared memory.
+         * @return ISharedMemory interface for the referenced registered shared memory.
+         */
         public ISharedMemory getSharedMemory(){
             return this.mSharedMemory;
         }
 
+        /**
+         * Set the offset of the referenced registered shared memory to use. If not set, it is
+         * initialized with 0 which means to start using the shared memory from the beginning.
+         * @param offset
+         */
         public void setOffset(int offset){
             this.mOffset = offset;
         }
@@ -195,9 +256,21 @@ public interface ITEEClient {
      * This class defines a pair of value which can be passed as a parameter for one Operation.
      */
     class Value extends Parameter{
+        /**
+         * Flag enum indicates the I/O direction of Value.
+         */
         public enum  Flag{
+            /**
+             * The I/O direction for Value is input for Trusted Application.
+             */
             TEEC_VALUE_INPUT(0x0000000),
+            /**
+             * The I/O direction for Value is output for Trusted Application.
+             */
             TEEC_VALUE_OUTPUT(0x00000001),
+            /**
+             * The I/O directions for Value are both input and output for Trusted Application.
+             */
             TEEC_VALUE_INOUT(0x00000002);
 
             int id;
@@ -211,7 +284,7 @@ public interface ITEEClient {
 
         /**
          *
-         * @param flag only accept TEEC_VALUE_INPUT, TEEC_VALUE_OUTPUT and TEEC_VALUE_INOUT
+         * @param flag
          * @param a
          * @param b
          */
@@ -222,19 +295,19 @@ public interface ITEEClient {
         }
 
         /**
-         * get method for private member A.
+         * Get method for private member A.
          * @return int
          */
         public int getA(){return this.mA;}
 
         /**
-         * get method for private member B.
+         * Get method for private member B.
          * @return int
          */
         public int getB(){return this.mB;}
 
         /**
-         * get method for flags
+         * Get method for flags
          * @return Value.Flag enum
          */
         public Flag getFlag(){
@@ -242,7 +315,7 @@ public interface ITEEClient {
         }
 
         /**
-         * get method for the type of the parameter.
+         * Get method for the type of the parameter.
          * @return
          */
         @Override
@@ -314,14 +387,14 @@ public interface ITEEClient {
     */
 
     /**
-     * This class defines the payload of either an open session or an invoke command operation.
+     * This class defines the payload for either an open session or an invoke command operation.
      */
     class Operation {
         int started = 0;
         List<Parameter> params = new ArrayList<>();
 
         /**
-         * Public constructor for no Parameter
+         * Public constructor with no Parameter.
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          */
         public Operation(int started){
@@ -330,7 +403,7 @@ public interface ITEEClient {
 
 
         /**
-         * Public constructor for taking 1 Parameter
+         * Public constructor with 1 Parameter.
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          * @param parameter carry the parameters for this Operation.
          */
@@ -342,7 +415,7 @@ public interface ITEEClient {
 
 
         /**
-         * Public constructor
+         * Public constructor with 2 Parameters.
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          * @param parameter1 carry the first parameters for this Operation.
          * @param parameter2 carry the second parameters for this Operation.
@@ -357,7 +430,7 @@ public interface ITEEClient {
 
 
         /**
-         * Public constructor
+         * Public constructor with 3 Parameters.
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          * @param parameter1 carry the first parameters for this Operation.
          * @param parameter2 carry the second parameters for this Operation.
@@ -375,7 +448,7 @@ public interface ITEEClient {
 
 
         /**
-         * Public constructor
+         * Public constructor with 4 Parameters.
          * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
          * @param parameter1 carry the first parameters for this Operation.
          * @param parameter2 carry the second parameters for this Operation.
@@ -403,101 +476,90 @@ public interface ITEEClient {
         }
     }
 
-
-    /**
-     * this class indicates where in the software stack the return code was generated for either an
-     * openSession or an invokeCommand operation.
-     */
-    class TeecReturnCodeOrigin {
-        enum origin{
-            TEEC_ORIGIN_API,
-            TEEC_ORIGIN_COMMS,
-            TEEC_ORIGIN_TEE,
-            TEEC_ORIGIN_TRUSTED_APP
-        }
-    }
-
     interface IContext{
-
         /**
-         * Connection Method enum with fixed value corresponding to GP specification.
+         * Connection Method enum with fixed value corresponding to GP specification when calling
+         * openSession.
          */
         enum ConnectionMethod{
+            /**
+             * No login data is provided.
+             */
             LoginPublic(0x0000000),
+            /**
+             * Login data about the user running the Client Application process is provided.
+             */
             LoginUser(0x00000001),
+            /**
+             * Login data about the group running the Client Application process is provided.
+             */
             LoginGroup(0x00000002),
+            /**
+             * Login data about the running Client Application process itself is provided.
+             */
             LoginApplication(0x00000004),
+            /**
+             * Login data about the user running the Client Application and about the Client
+             * Application itself is provided.
+             */
             LoginUserApplication(0x00000005),
+            /**
+             * Login data about the group running the Client Application and about the Client
+             * Application andthe about the Client Application itself is provided.
+             */
             LoginGroupApplication(0x00000006);
 
             int val;
             ConnectionMethod(int val){this.val = val;}
         }
 
-
-
         /**
-         * Finalize the context and close the connection to TEE after all sessions have been terminated
+         * Finalizing the context and close the connection to TEE after all sessions have been terminated
          * and all shared memory has been released
+         * @throws RemoteException
          */
         void finalizeContext() throws RemoteException;
 
         /**
-         * register a block of existing Client Application memory as a block of Shared Memory within the
-         * scope of the specified TEE context
+         * Registering a block of existing Client Application memory as a block of Shared Memory within
+         * current TEE context.
          * @param buffer indicates the reference of pre-allocated byte array which is to be shared.
-         * @param flags indicates I/O direction of this shared memory. Its value can only be TEEC_MEM_INPUT and
-         *              TEEC_MEM_OUPUT.
-         * @throws Exception exception message can be the return code in TeecResult or program
-         * error such as context not initialized, sharedMemory not correctly populated or trying to
-         * initialize the same shared memory structure concurrently from multiple threads
+         * @param flags indicates I/O direction of this shared memory for Trusted Application.
+         * @throws Exception
          */
-        ISharedMemory registerSharedMemory(byte[] buffer,
-                                                      int flags) throws Exception, RemoteException;
+        ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws Exception, RemoteException;
 
         /**
-         * allocate a new block of memory as a block of Shared Memory within the scope of the specified
-         * TEE Context
-         * @throws TeecException TeecException exception message can be the return code in TeecResult or
-         * program error such as context not initialized, sharedMemory not correctly populated or trying
-         * to initialize the same shared memory structure concurrently from multiple threads
-         */
-        // ITeecSharedMemory teecAllocateSharedMemory() throws TeecException;
-
-        /**
-         * release the Shared Memory which previously obtained using teecRegisterSharedMemory or
-         * teecAllocateSharedMemory.
-         * @param sharedMemory the reference the ITeecSharedMemory instance.
+         * Releasing the Shared Memory which is previously obtained using registerSharedMemory.
+         * @param sharedMemory the reference the ISharedMemory instance.
          * @throws Exception program error exceptions including attempting to release Shared Memory
-         * which is used by a pending operation or
-         * attempting to relaes the same Shared Memory structure concureently from multiple threads.
+         * which is used by a pending operation.
          */
         void releaseSharedMemory(ISharedMemory sharedMemory) throws Exception, RemoteException;
 
         /**
-         * this API opens a session within the context which is already built.
+         * Opening a session within current context.
          * @param uuid UUID of Trusted Application.
          * @param connectionMethod the method of connection to use.
          * @param connectionData any necessary data for connectionMethod.
-         * @param teecOperation operations to perform.
-         //* @param returnOriginCode return origin enum value.
-         * @return an ITeecSession instance.
+         * @param operation operations to perform.
+         * @return an ISession interface.
          * @throws Exception
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
                               int connectionData,
-                              Operation teecOperation
+                              Operation operation
                               //ReturnOriginCode returnOriginCode
                               ) throws Exception, RemoteException;
 
 
         /**
-         * this method requests the cancellation of a pending open Session operation or a Command invocation operation
+         * Requesting the cancellation of a pending open Session operation or a Command invocation operation
          * in a separate thread.
-         * @param teecOperation the started or pending Operation instance.
+         * @param operation the started or pending Operation instance.
          */
-        void requestCancellation(Operation teecOperation);
+        void requestCancellation(Operation operation);
     };
 
 
@@ -720,7 +782,7 @@ public interface ITEEClient {
     }
 
     /**
-     * Internal TEE error - document for completeness.
+     * Internal TEE error - documented for completeness.
      */
     class OverflowException extends Exception{
         public OverflowException(String msg){
@@ -743,6 +805,9 @@ public interface ITEEClient {
         }
     }
 
+    /**
+     * Internal TEE error - documented for completeness.
+     */
     class NoStorageSpaceException extends Exception{
         public NoStorageSpaceException(String msg){
             super(msg);

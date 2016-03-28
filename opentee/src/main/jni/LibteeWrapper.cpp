@@ -496,9 +496,9 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     printTeecOperation(&teec_operation);
 
-/**
- * call TEEC_OpenSession.
- */
+    /**
+     * call TEEC_OpenSession.
+     */
     TEEC_Result teec_ret = TEEC_OpenSession(
             &g_contextRecord,
             &teec_session,
@@ -510,17 +510,26 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
             &teec_ret_ori
     );
 
+    LOGD("%s: return code:%.8x, return origin:%.8x",
+         __FUNCTION__,
+         teec_ret,
+         teec_ret_ori
+    );
+
+    /**
+     * store the session upon success.
+     * */
+
     /**
      * Prepare the variables to return.
      */
 
     /**
-     * clean allocated resources
+     * clean allocated resources.
      */
     free(opInBytesBuffer);
 
     return teec_ret;
-
 }
 
 
