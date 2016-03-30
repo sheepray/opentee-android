@@ -225,9 +225,10 @@ public interface ITEEClient {
          * @param sharedMemory
          * @param flag
          */
-        public RegisteredMemoryReference(ISharedMemory sharedMemory, Flag flag){
+        public RegisteredMemoryReference(ISharedMemory sharedMemory, Flag flag, int offset){
             this.mSharedMemory = sharedMemory;
             this.mFlag = flag;
+            this.mOffset = offset;
         }
 
         /**
@@ -236,15 +237,6 @@ public interface ITEEClient {
          */
         public ISharedMemory getSharedMemory(){
             return this.mSharedMemory;
-        }
-
-        /**
-         * Set the offset of the referenced registered shared memory to use. If not set, it is
-         * initialized with 0 which means to start using the shared memory from the beginning.
-         * @param offset
-         */
-        public void setOffset(int offset){
-            this.mOffset = offset;
         }
 
         public int getOffset(){return this.mOffset;}
