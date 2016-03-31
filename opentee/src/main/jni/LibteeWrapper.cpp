@@ -332,10 +332,6 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     lsBits = env->CallLongMethod(uuid, jmGetLeastSignificantBits);
     msBits = env->CallLongMethod(uuid, jmGetMostSignificantBits);
 
-    //try to hard code uuid
-    msBits = 0x2e63933e10a79e46;
-    lsBits = 0xacc85edf8c8590e1;
-
     LOGI("%s: uuid:%llx %llx.", __FUNCTION__, msBits, lsBits);
 
     TEEC_UUID teec_uuid = { .timeLow = (uint32_t)(msBits >> 32),
