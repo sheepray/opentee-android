@@ -15,15 +15,61 @@ import fi.aalto.ssg.opentee.imps.OTClient;
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 public class MainActivity extends AppCompatActivity {
-    public static String TAG = "Test_APP";
-    public static String TEE_NAME = null;   //currently only one default TEE
+    public final String TAG = "Test_APP";
+    public final String TEE_NAME = null;   //currently only one default TEE
+
+    // uuid for ta_conn_test in OpenTEE:
+    // uuid = {0x12345678, 0x8765, 0x4321, {'T','A','C','O','N','N','T','E'}}
+    public UUID TA_CONN_TEST_UUID;
 
     HandlerThread mHandler;
+
+    /**
+     * Take a string and transfer its each char to a byte. Then combine all the bytes to a long var.
+     * If the string is too long, this func will only retrieve the lower 8 characters.
+     * @param strVal
+     * @return
+     */
+    long strToLong(String strVal){
+        if(strVal == null || strVal.isEmpty()) return 0;
+
+        byte[] vals = strVal.getBytes();
+        int tailFlag = vals.length > 8 ? 8 : vals.length;
+        long result = 0;
+        for(int i = 0; i < tailFlag; i++){
+            result = result << 8;
+            result += vals[i];
+
+            //test code
+            Log.d(TAG, i + ":" + vals[i]);
+        }
+        return result;
+    }
+
+    void prepareGlobalVars(){
+        Log.d(TAG, "******* Start preparing global vars ********");
+
+        /**
+         * prepare the uuid of ta to connect to.
+         */
+        long clockSeqAndNode = strToLong(new String("TACONNTE"));
+        TA_CONN_TEST_UUID = new UUID(0x1234567887654321L, clockSeqAndNode);
+
+        Log.d(TAG, "clockSeqAndNode:" + Long.toHexString( clockSeqAndNode ));
+
+
+        Log.d(TAG, "******* End preparing global vars ********");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /**
+         * prepare global vars.
+         */
+        prepareGlobalVars();
 
         /**
          * put the test in a separate thread. And developers are suggested to do so.
@@ -105,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
 
         // open session
-        UUID uuid = new UUID(0x1234567887654321L, 0x8765432112345678L);
+        UUID uuid = TA_CONN_TEST_UUID;
         int started = 0;
         ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
         ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);

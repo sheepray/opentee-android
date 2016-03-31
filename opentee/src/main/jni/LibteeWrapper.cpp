@@ -334,10 +334,16 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     LOGI("%s: uuid:%llx %llx.", __FUNCTION__, msBits, lsBits);
 
-    TEEC_UUID teec_uuid = { .timeLow = (uint32_t)lsBits,
-                            .timeMid = (uint16_t)(lsBits >> 32),
-                            .timeHiAndVersion = lsBits >> 48};
-    memcpy(teec_uuid.clockSeqAndNode, &msBits, sizeof(msBits));
+    TEEC_UUID teec_uuid = { .timeLow = (uint32_t)(msBits >> 32),
+                            .timeMid = (uint16_t)(msBits >> 16),
+                            .timeHiAndVersion = (uint16_t)msBits};
+    //memcpy(teec_uuid.clockSeqAndNode, &lsBits, sizeof(lsBits));
+    for(int i = 7; i >= 0; i--){
+        teec_uuid.clockSeqAndNode[i] = (uint8_t)lsBits;
+        lsBits = lsBits >> 8;
+
+        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
+    }
 
     LOGI("%s: timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
                         __FUNCTION__,
@@ -345,9 +351,6 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
 
-    for(int i = 0; i < 8; i++){
-        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
-    }
     // teec_uuid construction done.
 
     /* Parse opInBytes */
