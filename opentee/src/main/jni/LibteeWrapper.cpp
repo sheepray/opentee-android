@@ -327,10 +327,14 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
         return TEEC_ERROR_BAD_PARAMETERS;
     }
 
-    long long lsBits, msBits;
+    uint64_t lsBits, msBits;
     lsBits = msBits = 0;
     lsBits = env->CallLongMethod(uuid, jmGetLeastSignificantBits);
     msBits = env->CallLongMethod(uuid, jmGetMostSignificantBits);
+
+    //try to hard code uuid
+    msBits = 0x2e63933e10a79e46;
+    lsBits = 0xacc85edf8c8590e1;
 
     LOGI("%s: uuid:%llx %llx.", __FUNCTION__, msBits, lsBits);
 
@@ -341,8 +345,6 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     for(int i = 7; i >= 0; i--){
         teec_uuid.clockSeqAndNode[i] = (uint8_t)lsBits;
         lsBits = lsBits >> 8;
-
-        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
     }
 
     LOGI("%s: timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
@@ -350,6 +352,10 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         teec_uuid.timeLow,
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
+
+    for(int i = 0; i < 8; i++){
+        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
+    }
 
     // teec_uuid construction done.
 
