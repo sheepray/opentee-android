@@ -396,7 +396,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         "started %d. num of params:", started);
 */
     // the easy way to parse TeecOperation.
-    TEEC_Operation teec_operation;// = {0};
+    TEEC_Operation teec_operation = {0};
 
     TeecOperation op;
     op.ParseFromString(opsInString);
@@ -496,7 +496,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                                                  paramTypesArray[2],
                                                  paramTypesArray[3]);
 
-    TEEC_Session teec_session = {0};
+    TEEC_Session teec_session;
     uint32_t teec_ret_ori = 0;
 
     printTeecOperation(&teec_operation);
@@ -508,15 +508,18 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
             &g_contextRecord,
             &teec_session,
             &teec_uuid,
-            (uint32_t)connMethod,
-            &connData,
-            //NULL,
+            //(uint32_t)connMethod,
+            TEEC_LOGIN_PUBLIC,
+            //&connData,
+            NULL,
             &teec_operation,
+            //NULL,
             &teec_ret_ori
     );
 
-    LOGD("%s: return code:%.8x, return origin:%.8x",
+    LOGD("%s: connMethod:%.8x, return code:%.8x, return origin:%.8x",
          __FUNCTION__,
+         connMethod,
          teec_ret,
          teec_ret_ori
     );
