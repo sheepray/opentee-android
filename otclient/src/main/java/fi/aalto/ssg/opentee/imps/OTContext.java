@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,15 +136,11 @@ public class OTContext implements ITEEClient.IContext {
                 /**
                  * determine which type of parameter to parse.
                  */
-                int paraType = teecOperation.getParams().get(0).getType();
 
-                Log.d(TAG, "Found " + paraType);
+                List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
 
-                if ( paraType == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId() ){
-                    // it is class Value.
-                    List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
-
-                    for ( ITEEClient.Parameter param: parameterList ){
+                for ( ITEEClient.Parameter param: parameterList ){
+                    if( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId()){
                         GPDataTypes.TeecValue.Builder builder = GPDataTypes.TeecValue.newBuilder();
                         ITEEClient.Value val = (ITEEClient.Value)param;
 
@@ -157,15 +155,7 @@ public class OTContext implements ITEEClient.IContext {
                         paramBuilder.setTeecValue(builder.build());
                         toBuilder.addMParams(paramBuilder.build());
                     }
-                }
-                else if ( paraType == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId() ){
-                    // it is registered memory reference.
-                    // transfer the shared memory from public interface to implementation version.
-                    // aka identify the shared memory from the public interface and pass its id instead.
-
-                    List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
-
-                    for ( ITEEClient.Parameter param: parameterList ){
+                    else if ( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId() ){
                         GPDataTypes.TeecSharedMemoryReference.Builder builder
                                 = GPDataTypes.TeecSharedMemoryReference.newBuilder();
                         ITEEClient.RegisteredMemoryReference rmr
@@ -181,10 +171,11 @@ public class OTContext implements ITEEClient.IContext {
                         paramBuilder.setTeecSharedMemoryReference(builder.build());
                         toBuilder.addMParams(paramBuilder.build());
                     }
-                }else{
-                    Log.e(TAG, "Unsupported Operation type. Set the operation to null");
-                }
+                    else{
+                        Log.e(TAG, "Unsupported Operation type. Set the operation to null");
+                    }
 
+                }
             }
 
             toBuilder.setMStarted(teecOperation.getStarted());
@@ -201,6 +192,17 @@ public class OTContext implements ITEEClient.IContext {
         // upon success
         OTSession otSession =  new OTSession(sid, mProxyApis);
         mSessions.add(otSession);
+
+        //TODO: if the operation contains value and it can be output from TA, sync the value.
+        GPDataTypes.TeecOperation.Builder teecOpResultBuilder = GPDataTypes.TeecOperation.newBuilder();
+
+        try {
+            teecOpResultBuilder.mergeFrom(opInArray);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+
 
         return otSession;
     }

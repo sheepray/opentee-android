@@ -221,7 +221,6 @@ public class OTGuard {
 
         // recreate the shared memory reference by replacing the memory reference id with the id in
         // JNI if the operation is referencing registered memory.
-        boolean isValueInOp = false;
         if ( opsInBytes != null ){
             // make a deep copy of it in case the binder copy it back. Because it is just memory reference.
             // there is no need to copy the reference back.
@@ -267,9 +266,6 @@ public class OTGuard {
                                     + tmpParam.getTeecSharedMemoryReference().getParentId()
                                     + " in jni.");
                     modified = true;
-                }else {
-                    // the parameter must be Value.
-                    isValueInOp = true;
                 }
             }
 
@@ -289,20 +285,9 @@ public class OTGuard {
                 opsInBytes,
                 retOriginFromJni);
 
-        if(isValueInOp){
-            // check the flag of the Value. If it has OUTPUT flag, sync the content of Value back to
-            // Client Application. Each Value might have different flags (some might have OUTPUT flag
-            // while other might not). We just simply copy the bytes back. It is the duty of Jni layer
-            // to copy the content back. So checking corresponding flags should be done in the Jni layer.
-            //TODO: remember to copy the byte array back to opsInBytes to sync.
-        }
-
-        //TODO: copy back the returnOrigin.
-        //(worked)test code;
-        //retOrigin[0] = 3;
         retOrigin[0] = retOriginFromJni.getReturnOrigin();
 
-        // upon success add session to that caller.
+        // upon success, add session to that caller.
         if(retCode == OTReturnCode.TEEC_SUCCESS) {
             findCallerById(callerId).addSession(new OTCaller.OTCallerSession(sid));
         }

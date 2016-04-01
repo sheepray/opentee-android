@@ -52,4 +52,6 @@ public class NativeLibtee {
                                                           byte[] opsInBytes,
                                                           ReturnOriginWrapper retOriginWrapper);
 
+    public static synchronized native int teecCloseSession(int sidInJni);
+
 }
