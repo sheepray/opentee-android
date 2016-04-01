@@ -10,6 +10,7 @@
 #include <google/protobuf/message.h>
 #include <string.h>
 #include <vector>
+#include <unordered_map>
 
 #ifdef ANDROID
 #  define LOG_TAG "[JNI]"
@@ -59,10 +60,8 @@ static TEEC_Context g_contextRecord = {0};
 ///TODO: replace vector with unordered_map
 static vector<TEEC_SharedMemoryWithId> sharedMemoryWithIdList;
 
-static TEEC_Session g_sessionRecord[MAX_NUM_SESSION] = {{0}};
-static bool g_sessionRecordOccupied[MAX_NUM_SESSION] = {false};
-static int g_currentNumOfSession = 0;
-static pthread_mutex_t session_lock;
+//<session_id, teec_session>
+static unordered_map<int, TEEC_Session> sessions_map;
 
 int open_tee_socket_env_set = 0;
 
@@ -288,6 +287,7 @@ void flagFunc(){
 
 //test code
 void printSharedMemory(TEEC_SharedMemory* sm){
+    if(sm == NULL) return;
     LOGE("%s: buffer:%s, flag:%x, size:%d", __FUNCTION__, sm->buffer, sm->flags, sm->size);
 }
 
@@ -295,12 +295,22 @@ void printSharedMemory(TEEC_SharedMemory* sm){
 void printTeecOperation(TEEC_Operation* op){
     LOGE("%s: started:%d, paraType:%x", __FUNCTION__, op->started, op->paramTypes);
 
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < 4; i++){
         TEEC_SharedMemory* sm = op->params[i].memref.parent;
         printSharedMemory(sm);
     }
 }
 
+//test func
+void printClockSeqAndNode(uint8_t vars[8]){
+    LOGI("ClockSeqAndNode:%s", (char*)vars);
+}
+
+__inline void set_return_origin(JNIEnv* env, jobject returnOrigin, int var){
+    jclass jcRetOrigin = env->GetObjectClass(returnOrigin);
+    jfieldID jfROC = env->GetFieldID(jcRetOrigin, "mReturnOrigin", "I");
+    env->SetIntField(returnOrigin, jfROC, var);
+}
 
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
         (JNIEnv* env, jclass jc, jint sid, jobject uuid, jint connMethod, jint connData, jbyteArray opInBytes, jobject returnOrigin){
@@ -320,9 +330,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     if( jmGetLeastSignificantBits == 0 || jmGetMostSignificantBits == 0){
         // set return origin TEEC_ORIGIN_API.
-        jclass jcRetOrigin = env->GetObjectClass(returnOrigin);
-        jfieldID jfROC = env->GetFieldID(jcRetOrigin, "mReturnOrigin", "I");
-        env->SetIntField(returnOrigin, jfROC, TEEC_ORIGIN_API);
+        set_return_origin(env, returnOrigin, TEEC_ORIGIN_API);
 
         return TEEC_ERROR_BAD_PARAMETERS;
     }
@@ -349,9 +357,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
 
-    for(int i = 0; i < 8; i++){
-        LOGI("%s: %x", __FUNCTION__, teec_uuid.clockSeqAndNode[i]);
-    }
+    printClockSeqAndNode(teec_uuid.clockSeqAndNode);
 
     // teec_uuid construction done.
 
@@ -365,38 +371,14 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     // create a string to store this buffer.
     string opsInString(opInBytesBuffer, opInBytesBuffer + l);
 
+    free(opInBytesBuffer);
 
-    /* real step to create the operation from the string created above.
-    // the hard way to parse TeecOperation.
-    Message* opCreatorMsg = new TeecOperation;
-    opCreatorMsg->ParseFromString(opsInString);
-
-    const Descriptor* descriptor = opCreatorMsg->GetDescriptor();
-
-    const FieldDescriptor* started_field = descriptor->FindFieldByName("mStarted");
-    const FieldDescriptor* params_field = descriptor->FindFieldByName("mParams");
-
-    if(started_field == NULL || params_field == NULL){
-        // set return origin TEEC_ORIGIN_API.
-        jclass jcRetOrigin = env->GetObjectClass(returnOrigin);
-        jfieldID jfROC = env->GetFieldID(jcRetOrigin, "mReturnOrigin", "I");
-        env->SetIntField(returnOrigin, jfROC, TEEC_ORIGIN_API);
-
-        return TEEC_ERROR_BAD_PARAMETERS;
-    }
-
-    const Reflection* reflection = opCreatorMsg->GetReflection();
-    uint32_t started = reflection->GetInt32(*opCreatorMsg, started_field);
-    //uint32_t numOfParams = reflection->FieldSize(*opCreatorMsg, params_field);
-    //TeecParameter = reflection->GetString(*opCreatorMsg, params_field);
-
-    // test code
-    __android_log_print(ANDROID_LOG_INFO,
-                        "JNI",
-                        "started %d. num of params:", started);
-*/
+    /*
+     * step to create the operation from the string created above.
+     * */
     // the easy way to parse TeecOperation.
     TEEC_Operation teec_operation = {0};
+    bool params_modifed = false;
 
     TeecOperation op;
     op.ParseFromString(opsInString);
@@ -414,11 +396,9 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     for(int i = 0; i < op.mparams_size(); i++){
         const TeecParameter param = op.mparams(i);
-        //TEEC_Parameter teec_parameter = {0};
         if( param.has_teecsharedmemoryreference() ){
             // param is TEEC_RegisteredMemoryReference.
             const TeecSharedMemoryReference rmr = param.teecsharedmemoryreference();
-            //TEEC_RegisteredMemoryReference teec_rmr = {0};
 
             // get TEEC_SharedMemory.
             int smId = rmr.parentid();
@@ -450,20 +430,15 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                 }
             }
             else{
-                // using while memory.
+                // using whole memory.
                 paramTypesArray[i] = TEEC_MEMREF_WHOLE;
             }
-
-            //teec_operation.params[i].memref = teec_rmr;
         }
         else if(param.has_teecvalue()){
             // param is TEEC_Value.
             const TeecValue value = param.teecvalue();
-            //TEEC_Value teec_value = {0};
             teec_operation.params[i].value.a = value.a();
             teec_operation.params[i].value.b = value.b();
-
-            //teec_operation.params[i].value = teec_value;
 
             // set the flag based on the flag value from java layer.
             switch ( value.mflag() ){
@@ -472,9 +447,11 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
                     break;
                 case JavaConstants::VALUE_OUTPUT:
                     paramTypesArray[i] = TEEC_VALUE_OUTPUT;
+                    params_modifed = true;
                     break;
                 case JavaConstants::VALUE_INOUT:
                     paramTypesArray[i] = TEEC_VALUE_INOUT;
+                    params_modifed = true;
                     break;
                 default:
                     break;
@@ -484,17 +461,18 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
             LOGE("%s: Incorrect param. Ignore it.", __FUNCTION__);
             continue;
         }
-
-        // add created teec_parameter into the parameter array.
-        //teec_operation.params[i] = teec_parameter;
-        //memcpy(&teec_operation.params[i], &teec_parameter, sizeof(TEEC_Parameter));
     }
-    // set paramTypes field.
 
+    // set paramTypes field.
     teec_operation.paramTypes = TEEC_PARAM_TYPES(paramTypesArray[0],
                                                  paramTypesArray[1],
                                                  paramTypesArray[2],
                                                  paramTypesArray[3]);
+
+    //test code
+    for(int i = 0; i < 4; i++){
+        LOGI("paramTypesArray[%d] = %x", i, paramTypesArray[i]);
+    }
 
     TEEC_Session teec_session;
     uint32_t teec_ret_ori = 0;
@@ -508,18 +486,19 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
             &g_contextRecord,
             &teec_session,
             &teec_uuid,
-            //(uint32_t)connMethod,
-            TEEC_LOGIN_PUBLIC,
-            //&connData,
-            NULL,
+            (uint32_t)connMethod,
+            //TEEC_LOGIN_PUBLIC,
+            &connData,
+            //NULL,
             &teec_operation,
             //NULL,
             &teec_ret_ori
     );
 
-    LOGD("%s: connMethod:%.8x, return code:%.8x, return origin:%.8x",
+    LOGD("%s: connMethod:%.8x, connData:%.8x, return code:%.8x, return origin:%.8x",
          __FUNCTION__,
          connMethod,
+         connData,
          teec_ret,
          teec_ret_ori
     );
@@ -527,15 +506,26 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     /**
      * store the session upon success.
      * */
+    if( teec_ret == TEEC_SUCCESS ){
+        //TODO: potential issue with teec_session when out of this function. Needs to check.
+        sessions_map.emplace((int)sid, teec_session);
+    }
 
     /**
      * Prepare the variables to return.
      */
+    // set return origin
+    set_return_origin(env, returnOrigin, teec_ret_ori);
+
+    if( params_modifed ){
+        // if params are modified (only TEEC_Value in here)m, we copy it back.
+        env->SetByteArrayRegion(opInBytes, 0, opsInString.length(), (jbyte*)opsInString.c_str());
+    }
 
     /**
      * clean allocated resources.
      */
-    free(opInBytesBuffer);
+    //free(opInBytesBuffer); // already freed before.
 
     return teec_ret;
 }

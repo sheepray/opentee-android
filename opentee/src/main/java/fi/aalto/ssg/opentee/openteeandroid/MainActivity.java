@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
 
                 //install TA
-                worker.installAssetToHomeDir(context, OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
+                //worker.installAssetToHomeDir(context, OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
                 worker.installAssetToHomeDir(context, OTConstants.LIB_TA_OMNISHARE_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
 
                 //put the status of the opentee engine to setting

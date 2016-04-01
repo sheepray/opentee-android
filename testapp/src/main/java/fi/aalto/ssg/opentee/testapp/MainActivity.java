@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.sql.Array;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
         /**
          * prepare the uuid of ta to connect to.
          */
-        long clockSeqAndNode = strToLong(new String("TACONNTE"));
+        //long clockSeqAndNode = strToLong(new String("TACONNTE"));
+        long clockSeqAndNode = strToLong(new String("OMNISHAR"));
         TA_CONN_TEST_UUID = new UUID(0x1234567887654321L, clockSeqAndNode);
 
         Log.d(TAG, "clockSeqAndNode:" + Long.toHexString( clockSeqAndNode ));
@@ -126,9 +128,20 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        byte[] buffer2 = {
+
+        /**
+         * Register another shared memory.
+         */
+        int sizeOfBuffer2 = 256;
+        byte[] buffer2 = new byte[sizeOfBuffer2];
+        Arrays.fill(buffer2, (byte)'a');
+
+        /*
+        {
                 'o', 'p', 'e', 'n',
                 't', 'e', 'e'};
+        */
+
         ITEEClient.ISharedMemory sharedMemory2 = null;
 
         Log.d(TAG, "Create shared memory 2");
@@ -153,9 +166,11 @@ public class MainActivity extends AppCompatActivity {
         // open session
         UUID uuid = TA_CONN_TEST_UUID;
         int started = 0;
-        ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
+        //ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
         ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
-        ITEEClient.Operation op = new ITEEClient.Operation(started, rmrOne, rmrTwo);
+        //ITEEClient.Operation op = new ITEEClient.Operation(started, rmrOne, rmrTwo);
+        //ITEEClient.Operation op = new ITEEClient.Operation(started, rmrTwo); // omnishare_ta only allows one input parameter.
+        ITEEClient.Operation op = new ITEEClient.Operation(started); // generate_root_key
         ITEEClient.ISession session = null;
 
         try {
