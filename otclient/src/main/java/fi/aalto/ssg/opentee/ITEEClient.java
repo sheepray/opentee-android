@@ -167,11 +167,11 @@ public interface ITEEClient {
             /**
              * This Parameter is a Value.
              */
-            TEEC_PTYPE_VALUE(0x0000000),
+            TEEC_PTYPE_VALUE(0x0000001),
             /**
              * This Parameter is a RegisteredMemoryReference.
              */
-            TEEC_PTYPE_SMR(0x00000001);
+            TEEC_PTYPE_SMR(0x00000002);
 
             int id;
             Type(int id){this.id = id;}

@@ -186,10 +186,21 @@ public class MainActivity extends AppCompatActivity {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        // invoke command.
 
+        // invoke command.
+        try {
+            session.invokeCommand(0, // commandId.
+                    null); // no operation.
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        }
 
         // close session
+        try {
+            session.closeSession();
+        } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        }
 
         // release shared memory
         try {

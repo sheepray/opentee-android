@@ -193,7 +193,6 @@ public class OTContext implements ITEEClient.IContext {
         OTSession otSession =  new OTSession(sid, mProxyApis);
         mSessions.add(otSession);
 
-        //TODO: if the operation contains value and it can be output from TA, sync the value.
         GPDataTypes.TeecOperation.Builder teecOpResultBuilder = GPDataTypes.TeecOperation.newBuilder();
 
         try {
@@ -202,7 +201,33 @@ public class OTContext implements ITEEClient.IContext {
             e.printStackTrace();
         }
 
+        GPDataTypes.TeecOperation toResult = teecOpResultBuilder.build();
 
+        // clean old params.
+        List<ITEEClient.Parameter> params = teecOperation.getParams();
+
+        List<GPDataTypes.TeecParameter> tpResults = toResult.getMParamsList();
+        for(int i = 0; i < tpResults.size(); i++){
+            GPDataTypes.TeecParameter tpResult = tpResults.get(i);
+            if(tpResult.getType().ordinal() == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId()){
+                // value
+                ITEEClient.Value value = (ITEEClient.Value)params.get(i);
+                // update Value values.
+                params.set(
+                        i,
+                        new ITEEClient.Value(value.getFlag(),
+                                            tpResult.getTeecValue().getA(),
+                                            tpResult.getTeecValue().getB())
+                );
+            }
+            else if(tpResult.getType().ordinal() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId()){
+                // registered memory reference
+                //TODO: sync memory or already synced
+
+            }else{
+                Log.e(TAG, "Incorrect param type:" + tpResult.getType());
+            }
+        }
 
         return otSession;
     }
