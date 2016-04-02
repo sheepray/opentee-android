@@ -36,7 +36,7 @@ public interface ITEEClient {
          * 2. attempting to close the same Session concurrently from multiple threads and
          * attempting to close the same Session more than once.
          */
-        void closeSession()throws Exception;
+        void closeSession() throws Exception, RemoteException;
     }
 
 

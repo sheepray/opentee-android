@@ -26,4 +26,6 @@ interface IOTConnectionInterface {
 
     int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout byte[] teecOperation, out int[] retOrigin);
 
+    void teecCloseSession(int sid);
+
 }

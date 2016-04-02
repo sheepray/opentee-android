@@ -39,7 +39,7 @@ public class OTGuard {
     boolean mConnectedToOT = false;
     Context mContext;
     String mTeeName;
-    Map<Integer, OTSharedMemory> smIDMap; // <smIdInJni, SharedMemory>
+    Map<Integer, Integer> smIDMap; // <smIdInJni, placeHolder>
     Map<Integer, Integer> sessionIdMap; // <sessionIdInJni, sessionIdForCaller>
     Random smIdGenerator;
 
@@ -136,7 +136,7 @@ public class OTGuard {
             return;
         }
 
-        //TODO: release all resources including shared memory and openning sessions.
+        //TODO: release all resources including shared memory and opening sessions.
 
         // remove the caller.
         mOTCallerList.remove(callerId);
@@ -165,23 +165,23 @@ public class OTGuard {
             e.printStackTrace();
         }
 
-        int tmpSmID = generateSharedMemoryId();
+        int tmpSmIDInJni = generateSharedMemoryId();
         smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
         smBuilder.setSize(otSharedMemory.getSize());
         smBuilder.setMID(otSharedMemory.getId());
         smBuilder.setMFlag(otSharedMemory.getFlags());
 
         int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray(),
-                tmpSmID);
+                tmpSmIDInJni);
 
         // upon succeed from Libtee:
         if ( return_code == ITEEClient.TEEC_SUCCESS ){
             // add the OTSharedMemory into the OTSharedMemory list of the caller
-            findCallerById(callerId).addSharedMemory(otSharedMemory);
+            findCallerById(callerId).addSharedMemory(tmpSmIDInJni, otSharedMemory);
 
             // add the OTSharedMemory along with the signed id to smIDMap to keep track of shared memory
             // between OTGuard and JNI layer.
-            smIDMap.put(tmpSmID, otSharedMemory);
+            smIDMap.put(tmpSmIDInJni, 0);
         }
 
         return return_code;
@@ -193,10 +193,9 @@ public class OTGuard {
         if (caller == null) return;
 
         // release shared memory in JNI layer.
-        OTSharedMemory sm = caller.getSharedMemoryBySmId(smId);
-        Integer smIdInJni = findIdInJniById(smId);
+        int smIdInJni = caller.getSmIdInJniBySmid(smId);
 
-        if ( smIdInJni != null ){
+        if ( smIdInJni != -1 ){
             // found the id in jni.
             Log.d(TAG, smId + " found in jni with id:" + smIdInJni);
             NativeLibtee.teecReleaseSharedMemory(smIdInJni);
@@ -206,12 +205,14 @@ public class OTGuard {
         }
 
         // remove shared memory from caller.
-        caller.removeSharedMemoryBySmId(smId);
+        caller.removeSharedMemoryBySmIdInJni(smId);
     }
 
     public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
+
+        OTCaller caller = findCallerById(callerId);
 
         int retCode = -1;
         ReturnOriginWrapper retOriginFromJni = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
@@ -245,7 +246,7 @@ public class OTGuard {
                     // the parameter is shared memory reference. Replace the id of shared memory from
                     // to the corresponding shared memory id in JNI.
                     GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
-                    int idSmJni = findIdInJniById(smrPara.getParentId());
+                    int idSmJni = caller.getSmIdInJniBySmid(smrPara.getParentId());
 
                     //replace the id in here.
                     GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
@@ -289,23 +290,30 @@ public class OTGuard {
 
         // upon success, add session to that caller.
         if(retCode == OTReturnCode.TEEC_SUCCESS) {
-            findCallerById(callerId).addSession(new OTCaller.OTCallerSession(sid));
+            findCallerById(callerId).addSession(sidForJni, new OTCaller.OTCallerSession(sid));
+            sessionIdMap.put(sidForJni, sid);
         }
 
         return retCode;
+    }
+
+    public void teecCloseSession(int callerId, int sid){
+        if ( !mOTCallerList.containsKey(callerId) ) Log.e(TAG, "Incorrect callerId:" + callerId);
+
+        OTCaller caller = findCallerById(callerId);
+        // remove session id from caller.
+        int sidInJni = caller.removeSessionBySid(sid);
+
+        // remove sidInJni from global var.
+        sessionIdMap.remove(sidInJni);
+
+        NativeLibtee.teecCloseSession(sidInJni);
     }
 
     private OTCaller findCallerById(int callerId){
         return mOTCallerList.get(callerId);
     }
 
-    public Integer findIdInJniById(int idInCaller){
-        for(Map.Entry<Integer, OTSharedMemory> entry: smIDMap.entrySet()){
-            if ( entry.getValue().getId() == idInCaller ) return entry.getKey();
-        }
-
-        return null;
-    }
 
     // there is need to regenerate the id for the shared memory since different applications may
     // send the shared memory with the same id which is identical in ther context while not in OTGuard.

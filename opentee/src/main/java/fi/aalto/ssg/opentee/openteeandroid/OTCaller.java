@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fi.aalto.ssg.opentee.imps.OTSession;
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 /**
@@ -16,8 +17,8 @@ public class OTCaller {
     String TAG = "OTCaller.class";
 
     int mID;
-    Map<Integer, OTSharedMemory> mSharedMemoryList; // <smid, sharedMemory>reuse the OTSharedMemory class.
-    Map<Integer, OTCallerSession> mSessionList; // <sid, session>
+    HashMap<Integer, OTSharedMemory> mSharedMemoryList; // <smidInJni, sharedMemory>reuse the OTSharedMemory class.
+    HashMap<Integer, OTCallerSession> mSessionList; // <sidInJni, session>
 
     public OTCaller(int id){
         this.mID = id;
@@ -27,47 +28,54 @@ public class OTCaller {
 
     public int getID(){return this.mID;}
 
-    public void addSharedMemory(OTSharedMemory sharedMemory){
+    public void addSharedMemory(int smIdInJni, OTSharedMemory sharedMemory){
         if ( sharedMemory != null ){
             Log.d(TAG, this.mID + " added SharedMemory");
 
-            mSharedMemoryList.put(sharedMemory.getId(), sharedMemory);
+            mSharedMemoryList.put(smIdInJni, sharedMemory);
         }
     }
 
-    public void addSession(OTCallerSession session){
+    public void addSession(int sidInJni, OTCallerSession session){
         if ( session != null ){
             Log.d(TAG, this.mID + " opened session");
 
-            mSessionList.put(session.getSid(), session);
+            mSessionList.put(sidInJni, session);
         }
     }
 
-    public void removeSharedMemoryBySmId(int smId){
+    public void removeSharedMemoryBySmIdInJni(int smIdInJni){
         if ( mSharedMemoryList.size() == 0 ) {
-            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
+            Log.e(TAG, "SharedMemoryList empty, nothing to remove.");
             return;
         }
 
-        mSharedMemoryList.remove(smId);
+        mSharedMemoryList.remove(smIdInJni);
+
+        Log.i(TAG, mID + "'s shared memory:" + smIdInJni + " removed.");
     }
 
-    public void removeSessionBySid(int sid){
-        if( mSessionList.size() == 0 ){
-            Log.e(TAG, "Session list is empty, nothing to remove");
-            return;
+    public int removeSessionBySid(int sid){
+        for(Map.Entry<Integer, OTCallerSession> entry: mSessionList.entrySet()){
+            if( entry.getValue().getSid() == sid ){
+                Log.i(TAG, mID + "'s session:" + sid + " with sidInJni: " + entry.getKey() + " removed.");
+
+                mSessionList.remove(entry);
+                return entry.getKey();
+            }
         }
 
-        mSessionList.remove(sid);
+        Log.i(TAG, mID + "'s session:" + sid + " not found.");
+        return -1;
     }
 
-    public OTSharedMemory getSharedMemoryBySmId(int smId){
-        if ( mSharedMemoryList.size() == 0 ) {
-            Log.e(TAG, "SharedMemoryList empty, nothing to remove");
-            return null;
+    public int getSmIdInJniBySmid(int smid){
+        for( Map.Entry<Integer, OTSharedMemory> entry: mSharedMemoryList.entrySet() ){
+            if( entry.getValue().getId() == smid ) return entry.getKey();
         }
 
-        return mSharedMemoryList.get(smId);
+        // not found.
+        return -1;
     }
 
     /**

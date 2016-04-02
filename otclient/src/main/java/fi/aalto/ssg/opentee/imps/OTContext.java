@@ -8,6 +8,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -27,7 +28,7 @@ public class OTContext implements ITEEClient.IContext {
     Random smIdGenerator;
 
     List<OTSharedMemory> mSharedMemory = new ArrayList<>();
-    List<OTSession> mSessions = new ArrayList<>();
+    HashMap<Integer, Integer> mSessionMap = new HashMap<>(); // <sessionId, placeHolder>
 
     public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
         this.mTeeName = teeName;
@@ -71,7 +72,7 @@ public class OTContext implements ITEEClient.IContext {
 
         //clear up resources.
         mSharedMemory.clear();
-        mSessions.clear();
+        mSessionMap.clear();
         mProxyApis = null;
 
         Log.i(TAG, "context finalized and connection terminated");
@@ -191,7 +192,7 @@ public class OTContext implements ITEEClient.IContext {
 
         // upon success
         OTSession otSession =  new OTSession(sid, mProxyApis);
-        mSessions.add(otSession);
+        mSessionMap.put(sid, 0);
 
         GPDataTypes.TeecOperation.Builder teecOpResultBuilder = GPDataTypes.TeecOperation.newBuilder();
 
@@ -216,8 +217,8 @@ public class OTContext implements ITEEClient.IContext {
                 params.set(
                         i,
                         new ITEEClient.Value(value.getFlag(),
-                                            tpResult.getTeecValue().getA(),
-                                            tpResult.getTeecValue().getB())
+                                tpResult.getTeecValue().getA(),
+                                tpResult.getTeecValue().getB())
                 );
             }
             else if(tpResult.getType().ordinal() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId()){
@@ -259,16 +260,9 @@ public class OTContext implements ITEEClient.IContext {
         int id;
         do{
             id = smIdGenerator.nextInt(50000);
-        }while(occupiedSid(id));
+        }while(mSessionMap.containsKey(id));
 
         Log.i(TAG, "generating session id:" + id);
         return id;
-    }
-
-    private boolean occupiedSid(int id){
-        for( OTSession s: mSessions ){
-            if( s.getSessionId() == id ) return true;
-        }
-        return false;
     }
 }

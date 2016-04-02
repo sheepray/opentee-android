@@ -89,6 +89,14 @@ public class OTConnectionService extends Service {
                     teecOperation,
                     retOrigin);
         }
+
+        @Override
+        public void teecCloseSession(int sid){
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to close session.");
+
+            mOTGuard.teecCloseSession(Binder.getCallingPid(), sid);
+        }
     };
 
     @Override

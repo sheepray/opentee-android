@@ -182,6 +182,11 @@ public class ProxyApis {
         }
     }
 
+    public void teecCloseSession(int sessionId) throws RemoteException {
+        //TODO:
+        mService.teecCloseSession(sessionId);
+    }
+
     //note: switch statement can also apply in here.
     public static void throwExceptionBasedOnReturnCode(int return_code) throws ITEEClient.Exception{
         switch (return_code){

@@ -198,7 +198,11 @@ public class MainActivity extends AppCompatActivity {
         // close session
         try {
             session.closeSession();
+
+            Log.d(TAG, "Session closed.");
         } catch (ITEEClient.Exception e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
 
