@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInitializeContext
-        (JNIEnv *, jclass, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -21,7 +21,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecFinalizeContext
-        (JNIEnv *, jclass);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: ([BI)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRegisterSharedMemory
-        (JNIEnv *, jclass, jbyteArray, jint);
+  (JNIEnv *, jclass, jbyteArray, jint);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -37,7 +37,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
-        (JNIEnv *, jclass, jint);
+  (JNIEnv *, jclass, jint);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: (ILjava/util/UUID;II[BLfi/aalto/ssg/opentee/openteeandroid/ReturnOriginWrapper;)I
  */
 JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
-        (JNIEnv *, jclass, jint, jobject, jint, jint, jbyteArray, jobject);
+  (JNIEnv *, jclass, jint, jobject, jint, jint, jbyteArray, jobject);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -53,7 +53,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecCloseSession
-        (JNIEnv *, jclass, jint);
+  (JNIEnv *, jclass, jint);
 
 #ifdef __cplusplus
 }

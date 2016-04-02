@@ -530,7 +530,18 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     return teec_ret;
 }
 
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecCloseSession
+        (JNIEnv* env, jclass jc, jint sidInJni){
+    auto sessionWithId = sessions_map.find(sidInJni);
 
+    if( sessionWithId == sessions_map.end() ){
+        LOGE("Unable to find session with id %d.", sidInJni);
+        return;
+    }
+
+    TEEC_CloseSession(&(sessionWithId->second));
+    LOGI("Session with id %d is closed.", sidInJni);
+}
 
 #ifdef __cplusplus
 }
