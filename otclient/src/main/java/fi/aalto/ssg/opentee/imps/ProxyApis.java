@@ -14,10 +14,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.crypto.ShortBufferException;
-
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.AccessConflictException;
+import fi.aalto.ssg.opentee.exception.AccessDeniedException;
+import fi.aalto.ssg.opentee.exception.BadFormatException;
+import fi.aalto.ssg.opentee.exception.BadParametersException;
+import fi.aalto.ssg.opentee.exception.BadStateException;
+import fi.aalto.ssg.opentee.exception.BusyException;
+import fi.aalto.ssg.opentee.exception.CancelErrorException;
+import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
+import fi.aalto.ssg.opentee.exception.ExcessDataException;
+import fi.aalto.ssg.opentee.exception.ExternalCancelException;
+import fi.aalto.ssg.opentee.exception.GenericErrorException;
+import fi.aalto.ssg.opentee.exception.ItemNotFoundException;
+import fi.aalto.ssg.opentee.exception.NoDataException;
+import fi.aalto.ssg.opentee.exception.NoStorageSpaceException;
+import fi.aalto.ssg.opentee.exception.NotImplementedException;
+import fi.aalto.ssg.opentee.exception.NotSupportedException;
+import fi.aalto.ssg.opentee.exception.OutOfMemoryException;
+import fi.aalto.ssg.opentee.exception.OverflowException;
+import fi.aalto.ssg.opentee.exception.SecurityErrorException;
+import fi.aalto.ssg.opentee.exception.ShortBufferException;
+import fi.aalto.ssg.opentee.exception.TEEClientException;
+import fi.aalto.ssg.opentee.exception.TargetDeadException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
@@ -56,7 +76,7 @@ public class ProxyApis {
             //after connected, call initializeContext.
             try {
                 teecInitializeContext();
-            } catch (ITEEClient.Exception e) {
+            } catch (TEEClientException e) {
                 e.printStackTrace();
             }
 
@@ -92,7 +112,7 @@ public class ProxyApis {
         }
     }
 
-    public ProxyApis teecInitializeContext() throws ITEEClient.Exception {
+    public ProxyApis teecInitializeContext() throws TEEClientException {
         int return_code = 0;
         try {
             return_code = mService.teecInitializeContext(mTeeName);
@@ -115,9 +135,9 @@ public class ProxyApis {
         }
     }
 
-    public void teecRegisterSharedMemory(OTSharedMemory otSharedMemory) throws ITEEClient.Exception, RemoteException {
+    public void teecRegisterSharedMemory(OTSharedMemory otSharedMemory) throws TEEClientException, RemoteException {
         if ( mService == null ){
-            throw new ITEEClient.GenericErrorException("Service unavailable");
+            throw new GenericErrorException("Service unavailable");
         }
 
         // call IPC
@@ -134,9 +154,9 @@ public class ProxyApis {
 
     }
 
-    public void teecReleaseSharedMemory(int smId) throws ITEEClient.GenericErrorException, RemoteException {
+    public void teecReleaseSharedMemory(int smId) throws GenericErrorException, RemoteException {
         if ( mService == null ){
-            throw new ITEEClient.GenericErrorException("Service unavailable");
+            throw new GenericErrorException("Service unavailable");
         }
 
         mService.teecReleaseSharedMemory(smId);
@@ -146,9 +166,9 @@ public class ProxyApis {
                                UUID uuid,
                                ITEEClient.IContext.ConnectionMethod connectionMethod,
                                int connectionData,
-                               byte[] opInArray) throws ITEEClient.Exception, RemoteException {
+                               byte[] opInArray) throws TEEClientException, RemoteException {
         if ( mService == null ){
-            throw new ITEEClient.GenericErrorException("Service unavailable");
+            throw new GenericErrorException("Service unavailable");
         }
 
         /**
@@ -188,57 +208,58 @@ public class ProxyApis {
     }
 
     //note: switch statement can also apply in here.
-    public static void throwExceptionBasedOnReturnCode(int return_code) throws ITEEClient.Exception{
+    public static void throwExceptionBasedOnReturnCode(int return_code) throws TEEClientException{
         switch (return_code){
             case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
-                throw new ITEEClient.AccessConflictException("Access conflict.");
+                throw new AccessConflictException("Access conflict.");
             case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
-                throw new ITEEClient.AccessDeniedException("Access denied.");
+                throw new AccessDeniedException("Access denied.");
             case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
-                throw new ITEEClient.BadFormatException("Bad format");
+                throw new BadFormatException("Bad format");
             case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
-                throw new ITEEClient.BadParametersException("Bad parameters.");
+                throw new BadParametersException("Bad parameters.");
             case OTReturnCode.TEEC_ERROR_BAD_STATE:
-                throw new ITEEClient.BadStateException("Bad state");
+                throw new BadStateException("Bad state");
             case OTReturnCode.TEEC_ERROR_BUSY:
-                throw new ITEEClient.BusyException("Busy");
+                throw new BusyException("Busy");
             case OTReturnCode.TEEC_ERROR_CANCEL:
-                throw new ITEEClient.CancelErrorException("Cancel");
+                throw new CancelErrorException("Cancel");
             case OTReturnCode.TEEC_ERROR_COMMUNICATION:
-                throw new ITEEClient.CommunicationErrorException("Communication error");
+                throw new CommunicationErrorException("Communication error");
             case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
-                throw new ITEEClient.ExcessDataException("Excess data");
+                throw new ExcessDataException("Excess data");
             case OTReturnCode.TEEC_ERROR_GENERIC:
-                throw new ITEEClient.GenericErrorException("Generic error");
+                throw new GenericErrorException("Generic error");
             case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
-                throw new ITEEClient.ItemNotFoundException("Item not found");
+                throw new ItemNotFoundException("Item not found");
             case OTReturnCode.TEEC_ERROR_NO_DATA:
-                throw new ITEEClient.NoDataException("Not data provided");
+                throw new NoDataException("Not data provided");
             case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
-                throw new ITEEClient.NotImplementedException("Not impelemented");
+                throw new NotImplementedException("Not impelemented");
             case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
-                throw new ITEEClient.NotSupportedException("Not supported");
+                throw new NotSupportedException("Not supported");
             case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
-                throw new ITEEClient.OutOfMemoryException("Out of memory");
+                throw new OutOfMemoryException("Out of memory");
             case OTReturnCode.TEEC_ERROR_SECURITY:
-                throw new ITEEClient.SecurityErrorException("Security check failed");
+                throw new SecurityErrorException("Security check failed");
             case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
-                throw new ITEEClient.ShortBufferException("Short buffer");
+                throw new ShortBufferException("Short buffer");
             case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
-                throw new ITEEClient.ExternalCancelException("External cancel");
+                throw new ExternalCancelException("External cancel");
             case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new ITEEClient.OverflowException("Overflow");
+                throw new OverflowException("Overflow");
             case OTReturnCode.TEE_ERROR_TARGET_DEAD:
-                throw new ITEEClient.TargetDeadException("TEE: target dead");
+                throw new TargetDeadException("TEE: target dead");
             case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new ITEEClient.NoStorageSpaceException("Storage no space");
+                throw new NoStorageSpaceException("Storage no space");
             default:
-                throw new ITEEClient.Exception("Unknown error");
+                break;
+                //throw new TEEClientException("Unknown error");
         }
 
     }
 
-    public static void throwExceptionWithReturnOrigin(int return_code, int retOrigin) throws ITEEClient.Exception{
+    public static void throwExceptionWithReturnOrigin(int return_code, int retOrigin) throws TEEClientException{
         ITEEClient.ReturnOriginCode returnOriginCode = intToReturnOrigin(retOrigin);
 
         if ( returnOriginCode == null ){
@@ -247,49 +268,50 @@ public class ProxyApis {
 
         switch (return_code){
             case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
-                throw new ITEEClient.AccessConflictException("Access conflict.", returnOriginCode);
+                throw new AccessConflictException("Access conflict.", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
-                throw new ITEEClient.AccessDeniedException("Access denied.", returnOriginCode);
+                throw new AccessDeniedException("Access denied.", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
-                throw new ITEEClient.BadFormatException("Bad format", returnOriginCode);
+                throw new BadFormatException("Bad format", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
-                throw new ITEEClient.BadParametersException("Bad parameters.", returnOriginCode);
+                throw new BadParametersException("Bad parameters.", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_BAD_STATE:
-                throw new ITEEClient.BadStateException("Bad state", returnOriginCode);
+                throw new BadStateException("Bad state", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_BUSY:
-                throw new ITEEClient.BusyException("Busy", returnOriginCode);
+                throw new BusyException("Busy", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_CANCEL:
-                throw new ITEEClient.CancelErrorException("Cancel", returnOriginCode);
+                throw new CancelErrorException("Cancel", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_COMMUNICATION:
-                throw new ITEEClient.CommunicationErrorException("Communication error", returnOriginCode);
+                throw new CommunicationErrorException("Communication error", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
-                throw new ITEEClient.ExcessDataException("Excess data", returnOriginCode);
+                throw new ExcessDataException("Excess data", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_GENERIC:
-                throw new ITEEClient.GenericErrorException("Generic error", returnOriginCode);
+                throw new GenericErrorException("Generic error", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
-                throw new ITEEClient.ItemNotFoundException("Item not found", returnOriginCode);
+                throw new ItemNotFoundException("Item not found", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_NO_DATA:
-                throw new ITEEClient.NoDataException("Not data provided", returnOriginCode);
+                throw new NoDataException("Not data provided", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
-                throw new ITEEClient.NotImplementedException("Not impelemented", returnOriginCode);
+                throw new NotImplementedException("Not impelemented", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
-                throw new ITEEClient.NotSupportedException("Not supported", returnOriginCode);
+                throw new NotSupportedException("Not supported", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
-                throw new ITEEClient.OutOfMemoryException("Out of memory", returnOriginCode);
+                throw new OutOfMemoryException("Out of memory", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_SECURITY:
-                throw new ITEEClient.SecurityErrorException("Security check failed", returnOriginCode);
+                throw new SecurityErrorException("Security check failed", returnOriginCode);
             case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
-                throw new ITEEClient.ShortBufferException("Short buffer", returnOriginCode);
+                throw new ShortBufferException("Short buffer", returnOriginCode);
             case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
-                throw new ITEEClient.ExternalCancelException("External cancel", returnOriginCode);
+                throw new ExternalCancelException("External cancel", returnOriginCode);
             case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new ITEEClient.OverflowException("Overflow", returnOriginCode);
+                throw new OverflowException("Overflow", returnOriginCode);
             case OTReturnCode.TEE_ERROR_TARGET_DEAD:
-                throw new ITEEClient.TargetDeadException("TEE: target dead", returnOriginCode);
+                throw new TargetDeadException("TEE: target dead", returnOriginCode);
             case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new ITEEClient.NoStorageSpaceException("Storage no space", returnOriginCode);
+                throw new NoStorageSpaceException("Storage no space", returnOriginCode);
             default:
-                throw new ITEEClient.Exception("Unknown error", returnOriginCode);
+                break;
+                //throw new TEEClientException("Unknown error", returnOriginCode);
         }
     }
 

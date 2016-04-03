@@ -7,8 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import fi.aalto.ssg.opentee.exception.TEEClientException;
+
 /**
  * Public interface as main entrances of APIs for developer.
+ * Key words definition:
+ * 1. TEE: Trusted Execution Environment in target device that the developer is working on.
+ * 2. CA: Client Application that the developer is creating.
+ * 3. TA: Trusted Application which is already deployed in TEE.
+ * 4. Underlying library: A library which resides in the CA and communicates with the remote service.
+ * 5. NativeLibtee: A library which interacts with the remote TEE on CA's behalf.
  */
 public interface ITEEClient {
 
@@ -23,20 +31,20 @@ public interface ITEEClient {
          *
          * @param commandId command identifier that is agreed with the Trusted Application.
          * @param operation parameters for the command to invoke.
-         * @throws Exception throws program error including:<br>
+         * @throws TEEClientException throws program error including:<br>
          * 1. calling with invalid content in the teecOperation structure;<br>
          * 2. using the same operation structure concurrently for multiple operations.
          */
-        void invokeCommand(int commandId, Operation operation) throws Exception;
+        void invokeCommand(int commandId, Operation operation) throws TEEClientException;
 
         /**
          * Close the connection to the remote Trusted Application.
-         * @throws Exception throws program error including:<br>
+         * @throws TEEClientException throws program error including:<br>
          * 1. calling with a session while still has commands running;<br>
          * 2. attempting to close the same Session concurrently from multiple threads and
          * attempting to close the same Session more than once.
          */
-        void closeSession() throws Exception, RemoteException;
+        void closeSession() throws TEEClientException, RemoteException;
     }
 
 
@@ -119,42 +127,10 @@ public interface ITEEClient {
      * @param teeName the name of remote TEE.
      * @param context Android application context.
      * @return IContext interface.
-     * @throws Exception when try to initialize the same context more than once within a single thread.
+     * @throws TEEClientException when try to initialize the same context more than once within a single thread.
      * @throws RemoteException when connection disconnected with the remote TEE.
      */
-    IContext initializeContext(String teeName, Context context) throws Exception, RemoteException;
-
-    /**
-     * Exception extends the java.lang.Exception class. All exceptions in this project should subclass it
-     * excluding exceptions defined by Android.
-     */
-    class Exception extends java.lang.Exception {
-        /**
-         * The field indicates the return origin which cause this exception.
-         */
-        ReturnOriginCode mReturnOriginCode;
-
-        public Exception() { super(); }
-        public Exception(ReturnOriginCode returnOriginCode){
-            super();
-            mReturnOriginCode = returnOriginCode;
-        }
-        public Exception(String message) { super(message); }
-        public Exception(String message, ReturnOriginCode returnOriginCode) {
-            super(message);
-            mReturnOriginCode = returnOriginCode;
-        }
-        public Exception(String message, Throwable cause) { super(message, cause); }
-        public Exception(Throwable cause) { super(cause); }
-
-        /**
-         * Get the return origin.
-         * @return The return origin code.
-         */
-        public ReturnOriginCode getReturnOrigin(){
-            return this.mReturnOriginCode;
-        }
-    }
+    IContext initializeContext(String teeName, Context context) throws TEEClientException, RemoteException;
 
     /**
      * Abstract class for Value and RegisteredMemoryReference.
@@ -517,17 +493,17 @@ public interface ITEEClient {
          * current TEE context.
          * @param buffer indicates the reference of pre-allocated byte array which is to be shared.
          * @param flags indicates I/O direction of this shared memory for Trusted Application.
-         * @throws Exception
+         * @throws TEEClientException
          */
-        ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws Exception, RemoteException;
+        ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws TEEClientException, RemoteException;
 
         /**
          * Releasing the Shared Memory which is previously obtained using registerSharedMemory.
          * @param sharedMemory the reference the ISharedMemory instance.
-         * @throws Exception program error exceptions including attempting to release Shared Memory
+         * @throws TEEClientException program error exceptions including attempting to release Shared Memory
          * which is used by a pending operation.
          */
-        void releaseSharedMemory(ISharedMemory sharedMemory) throws Exception, RemoteException;
+        void releaseSharedMemory(ISharedMemory sharedMemory) throws TEEClientException, RemoteException;
 
         /**
          * Opening a session within current context.
@@ -536,14 +512,14 @@ public interface ITEEClient {
          * @param connectionData any necessary data for connectionMethod.
          * @param operation operations to perform.
          * @return an ISession interface.
-         * @throws Exception
+         * @throws TEEClientException
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
                               int connectionData,
                               Operation operation
                               //ReturnOriginCode returnOriginCode
-                              ) throws Exception, RemoteException;
+                              ) throws TEEClientException, RemoteException;
 
 
         /**
@@ -553,260 +529,4 @@ public interface ITEEClient {
          */
         void requestCancellation(Operation operation);
     };
-
-
-    /******************* begin of the client exception definitions ****************************/
-    /**
-     * Concurrent accesses caused conflict.
-     */
-    class AccessConflictException extends ITEEClient.Exception {
-        public AccessConflictException(String msg){ super(msg);}
-
-        public AccessConflictException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Access privileges are not sufficient
-     */
-    class AccessDeniedException extends ITEEClient.Exception {
-        public AccessDeniedException(String msg){
-            super(msg);
-        }
-
-        public AccessDeniedException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Input data was of invalid format.
-     */
-    class BadFormatException extends ITEEClient.Exception {
-        public BadFormatException(String msg){
-            super(msg);
-        }
-
-        public BadFormatException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Input parameters were invalid.
-     */
-    class BadParametersException extends ITEEClient.Exception {
-        public BadParametersException(String msg){
-            super(msg);
-        }
-        public BadParametersException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Operation is not valid in the current state.
-     */
-    class BadStateException extends ITEEClient.Exception {
-        public BadStateException(String msg){
-            super(msg);
-        }
-        public BadStateException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The system is busy working on something else.
-     */
-    class BusyException extends ITEEClient.Exception {
-        public BusyException(String msg){
-            super(msg);
-        }
-        public BusyException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The operation was cancelled
-     */
-    class CancelErrorException extends ITEEClient.Exception {
-        public CancelErrorException(String msg){
-            super(msg);
-        }
-        public CancelErrorException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Communication with a remote party failed.
-     */
-    class CommunicationErrorException extends ITEEClient.Exception {
-        public CommunicationErrorException(String msg){
-            super(msg);
-        }
-        public CommunicationErrorException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Too much data for the requested operation was passed.
-     */
-    class ExcessDataException extends ITEEClient.Exception {
-        public ExcessDataException(String msg){
-            super(msg);
-        }
-        public ExcessDataException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Non-specific cause exception.
-     */
-    class GenericErrorException extends ITEEClient.Exception {
-        public GenericErrorException(String msg){
-            super(msg);
-        }
-        public GenericErrorException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The requested data item is not found.
-     */
-    class ItemNotFoundException extends ITEEClient.Exception {
-        public ItemNotFoundException(String msg){
-            super(msg);
-        }
-        public ItemNotFoundException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Expected data was missing.
-     */
-    class NoDataException extends ITEEClient.Exception {
-        public NoDataException(String msg){
-            super(msg);
-        }
-        public NoDataException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The requested operation should exist but is not yet implemented.
-     */
-    class NotImplementedException extends ITEEClient.Exception {
-        public NotImplementedException(String msg){
-            super(msg);
-        }
-        public NotImplementedException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The requested operation is valid but is not supported in this implementation.
-     */
-    class NotSupportedException extends ITEEClient.Exception {
-        public NotSupportedException(String msg){
-            super(msg);
-        }
-        public NotSupportedException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * System ran out of resources.
-     */
-    class OutOfMemoryException extends ITEEClient.Exception {
-        public OutOfMemoryException(String msg){
-            super(msg);
-        }
-        public OutOfMemoryException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * A security fault was detected.
-     */
-    class SecurityErrorException extends ITEEClient.Exception {
-        public SecurityErrorException(String msg){
-            super(msg);
-        }
-        public SecurityErrorException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The supplied buffer is too short for the generated output.
-     */
-    class ShortBufferException extends Exception {
-        public ShortBufferException(String msg){
-            super(msg);
-        }
-        public ShortBufferException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * An external event has caused a User Interface operation to be aborted.
-     */
-    class ExternalCancelException extends Exception{
-        public ExternalCancelException(String msg){
-            super(msg);
-        }
-        public ExternalCancelException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Internal TEE error - documented for completeness.
-     */
-    class OverflowException extends Exception{
-        public OverflowException(String msg){
-            super(msg);
-        }
-        public OverflowException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * The Trusted Application has terminated.
-     */
-    class TargetDeadException extends Exception{
-        public TargetDeadException(String msg){
-            super(msg);
-        }
-        public TargetDeadException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-
-    /**
-     * Internal TEE error - documented for completeness.
-     */
-    class NoStorageSpaceException extends Exception{
-        public NoStorageSpaceException(String msg){
-            super(msg);
-        }
-        public NoStorageSpaceException(String msg, ReturnOriginCode retOrigin){
-            super(msg, retOrigin);
-        }
-    }
-    /******************* end of the client exception definitions ******************************/
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
  * this class implements the ISharedMemory interface
@@ -34,7 +35,7 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     }
 
     @Override
-    public byte[] asByteArray() throws ITEEClient.Exception {
+    public byte[] asByteArray() throws TEEClientException {
         return this.mBuffer;
     }
 

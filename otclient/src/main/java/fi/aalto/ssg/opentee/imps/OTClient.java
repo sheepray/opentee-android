@@ -4,13 +4,14 @@ import android.content.Context;
 import android.os.RemoteException;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
  * This class implements the ITEEClient interface.
  */
 public class OTClient implements ITEEClient {
     @Override
-    public IContext initializeContext(String teeName, Context context) throws Exception, RemoteException {
+    public IContext initializeContext(String teeName, Context context) throws TEEClientException, RemoteException {
         return new OTContext(teeName, context);
     }
 }

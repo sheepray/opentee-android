@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
@@ -161,7 +162,7 @@ public class OTGuard {
         GPDataTypes.TeecSharedMemory.Builder smBuilder = GPDataTypes.TeecSharedMemory.newBuilder();
         try {
             smBuilder.setMBuffer( ByteString.copyFrom( otSharedMemory.asByteArray()) );
-        } catch (ITEEClient.Exception e) {
+        } catch (TEEClientException e) {
             e.printStackTrace();
         }
 

@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
@@ -30,7 +31,7 @@ public class OTContext implements ITEEClient.IContext {
     List<OTSharedMemory> mSharedMemory = new ArrayList<>();
     HashMap<Integer, Integer> mSessionMap = new HashMap<>(); // <sessionId, placeHolder>
 
-    public OTContext(String teeName, Context context) throws ITEEClient.Exception, RemoteException {
+    public OTContext(String teeName, Context context) throws TEEClientException, RemoteException {
         this.mTeeName = teeName;
         this.smIdGenerator = new Random();
 
@@ -79,7 +80,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ITEEClient.ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws ITEEClient.Exception, RemoteException {
+    public ITEEClient.ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws TEEClientException, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to register shared memory");
             return null;
@@ -100,7 +101,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public void releaseSharedMemory(ITEEClient.ISharedMemory sharedMemory) throws ITEEClient.Exception, RemoteException {
+    public void releaseSharedMemory(ITEEClient.ISharedMemory sharedMemory) throws TEEClientException, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to release shared memory");
             return;
@@ -117,7 +118,7 @@ public class OTContext implements ITEEClient.IContext {
     public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
-                                ITEEClient.Operation teecOperation) throws ITEEClient.Exception, RemoteException {
+                                ITEEClient.Operation teecOperation) throws TEEClientException, RemoteException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
