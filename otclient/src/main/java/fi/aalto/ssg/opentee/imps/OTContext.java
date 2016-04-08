@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
@@ -31,7 +32,7 @@ public class OTContext implements ITEEClient.IContext {
     List<OTSharedMemory> mSharedMemory = new ArrayList<>();
     HashMap<Integer, Integer> mSessionMap = new HashMap<>(); // <sessionId, placeHolder>
 
-    public OTContext(String teeName, Context context) throws TEEClientException, RemoteException {
+    public OTContext(String teeName, Context context) throws TEEClientException {
         this.mTeeName = teeName;
         this.smIdGenerator = new Random();
 
@@ -59,7 +60,7 @@ public class OTContext implements ITEEClient.IContext {
 
 
     @Override
-    public void finalizeContext() throws RemoteException {
+    public void finalizeContext() throws TEEClientException{
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Nothing to finalize");
             return;
@@ -67,7 +68,11 @@ public class OTContext implements ITEEClient.IContext {
 
         if ( mInitialized ) mInitialized = false;
         if ( mProxyApis != null ){
-            mProxyApis.teecFinalizeContext();
+            try {
+                mProxyApis.teecFinalizeContext();
+            } catch (RemoteException e) {
+                throw new CommunicationErrorException("Communication error with remote TEE service.");
+            }
             mProxyApis.terminateConnection();
         }
 
@@ -80,7 +85,7 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public ITEEClient.ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws TEEClientException, RemoteException {
+    public ITEEClient.ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws TEEClientException{
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to register shared memory");
             return null;
@@ -92,7 +97,11 @@ public class OTContext implements ITEEClient.IContext {
         OTSharedMemory otSharedMemory = new OTSharedMemory(buffer, flags, smId);
 
         // register the shared memory
-        mProxyApis.teecRegisterSharedMemory(otSharedMemory);
+        try {
+            mProxyApis.teecRegisterSharedMemory(otSharedMemory);
+        } catch (RemoteException e) {
+            throw new CommunicationErrorException("Communication error with remote TEE service.");
+        }
 
         // add the registered shared memory to mSharedMemory list.
         mSharedMemory.add(otSharedMemory);
@@ -101,14 +110,18 @@ public class OTContext implements ITEEClient.IContext {
     }
 
     @Override
-    public void releaseSharedMemory(ITEEClient.ISharedMemory sharedMemory) throws TEEClientException, RemoteException {
+    public void releaseSharedMemory(ITEEClient.ISharedMemory sharedMemory) throws TEEClientException{
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to release shared memory");
             return;
         }
 
         // tell remote tee to release the shared memory.
-        if ( sharedMemory != null ) mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
+        if ( sharedMemory != null ) try {
+            mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
+        } catch (RemoteException e) {
+            throw new CommunicationErrorException("Communication error with remote TEE service.");
+        }
 
         // remove it from shared memory list.
         mSharedMemory.remove(sharedMemory);
@@ -118,7 +131,7 @@ public class OTContext implements ITEEClient.IContext {
     public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
-                                ITEEClient.Operation teecOperation) throws TEEClientException, RemoteException {
+                                ITEEClient.Operation teecOperation) throws TEEClientException {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
@@ -185,11 +198,15 @@ public class OTContext implements ITEEClient.IContext {
         }
 
 
-        mProxyApis.teecOpenSession(sid,
-                uuid,
-                connectionMethod,
-                connectionData,
-                opInArray);
+        try {
+            mProxyApis.teecOpenSession(sid,
+                    uuid,
+                    connectionMethod,
+                    connectionData,
+                    opInArray);
+        } catch (RemoteException e) {
+            throw new CommunicationErrorException("Communication error with remote TEE service.");
+        }
 
         // upon success
         OTSession otSession =  new OTSession(sid, mProxyApis);

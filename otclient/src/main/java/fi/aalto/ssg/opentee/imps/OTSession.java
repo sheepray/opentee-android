@@ -3,6 +3,7 @@ package fi.aalto.ssg.opentee.imps;
 import android.os.RemoteException;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
@@ -29,7 +30,11 @@ public class OTSession implements ITEEClient.ISession {
     }
 
     @Override
-    public void closeSession() throws TEEClientException, RemoteException {
-        mProxyApis.teecCloseSession(mSessionId);
+    public void closeSession() throws TEEClientException{
+        try {
+            mProxyApis.teecCloseSession(mSessionId);
+        } catch (RemoteException e) {
+            throw new CommunicationErrorException("Communication error with remote TEE service.");
+        }
     }
 }

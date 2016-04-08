@@ -3,7 +3,7 @@ package fi.aalto.ssg.opentee.exception;
 import fi.aalto.ssg.opentee.ITEEClient;
 
 /**
- * Communication with a remote party failed. This exception excludes the communication errors with
+ * Communication with a remote party failed. This exception includes the communication errors with
  * Android IPC calls which have already been defined in RemoteException and the developers are also
  * suppose to handle it too. On the basis of the CA able to communicate with remote service, this
  * exception is threw by underlying library when the NativeLibtee fails to communicate with the TEE

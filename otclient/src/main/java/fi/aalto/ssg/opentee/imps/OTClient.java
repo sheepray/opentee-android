@@ -11,7 +11,7 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
  */
 public class OTClient implements ITEEClient {
     @Override
-    public IContext initializeContext(String teeName, Context context) throws TEEClientException, RemoteException {
+    public IContext initializeContext(String teeName, Context context) throws TEEClientException{
         return new OTContext(teeName, context);
     }
 }

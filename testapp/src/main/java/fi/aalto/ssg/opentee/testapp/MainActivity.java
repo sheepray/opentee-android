@@ -108,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
             //if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
         } catch (TEEClientException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
 
         // let's create a shared memory;
@@ -124,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
             sharedMemory = ctx.registerSharedMemory(buffer,
                     ITEEClient.ISharedMemory.TEEC_MEM_INPUT | ITEEClient.ISharedMemory.TEEC_MEM_OUTPUT);
         } catch (TEEClientException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
             e.printStackTrace();
         }
 
@@ -152,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
                     ITEEClient.ISharedMemory.TEEC_MEM_INPUT);
         } catch (TEEClientException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
 
         byte[] msg_to_enc = {
@@ -173,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         //ITEEClient.Operation op = new ITEEClient.Operation(started, rmrTwo); // omnishare_ta only allows one input parameter.
         ITEEClient.Operation op = new ITEEClient.Operation(started); // generate_root_key
         ITEEClient.ISession session = null;
+        ITEEClient.ISession sessionTwo = null;
 
         try {
             session = ctx.openSession(uuid,
@@ -184,7 +179,14 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
 
             Log.e(TAG, "Return origin: " + e.getReturnOrigin());
-        } catch (RemoteException e) {
+        }
+
+        try {
+            sessionTwo = ctx.openSession(uuid,
+                    ITEEClient.IContext.ConnectionMethod.LoginPublic,
+                    0,
+                    op);
+        } catch (TEEClientException e) {
             e.printStackTrace();
         }
 
@@ -203,7 +205,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Session closed.");
         } catch (TEEClientException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
+        }
+
+        try {
+            sessionTwo.closeSession();
+        } catch (TEEClientException e) {
             e.printStackTrace();
         }
 
@@ -212,21 +218,17 @@ public class MainActivity extends AppCompatActivity {
             ctx.releaseSharedMemory(sharedMemory2);
         } catch (TEEClientException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
 
         try {
             ctx.releaseSharedMemory(sharedMemory);
         } catch (TEEClientException e) {
             e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
 
         try {
             ctx.finalizeContext();
-        } catch (RemoteException e) {
+        } catch (TEEClientException e) {
             e.printStackTrace();
         }
 
