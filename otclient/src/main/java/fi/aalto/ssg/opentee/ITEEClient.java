@@ -48,7 +48,7 @@ public interface ITEEClient {
     /**
      * In order for the CA to communicate with the TA within a TEE, a session must be opened between CA and TA.
      * To open a session, the CA must call openSession within a valid context. When a session is opened,
-     * a ISession interface will be returned. It embraces all functions for CA to communicate with TA.
+     * an ISession interface will be returned. It embraces all functions for CA to communicate with TA.
      * Within this session, the developer can call the invokeCommand function to invoke corresponding function within the TA.
      * When the session is no longer needed, the developers should close the session by calling
      * closeSession function.
@@ -89,6 +89,8 @@ public interface ITEEClient {
          * the remote system runs out of memory.
          * @throws exception.OverflowException:
          * an buffer overflow happened in the remote TEE or TA.
+         * @throws exception.SecurityErrorException:
+         * incorrect usage of shared memory.
          * @throws exception.ShortBufferException:
          * the provided output buffer is too short to hold the output.
          * @throws exception.TargetDeadException:
@@ -386,70 +388,6 @@ public interface ITEEClient {
     }
 
     /**
-     * This class extends the Parameter abstract class.
-     * It will be subclassed by TempMemoryReference and RegisteredMemoryReference.
-     */
-    // abstract class MemoryReference extends Parameter {}
-
-    /**
-     * this class defines a Temporary Memory Reference which is temporarily registered for data exchange
-     * between Client Application and Trusted Application.
-     */
-    /*
-    class TempMemoryReference extends MemoryReference {
-        Type mType;
-        byte[] mBuffer;
-
-        enum Type{
-            TEEC_MEMREF_TEMP_INPUT(0x00000004),
-            TEEC_MEMREF_TEMP_OUTPUT(0x00000005),
-            TEEC_MEMREF_TEMP_INOUT(0x00000006);
-
-            int id;
-            Type(int id){this.id = id;}
-            int getId(){return this.id;}
-        }
-
-        public TempMemoryReference(Type type, byte[] buffer){}
-
-        @Override
-        public int getType() {
-            return this.mType.getId();
-        }
-
-        public byte[] asByteArray(){return this.mBuffer;}
-    }
-    */
-
-    /**
-     * a reference to pre-registered or allocated memory.
-     */
-    /*
-    class RegisteredMemoryReference extends Parameter {
-        Type mType;
-        ITEEClient.ISharedMemory mParent;
-        int mOffset;
-
-        enum Type{
-            TEEC_MEMREF_PARTIAL_INPUT(0x00000007),
-            TEEC_MEMREF_PARTIAL_OUTPUT(0x00000008),
-            TEEC_MEMREF_PARTIAL_INOUT(0x00000009),
-            TEEC_MEMREF_WHOLE(0x0000000a);
-
-            int id;
-            Type(int id){this.id = id;}
-            int getId(){return this.id;}
-        }
-
-        public RegisteredMemoryReference(Type type,
-                                         ITEEClient.ISharedMemory parent,
-                                         int offset){}
-        @Override
-        public int getType() {return this.mType.getId();}
-    }
-    */
-
-    /**
      * This class defines the payload for either an open session or an invoke command operation.
      */
     class Operation {
@@ -604,10 +542,27 @@ public interface ITEEClient {
          * the TEE.
          * @param buffer indicates the reference of pre-allocated byte array which is to be shared.
          * @param flags indicates I/O direction of this shared memory for Trusted Application.
-         * @throws TEEClientException
-         *
+         * @throws exception.BadParametersException:
+         * 1. try to register a null/empty buffer as a shared memory.
+         * 2. providing incorrect flag value.
+         * @throws exception.BadStateException:
+         * TEE is not ready to register a shared memory.
+         * @throws exception.BusyException:
+         * TEE is busy
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
+         * @throws exception.ExternalCancelException:
+         * Current operation is cancelled by external signal in TEE.
+         * @throws exception.GenericErrorException:
+         * Non-specific causes error.
+         * @throws exception.NoStorageSpaceException:
+         * Insufficient storage in TEE.
+         * @throws exception.OutOfMemoryException:
+         * Insufficient memory in TEE.
+         * @throws exception.OverflowException:
+         * Buffer overflow in TEE.
+         * @throws exception.TargetDeadException:
+         * TEE/TA crashed.
          */
         ISharedMemory registerSharedMemory(byte[] buffer, int flags) throws TEEClientException;
 
@@ -618,8 +573,6 @@ public interface ITEEClient {
          * holds will still remain valid. When using the same shared memory within multi-threads, it
          * is recommended to release the shared memory in the same thread who registered it.
          * @param sharedMemory the reference the ISharedMemory instance.
-         * @throws TEEClientException program error exceptions including attempting to release Shared Memory
-         * which is used by a pending operation.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
          */
@@ -635,9 +588,38 @@ public interface ITEEClient {
          * @param connectionData any necessary data for connectionMethod.
          * @param operation operations to perform.
          * @return an ISession interface.
-         * @throws TEEClientException
+         * @throws exception.AccessDeniedException:
+         * Insufficient privilege.
+         * @throws exception.BadFormatException:
+         * Using incorrect format of parameter(s).
+         * @throws exception.BadParametersException:
+         * Unexpected value(s) for parameter(s).
+         * @throws exception.BadStateException:
+         * TEE is not ready to open a session.
+         * @throws exception.BusyException:
+         * TEE is busy.
+         * @throws exception.CancelErrorException:
+         * Current operation is cancelled by another thread.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
+         * @throws exception.GenericErrorException:
+         * No specific cause error.
+         * @throws exception.ItemNotFoundException:
+         * Referred shared memory not found.
+         * @throws exception.NoDataException:
+         * Extra data expected.
+         * @throws exception.NoStorageSpaceException:
+         * Insufficient data storage in TEE.
+         * @throws exception.OutOfMemoryException:
+         * TEE runs out of memory.
+         * @throws exception.OverflowException:
+         * Buffer overflow in TEE.
+         * @throws exception.SecurityErrorException:
+         * Incorrect usage of shared memory.
+         * @throws exception.ShortBufferException:
+         * the provided output buffer is too short to hold the output.
+         * @throws exception.TargetDeadException:
+         * TEE/TA crashed.
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
