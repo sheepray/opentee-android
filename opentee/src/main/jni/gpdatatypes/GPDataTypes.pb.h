@@ -527,17 +527,14 @@ class TeecSharedMemoryReference : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required bytes parent = 1;
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
   inline bool has_parent() const;
   inline void clear_parent();
   static const int kParentFieldNumber = 1;
-  inline const ::std::string& parent() const;
-  inline void set_parent(const ::std::string& value);
-  inline void set_parent(const char* value);
-  inline void set_parent(const void* value, size_t size);
-  inline ::std::string* mutable_parent();
-  inline ::std::string* release_parent();
-  inline void set_allocated_parent(::std::string* parent);
+  inline const ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory& parent() const;
+  inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* mutable_parent();
+  inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* release_parent();
+  inline void set_allocated_parent(::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent);
 
   // required int32 mOffset = 2;
   inline bool has_moffset() const;
@@ -566,7 +563,7 @@ class TeecSharedMemoryReference : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::std::string* parent_;
+  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent_;
   ::google::protobuf::int32 moffset_;
   int mflag_;
   friend void  protobuf_AddDesc_GPDataTypes_2eproto();
@@ -1052,7 +1049,7 @@ inline void TeecSharedMemory::set_mid(::google::protobuf::int32 value) {
 
 // TeecSharedMemoryReference
 
-// required bytes parent = 1;
+// required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
 inline bool TeecSharedMemoryReference::has_parent() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1063,67 +1060,32 @@ inline void TeecSharedMemoryReference::clear_has_parent() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void TeecSharedMemoryReference::clear_parent() {
-  if (parent_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    parent_->clear();
-  }
+  if (parent_ != NULL) parent_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::Clear();
   clear_has_parent();
 }
-inline const ::std::string& TeecSharedMemoryReference::parent() const {
+inline const ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory& TeecSharedMemoryReference::parent() const {
   // @@protoc_insertion_point(field_get:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
-  return *parent_;
+  return parent_ != NULL ? *parent_ : *default_instance_->parent_;
 }
-inline void TeecSharedMemoryReference::set_parent(const ::std::string& value) {
+inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* TeecSharedMemoryReference::mutable_parent() {
   set_has_parent();
-  if (parent_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    parent_ = new ::std::string;
-  }
-  parent_->assign(value);
-  // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
-}
-inline void TeecSharedMemoryReference::set_parent(const char* value) {
-  set_has_parent();
-  if (parent_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    parent_ = new ::std::string;
-  }
-  parent_->assign(value);
-  // @@protoc_insertion_point(field_set_char:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
-}
-inline void TeecSharedMemoryReference::set_parent(const void* value, size_t size) {
-  set_has_parent();
-  if (parent_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    parent_ = new ::std::string;
-  }
-  parent_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
-}
-inline ::std::string* TeecSharedMemoryReference::mutable_parent() {
-  set_has_parent();
-  if (parent_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    parent_ = new ::std::string;
-  }
+  if (parent_ == NULL) parent_ = new ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory;
   // @@protoc_insertion_point(field_mutable:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
   return parent_;
 }
-inline ::std::string* TeecSharedMemoryReference::release_parent() {
+inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* TeecSharedMemoryReference::release_parent() {
   clear_has_parent();
-  if (parent_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = parent_;
-    parent_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
+  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* temp = parent_;
+  parent_ = NULL;
+  return temp;
 }
-inline void TeecSharedMemoryReference::set_allocated_parent(::std::string* parent) {
-  if (parent_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete parent_;
-  }
+inline void TeecSharedMemoryReference::set_allocated_parent(::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent) {
+  delete parent_;
+  parent_ = parent;
   if (parent) {
     set_has_parent();
-    parent_ = parent;
   } else {
     clear_has_parent();
-    parent_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   // @@protoc_insertion_point(field_set_allocated:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
 }

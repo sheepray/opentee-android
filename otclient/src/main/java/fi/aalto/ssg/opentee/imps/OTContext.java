@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.awt.font.TextAttribute;
@@ -131,7 +132,7 @@ public class OTContext implements ITEEClient.IContext {
     public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
-                                ITEEClient.Operation teecOperation) throws TEEClientException {
+                                ITEEClient.Operation teecOperation) throws Exception {
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
@@ -177,8 +178,10 @@ public class OTContext implements ITEEClient.IContext {
                                 = (ITEEClient.RegisteredMemoryReference)param;
 
                         // find the id for the shared memory in rmr.
+                        ByteString bs = null;
+                        bs.copyFrom(rmr.getSharedMemory().asByteArray());
+                        builder.setParent(bs);
 
-                        builder.setParent(rmr.getSharedMemory());
                         builder.setMOffset(rmr.getOffset());
                         builder.setMFlag(GPDataTypes.TeecSharedMemoryReference.Flag.values()[rmr.getFlag().ordinal()]);
 

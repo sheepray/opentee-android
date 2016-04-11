@@ -247,6 +247,7 @@ public class OTGuard {
                     // the parameter is shared memory reference. Replace the id of shared memory from
                     // to the corresponding shared memory id in JNI.
                     GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
+                    OTSharedMemory otSM = new OTSharedMemory();
                     int idSmJni = caller.getSmIdInJniBySmid(smrPara.getParentId());
 
                     //replace the id in here.

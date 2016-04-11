@@ -646,7 +646,7 @@ public interface ITEEClient {
                               ConnectionMethod connectionMethod,
                               int connectionData,
                               Operation operation
-                              ) throws TEEClientException;
+                              ) throws Exception;
 
 
         /**
