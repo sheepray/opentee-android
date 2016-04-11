@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
@@ -35,7 +36,7 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     }
 
     @Override
-    public byte[] asByteArray() throws TEEClientException {
+    public byte[] asByteArray(){
         return this.mBuffer;
     }
 
@@ -48,6 +49,7 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     public int getId() {
         return this.mId;
     }
+    public void setId(int id){this.mId = id;}
 
     public int getSize(){return mBuffer.length;}
 
@@ -67,7 +69,9 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
 
     public void readFromParcel(Parcel in){
         int bl = in.readInt();
-        this.mBuffer = new byte[bl];
+        if(this.mBuffer == null){
+            this.mBuffer = new byte[bl];
+        }
         in.readByteArray(this.mBuffer);
         this.mFlag = in.readInt();
         this.mReturnSize = in.readInt();
