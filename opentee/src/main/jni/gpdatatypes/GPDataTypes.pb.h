@@ -527,12 +527,14 @@ class TeecSharedMemoryReference : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required int32 parentId = 1;
-  inline bool has_parentid() const;
-  inline void clear_parentid();
-  static const int kParentIdFieldNumber = 1;
-  inline ::google::protobuf::int32 parentid() const;
-  inline void set_parentid(::google::protobuf::int32 value);
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+  inline bool has_parent() const;
+  inline void clear_parent();
+  static const int kParentFieldNumber = 1;
+  inline const ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory& parent() const;
+  inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* mutable_parent();
+  inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* release_parent();
+  inline void set_allocated_parent(::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent);
 
   // required int32 mOffset = 2;
   inline bool has_moffset() const;
@@ -550,8 +552,8 @@ class TeecSharedMemoryReference : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
  private:
-  inline void set_has_parentid();
-  inline void clear_has_parentid();
+  inline void set_has_parent();
+  inline void clear_has_parent();
   inline void set_has_moffset();
   inline void clear_has_moffset();
   inline void set_has_mflag();
@@ -561,7 +563,7 @@ class TeecSharedMemoryReference : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::int32 parentid_;
+  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent_;
   ::google::protobuf::int32 moffset_;
   int mflag_;
   friend void  protobuf_AddDesc_GPDataTypes_2eproto();
@@ -1047,28 +1049,45 @@ inline void TeecSharedMemory::set_mid(::google::protobuf::int32 value) {
 
 // TeecSharedMemoryReference
 
-// required int32 parentId = 1;
-inline bool TeecSharedMemoryReference::has_parentid() const {
+// required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+inline bool TeecSharedMemoryReference::has_parent() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void TeecSharedMemoryReference::set_has_parentid() {
+inline void TeecSharedMemoryReference::set_has_parent() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void TeecSharedMemoryReference::clear_has_parentid() {
+inline void TeecSharedMemoryReference::clear_has_parent() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void TeecSharedMemoryReference::clear_parentid() {
-  parentid_ = 0;
-  clear_has_parentid();
+inline void TeecSharedMemoryReference::clear_parent() {
+  if (parent_ != NULL) parent_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::Clear();
+  clear_has_parent();
 }
-inline ::google::protobuf::int32 TeecSharedMemoryReference::parentid() const {
-  // @@protoc_insertion_point(field_get:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parentId)
-  return parentid_;
+inline const ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory& TeecSharedMemoryReference::parent() const {
+  // @@protoc_insertion_point(field_get:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
+  return parent_ != NULL ? *parent_ : *default_instance_->parent_;
 }
-inline void TeecSharedMemoryReference::set_parentid(::google::protobuf::int32 value) {
-  set_has_parentid();
-  parentid_ = value;
-  // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parentId)
+inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* TeecSharedMemoryReference::mutable_parent() {
+  set_has_parent();
+  if (parent_ == NULL) parent_ = new ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory;
+  // @@protoc_insertion_point(field_mutable:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
+  return parent_;
+}
+inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* TeecSharedMemoryReference::release_parent() {
+  clear_has_parent();
+  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* temp = parent_;
+  parent_ = NULL;
+  return temp;
+}
+inline void TeecSharedMemoryReference::set_allocated_parent(::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory* parent) {
+  delete parent_;
+  parent_ = parent;
+  if (parent) {
+    set_has_parent();
+  } else {
+    clear_has_parent();
+  }
+  // @@protoc_insertion_point(field_set_allocated:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference.parent)
 }
 
 // required int32 mOffset = 2;

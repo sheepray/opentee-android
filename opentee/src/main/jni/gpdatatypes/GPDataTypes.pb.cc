@@ -108,7 +108,7 @@ void protobuf_AssignDesc_GPDataTypes_2eproto() {
       sizeof(TeecSharedMemory));
   TeecSharedMemoryReference_descriptor_ = file->message_type(3);
   static const int TeecSharedMemoryReference_offsets_[3] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, parentid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, parent_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, moffset_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecSharedMemoryReference, mflag_),
   };
@@ -201,18 +201,19 @@ void protobuf_AddDesc_GPDataTypes_2eproto() {
     "mps.pbdatatypes.TeecValue\"\030\n\004Type\022\007\n\003smr"
     "\020\001\022\007\n\003val\020\002\"b\n\020TeecSharedMemory\022\017\n\007mBuff"
     "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n"
-    "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\342\001\n\031Teec"
-    "SharedMemoryReference\022\020\n\010parentId\030\001 \002(\005\022"
-    "\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag\030\003 \002(\0162E.fi.aal"
-    "to.ssg.opentee.imps.pbdatatypes.TeecShar"
-    "edMemoryReference.Flag\"L\n\004Flag\022\025\n\021TEEC_M"
-    "EMREF_INPUT\020\000\022\026\n\022TEEC_MEMREF_OUTPUT\020\001\022\025\n"
-    "\021TEEC_MEMREF_INOUT\020\002\"\262\001\n\tTeecValue\022\t\n\001a\030"
-    "\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag\030\003 \002(\01625.fi.aal"
-    "to.ssg.opentee.imps.pbdatatypes.TeecValu"
-    "e.Flag\"I\n\004Flag\022\024\n\020TEEC_VALUE_INPUT\020\000\022\025\n\021"
-    "TEEC_VALUE_OUTPUT\020\001\022\024\n\020TEEC_VALUE_INOUT\020"
-    "\002", 961);
+    "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031Teec"
+    "SharedMemoryReference\022G\n\006parent\030\001 \002(\01327."
+    "fi.aalto.ssg.opentee.imps.pbdatatypes.Te"
+    "ecSharedMemory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag"
+    "\030\003 \002(\0162E.fi.aalto.ssg.opentee.imps.pbdat"
+    "atypes.TeecSharedMemoryReference.Flag\"L\n"
+    "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\000\022\026\n\022TEEC_MEM"
+    "REF_OUTPUT\020\001\022\025\n\021TEEC_MEMREF_INOUT\020\002\"\262\001\n\t"
+    "TeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag"
+    "\030\003 \002(\01625.fi.aalto.ssg.opentee.imps.pbdat"
+    "atypes.TeecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VA"
+    "LUE_INPUT\020\000\022\025\n\021TEEC_VALUE_OUTPUT\020\001\022\024\n\020TE"
+    "EC_VALUE_INOUT\020\002", 1016);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GPDataTypes.proto", &protobuf_RegisterTypes);
   TeecOperation::default_instance_ = new TeecOperation();
@@ -1271,7 +1272,7 @@ const TeecSharedMemoryReference_Flag TeecSharedMemoryReference::Flag_MAX;
 const int TeecSharedMemoryReference::Flag_ARRAYSIZE;
 #endif  // _MSC_VER
 #ifndef _MSC_VER
-const int TeecSharedMemoryReference::kParentIdFieldNumber;
+const int TeecSharedMemoryReference::kParentFieldNumber;
 const int TeecSharedMemoryReference::kMOffsetFieldNumber;
 const int TeecSharedMemoryReference::kMFlagFieldNumber;
 #endif  // !_MSC_VER
@@ -1283,6 +1284,7 @@ TeecSharedMemoryReference::TeecSharedMemoryReference()
 }
 
 void TeecSharedMemoryReference::InitAsDefaultInstance() {
+  parent_ = const_cast< ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory*>(&::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::default_instance());
 }
 
 TeecSharedMemoryReference::TeecSharedMemoryReference(const TeecSharedMemoryReference& from)
@@ -1294,7 +1296,7 @@ TeecSharedMemoryReference::TeecSharedMemoryReference(const TeecSharedMemoryRefer
 
 void TeecSharedMemoryReference::SharedCtor() {
   _cached_size_ = 0;
-  parentid_ = 0;
+  parent_ = NULL;
   moffset_ = 0;
   mflag_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1307,6 +1309,7 @@ TeecSharedMemoryReference::~TeecSharedMemoryReference() {
 
 void TeecSharedMemoryReference::SharedDtor() {
   if (this != default_instance_) {
+    delete parent_;
   }
 }
 
@@ -1342,7 +1345,12 @@ void TeecSharedMemoryReference::Clear() {
     ::memset(&first, 0, n);                                \
   } while (0)
 
-  ZR_(parentid_, mflag_);
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(moffset_, mflag_);
+    if (has_parent()) {
+      if (parent_ != NULL) parent_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::Clear();
+    }
+  }
 
 #undef OFFSET_OF_FIELD_
 #undef ZR_
@@ -1361,13 +1369,11 @@ bool TeecSharedMemoryReference::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 parentId = 1;
+      // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
       case 1: {
-        if (tag == 8) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &parentid_)));
-          set_has_parentid();
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_parent()));
         } else {
           goto handle_unusual;
         }
@@ -1435,9 +1441,10 @@ failure:
 void TeecSharedMemoryReference::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
-  // required int32 parentId = 1;
-  if (has_parentid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->parentid(), output);
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+  if (has_parent()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->parent(), output);
   }
 
   // required int32 mOffset = 2;
@@ -1461,9 +1468,11 @@ void TeecSharedMemoryReference::SerializeWithCachedSizes(
 ::google::protobuf::uint8* TeecSharedMemoryReference::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemoryReference)
-  // required int32 parentId = 1;
-  if (has_parentid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->parentid(), target);
+  // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+  if (has_parent()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->parent(), target);
   }
 
   // required int32 mOffset = 2;
@@ -1489,11 +1498,11 @@ int TeecSharedMemoryReference::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 parentId = 1;
-    if (has_parentid()) {
+    // required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;
+    if (has_parent()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->parentid());
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->parent());
     }
 
     // required int32 mOffset = 2;
@@ -1536,8 +1545,8 @@ void TeecSharedMemoryReference::MergeFrom(const ::google::protobuf::Message& fro
 void TeecSharedMemoryReference::MergeFrom(const TeecSharedMemoryReference& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_parentid()) {
-      set_parentid(from.parentid());
+    if (from.has_parent()) {
+      mutable_parent()->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::MergeFrom(from.parent());
     }
     if (from.has_moffset()) {
       set_moffset(from.moffset());
@@ -1564,12 +1573,15 @@ void TeecSharedMemoryReference::CopyFrom(const TeecSharedMemoryReference& from) 
 bool TeecSharedMemoryReference::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
 
+  if (has_parent()) {
+    if (!this->parent().IsInitialized()) return false;
+  }
   return true;
 }
 
 void TeecSharedMemoryReference::Swap(TeecSharedMemoryReference* other) {
   if (other != this) {
-    std::swap(parentid_, other->parentid_);
+    std::swap(parent_, other->parent_);
     std::swap(moffset_, other->moffset_);
     std::swap(mflag_, other->mflag_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
