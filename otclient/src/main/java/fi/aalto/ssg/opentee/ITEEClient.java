@@ -10,33 +10,54 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
  * Open-TEE Java API Version: V 1.0
+ * Tested Environment: Nexus 6 (shamu build tag) running Android 5.1.1
  *
- * Tested Environment: Nexus 6 (shamu build tag) running Android 5.1.1.
- *
+ * Introduction:<br>
+ *     This public API documentation defines the Java APIs corresponding to the C APIs defined in
+ *     the GlobalPlatform Device Technology TEE Client API specification \ref{}. It describes how
+ *     the Client Android Application communicate with the Remote TEE service manager
  * This is the main entrances of public APIs. In order to help explaining the APIs,
  * there are definitions for several essential key words in the following:<br>
  * Key word definition:<br>
- * 1. TEE: Trusted Execution Environment in target Android device that the developer is working on;<br>
- * 2. CA: Client Application that the developer is creating;<br>
- * 3. TA: Trusted Application which is already deployed in TEE.<br>
- * 4. Underlying library: A library which resides in the CA and communicates with the remote service.<br>
- * 5. NativeLibtee: A library which interacts with the remote TEE on CA's behalf.<br>
+ *     1. CA: Client Application that the developer is creating;<br>
+ *     2. TA: Trusted Application which is already deployed in TEE.<br>
+ *     3. TEE: Trusted Execution Environment in target Android device that TAs are running;<br>
+ *     4. TEE Service Manager: Android service layer abstraction for TEE who is responsible for handling
+ *     incoming connection from CAs and communicating with TEE with the help of NativeLibtee.<br>
+ *     5. NativeLibtee: A library which enables the communication between TEE and TEE Service Manager.<br>
+ *     6. Underlying library: A library which resides in the CA and communicates with the remote TEE service.<br>
  *<p>
- * Target audience<br>
- *
+ * Target audience:<br>
+ * This document suits for software developers implementing:<br>
+ *     1. Client Android Application running within the rich operating environment and which needs to
+ *     talk to the Trusted Application.<br>
+ *     2. Trusted Application running inside the TEE which need to expose its internal functions
+ *     to the Client Application.
  * <p>
  * Background information<br>
- *    what is TEE,
- *    GP Specification for Trusted Application APIs.
- *    what is OpenTEE.
+ *    1. what is TEE?
+ *    TEE stands for Trusted Execution Environment. There is another notation called Rich Execution
+ *    Environment (REE). These two are often brought together to help explain.
  *
- * What is this APIs?
- * What is this APs for?
- * Why it is needed?
- * How to use it and what to expect from the APIs?
- *      1. How to set up the environment.
- *      2. Check the descriptions for each API.
- * Bug report:
+ *    <p>
+ *    2. GP Specification for Trusted Application APIs.
+ *
+ *    <p>
+ *    3.what is OpenTEE.
+ *
+ * Design:<br>
+ *    1. What is this APIs?
+ *    <p>
+ *    2. What is this APs for?
+ *    <p>
+ *    3. Why it is needed?
+ *    <p>
+ *    4. How to use it and what to expect from the APIs?
+ *      a. How to set up the environment.
+ *      b. Check the descriptions for each API.
+ *
+ * Bug report to:
+ *      Aalto University School of Science SSG group.
  */
 
 /**
