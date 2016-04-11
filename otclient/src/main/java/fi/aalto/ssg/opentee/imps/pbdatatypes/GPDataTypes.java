@@ -2424,17 +2424,13 @@ public final class GPDataTypes {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required bytes parent = 1;</code>
      */
     boolean hasParent();
     /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required bytes parent = 1;</code>
      */
-    TeecSharedMemory getParent();
-    /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-     */
-    TeecSharedMemoryOrBuilder getParentOrBuilder();
+    com.google.protobuf.ByteString getParent();
 
     /**
      * <code>required int32 mOffset = 2;</code>
@@ -2507,16 +2503,8 @@ public final class GPDataTypes {
               break;
             }
             case 10: {
-              TeecSharedMemory.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                subBuilder = parent_.toBuilder();
-              }
-              parent_ = input.readMessage(TeecSharedMemory.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(parent_);
-                parent_ = subBuilder.buildPartial();
-              }
               bitField0_ |= 0x00000001;
+              parent_ = input.readBytes();
               break;
             }
             case 16: {
@@ -2667,23 +2655,17 @@ public final class GPDataTypes {
 
     private int bitField0_;
     public static final int PARENT_FIELD_NUMBER = 1;
-    private TeecSharedMemory parent_;
+    private com.google.protobuf.ByteString parent_;
     /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required bytes parent = 1;</code>
      */
     public boolean hasParent() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+     * <code>required bytes parent = 1;</code>
      */
-    public TeecSharedMemory getParent() {
-      return parent_;
-    }
-    /**
-     * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-     */
-    public TeecSharedMemoryOrBuilder getParentOrBuilder() {
+    public com.google.protobuf.ByteString getParent() {
       return parent_;
     }
 
@@ -2718,7 +2700,7 @@ public final class GPDataTypes {
     }
 
     private void initFields() {
-      parent_ = TeecSharedMemory.getDefaultInstance();
+      parent_ = com.google.protobuf.ByteString.EMPTY;
       mOffset_ = 0;
       mFlag_ = Flag.TEEC_MEMREF_INPUT;
     }
@@ -2740,10 +2722,6 @@ public final class GPDataTypes {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!getParent().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2752,7 +2730,7 @@ public final class GPDataTypes {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, parent_);
+        output.writeBytes(1, parent_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, mOffset_);
@@ -2771,7 +2749,7 @@ public final class GPDataTypes {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, parent_);
+          .computeBytesSize(1, parent_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2890,7 +2868,6 @@ public final class GPDataTypes {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getParentFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2899,11 +2876,7 @@ public final class GPDataTypes {
 
       public Builder clear() {
         super.clear();
-        if (parentBuilder_ == null) {
-          parent_ = TeecSharedMemory.getDefaultInstance();
-        } else {
-          parentBuilder_.clear();
-        }
+        parent_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         mOffset_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2940,11 +2913,7 @@ public final class GPDataTypes {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        if (parentBuilder_ == null) {
-          result.parent_ = parent_;
-        } else {
-          result.parent_ = parentBuilder_.build();
-        }
+        result.parent_ = parent_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
@@ -2970,7 +2939,7 @@ public final class GPDataTypes {
       public Builder mergeFrom(TeecSharedMemoryReference other) {
         if (other == TeecSharedMemoryReference.getDefaultInstance()) return this;
         if (other.hasParent()) {
-          mergeParent(other.getParent());
+          setParent(other.getParent());
         }
         if (other.hasMOffset()) {
           setMOffset(other.getMOffset());
@@ -2992,10 +2961,6 @@ public final class GPDataTypes {
           return false;
         }
         if (!hasMFlag()) {
-          
-          return false;
-        }
-        if (!getParent().isInitialized()) {
           
           return false;
         }
@@ -3021,120 +2986,39 @@ public final class GPDataTypes {
       }
       private int bitField0_;
 
-      private TeecSharedMemory parent_ = TeecSharedMemory.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          TeecSharedMemory, TeecSharedMemory.Builder, TeecSharedMemoryOrBuilder> parentBuilder_;
+      private com.google.protobuf.ByteString parent_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required bytes parent = 1;</code>
        */
       public boolean hasParent() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required bytes parent = 1;</code>
        */
-      public TeecSharedMemory getParent() {
-        if (parentBuilder_ == null) {
-          return parent_;
-        } else {
-          return parentBuilder_.getMessage();
-        }
+      public com.google.protobuf.ByteString getParent() {
+        return parent_;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required bytes parent = 1;</code>
        */
-      public Builder setParent(TeecSharedMemory value) {
-        if (parentBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          parent_ = value;
-          onChanged();
-        } else {
-          parentBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000001;
+      public Builder setParent(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        parent_ = value;
+        onChanged();
         return this;
       }
       /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-       */
-      public Builder setParent(
-          TeecSharedMemory.Builder builderForValue) {
-        if (parentBuilder_ == null) {
-          parent_ = builderForValue.build();
-          onChanged();
-        } else {
-          parentBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-       */
-      public Builder mergeParent(TeecSharedMemory value) {
-        if (parentBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              parent_ != TeecSharedMemory.getDefaultInstance()) {
-            parent_ =
-              TeecSharedMemory.newBuilder(parent_).mergeFrom(value).buildPartial();
-          } else {
-            parent_ = value;
-          }
-          onChanged();
-        } else {
-          parentBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
+       * <code>required bytes parent = 1;</code>
        */
       public Builder clearParent() {
-        if (parentBuilder_ == null) {
-          parent_ = TeecSharedMemory.getDefaultInstance();
-          onChanged();
-        } else {
-          parentBuilder_.clear();
-        }
         bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-      /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-       */
-      public TeecSharedMemory.Builder getParentBuilder() {
-        bitField0_ |= 0x00000001;
+        parent_ = getDefaultInstance().getParent();
         onChanged();
-        return getParentFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-       */
-      public TeecSharedMemoryOrBuilder getParentOrBuilder() {
-        if (parentBuilder_ != null) {
-          return parentBuilder_.getMessageOrBuilder();
-        } else {
-          return parent_;
-        }
-      }
-      /**
-       * <code>required .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecSharedMemory parent = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          TeecSharedMemory, TeecSharedMemory.Builder, TeecSharedMemoryOrBuilder>
-          getParentFieldBuilder() {
-        if (parentBuilder_ == null) {
-          parentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              TeecSharedMemory, TeecSharedMemory.Builder, TeecSharedMemoryOrBuilder>(
-                  getParent(),
-                  getParentForChildren(),
-                  isClean());
-          parent_ = null;
-        }
-        return parentBuilder_;
+        return this;
       }
 
       private int mOffset_ ;
@@ -3939,19 +3823,17 @@ public final class GPDataTypes {
       "mps.pbdatatypes.TeecValue\"\030\n\004Type\022\007\n\003smr" +
       "\020\001\022\007\n\003val\020\002\"b\n\020TeecSharedMemory\022\017\n\007mBuff" +
       "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n" +
-      "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031Teec" +
-      "SharedMemoryReference\022G\n\006parent\030\001 \002(\01327." +
-      "fi.aalto.ssg.opentee.imps.pbdatatypes.Te" +
-      "ecSharedMemory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag" +
-      "\030\003 \002(\0162E.fi.aalto.ssg.opentee.imps.pbdat" +
-      "atypes.TeecSharedMemoryReference.Flag\"L\n" +
-      "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\000\022\026\n\022TEEC_MEM",
-      "REF_OUTPUT\020\001\022\025\n\021TEEC_MEMREF_INOUT\020\002\"\262\001\n\t" +
-      "TeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag" +
-      "\030\003 \002(\01625.fi.aalto.ssg.opentee.imps.pbdat" +
-      "atypes.TeecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VA" +
-      "LUE_INPUT\020\000\022\025\n\021TEEC_VALUE_OUTPUT\020\001\022\024\n\020TE" +
-      "EC_VALUE_INOUT\020\002"
+      "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\340\001\n\031Teec" +
+      "SharedMemoryReference\022\016\n\006parent\030\001 \002(\014\022\017\n" +
+      "\007mOffset\030\002 \002(\005\022T\n\005mFlag\030\003 \002(\0162E.fi.aalto" +
+      ".ssg.opentee.imps.pbdatatypes.TeecShared" +
+      "MemoryReference.Flag\"L\n\004Flag\022\025\n\021TEEC_MEM" +
+      "REF_INPUT\020\000\022\026\n\022TEEC_MEMREF_OUTPUT\020\001\022\025\n\021T" +
+      "EEC_MEMREF_INOUT\020\002\"\262\001\n\tTeecValue\022\t\n\001a\030\001 ",
+      "\002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag\030\003 \002(\01625.fi.aalto" +
+      ".ssg.opentee.imps.pbdatatypes.TeecValue." +
+      "Flag\"I\n\004Flag\022\024\n\020TEEC_VALUE_INPUT\020\000\022\025\n\021TE" +
+      "EC_VALUE_OUTPUT\020\001\022\024\n\020TEEC_VALUE_INOUT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -25,7 +25,7 @@ message TeecSharedMemory{
 message TeecSharedMemoryReference{
     enum Flag{ TEEC_MEMREF_INPUT = 0x0000000; TEEC_MEMREF_OUTPUT = 0x00000001; TEEC_MEMREF_INOUT= 0x00000002;}
 
-    required TeecSharedMemory parent = 1;
+    required bytes parent = 1;
     required int32  mOffset = 2;
     required Flag mFlag = 3;
 
