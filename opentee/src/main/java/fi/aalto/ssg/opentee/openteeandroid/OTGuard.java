@@ -160,18 +160,15 @@ public class OTGuard {
          */
         // serialize the otSharedMemory into byte array.
         GPDataTypes.TeecSharedMemory.Builder smBuilder = GPDataTypes.TeecSharedMemory.newBuilder();
-        try {
-            smBuilder.setMBuffer( ByteString.copyFrom( otSharedMemory.asByteArray()) );
-        } catch (TEEClientException e) {
-            e.printStackTrace();
-        }
-
         int tmpSmIDInJni = generateSharedMemoryId();
-        smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
-        smBuilder.setSize(otSharedMemory.getSize());
-        smBuilder.setMID(otSharedMemory.getId());
-        smBuilder.setMFlag(otSharedMemory.getFlags());
+        if(otSharedMemory != null){
+            smBuilder.setMBuffer( ByteString.copyFrom( otSharedMemory.asByteArray()) );
+            smBuilder.setMReturnSize(otSharedMemory.getReturnSize());
+            smBuilder.setSize(otSharedMemory.getSize());
+            smBuilder.setMID(otSharedMemory.getId());
+            smBuilder.setMFlag(otSharedMemory.getFlags());
 
+        }
         int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray(),
                 tmpSmIDInJni);
 
@@ -242,34 +239,49 @@ public class OTGuard {
             GPDataTypes.TeecOperation.Builder toBuilder = opBuilder;
 
             boolean modified = false;
+            int i = 0;
             for(GPDataTypes.TeecParameter para: op.getMParamsList()){
-                if (op.getMParams(0).getType() == GPDataTypes.TeecParameter.Type.smr) {
+                Log.d(TAG, "param type:" + op.getMParams(i).getType());
+
+                if (op.getMParams(i).getType() == GPDataTypes.TeecParameter.Type.smr) {
+                    Log.d(TAG, "Param is smr");
+
                     // the parameter is shared memory reference. Replace the id of shared memory from
                     // to the corresponding shared memory id in JNI.
                     GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
-                    OTSharedMemory otSM = new OTSharedMemory();
-                    int idSmJni = caller.getSmIdInJniBySmid(smrPara.getParentId());
 
-                    //replace the id in here.
+                    // find the id in JNI
+                    int idSmJni = caller.getSmIdInJniBySmid(smrPara.getParent().getMID());
+
+                    /**
+                     * replace the id in here. Since the id is changed, a new GP shared memory will
+                     * be created.
+                     */
                     GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
                             GPDataTypes.TeecSharedMemoryReference.newBuilder(smrPara);
-                    smrParaWithReplacedIdBuilder.setParentId(idSmJni);
+
+                    GPDataTypes.TeecSharedMemory.Builder gpSMBuilder = GPDataTypes.TeecSharedMemory.newBuilder(smrPara.getParent());
+                    gpSMBuilder.setMID(idSmJni);
+
+                    // replace the share memory in smr
+                    smrParaWithReplacedIdBuilder.setParent(gpSMBuilder.build());
 
                     GPDataTypes.TeecParameter.Builder tpBuilder = GPDataTypes.TeecParameter.newBuilder(para);
                     tpBuilder.setTeecSharedMemoryReference(smrParaWithReplacedIdBuilder.build());
 
-                    toBuilder.removeMParams(0);
+
                     GPDataTypes.TeecParameter tmpParam = tpBuilder.build();
-                    toBuilder.addMParams(tmpParam);
+                    toBuilder.setMParams(i, tmpParam);
 
                     Log.d(TAG,
                             "Using shared memory reference in operation. Replace the id "
-                                    + smrPara.getParentId()
+                                    + smrPara.getParent().getMID()
                                     + " of shared memory to the id "
-                                    + tmpParam.getTeecSharedMemoryReference().getParentId()
+                                    + tmpParam.getTeecSharedMemoryReference().getParent().getMID()
                                     + " in jni.");
                     modified = true;
                 }
+                i++;
             }
 
             if(modified) {
