@@ -5,11 +5,11 @@ package fi.aalto.ssg.opentee.openteeandroid;
  * origin from jni layer to Java layer.
  */
 public class IntWrapper {
-    int mReturnOrigin;
+    int mValue;
 
     public IntWrapper(int ro){
-        this.mReturnOrigin = ro;
+        this.mValue = ro;
     }
 
-    public int getReturnOrigin(){return this.mReturnOrigin;}
+    public int getValue(){return this.mValue;}
 }

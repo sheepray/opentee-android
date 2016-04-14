@@ -6,17 +6,13 @@ import android.util.Log;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
@@ -206,109 +202,164 @@ public class OTGuard {
         caller.removeSharedMemoryBySmIdInJni(smId);
     }
 
+    /*
+    * recreate the shared memory reference by replacing the memory reference id with the id in
+    * JNI if the operation is referencing registered memory.
+    * If reversed is true, then it replaces smid with smidInJni. Otherwise, it replaces smidInJni
+    * with smid.
+    * */
+    private byte[] replaceSMId(OTCaller caller, byte[] opsInBytes, boolean reversed){
+        if ( opsInBytes == null ) return null;
+
+        GPDataTypes.TeecOperation.Builder opBuilder = GPDataTypes.TeecOperation.newBuilder();
+        try {
+            opBuilder.mergeFrom(opsInBytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+
+            Log.e(TAG, "Internal error.");
+        }
+
+        GPDataTypes.TeecOperation op = opBuilder.build();
+
+        GPDataTypes.TeecOperation.Builder toBuilder = opBuilder;
+
+        boolean modified = false;
+        int i = 0;
+        for(GPDataTypes.TeecParameter para: op.getMParamsList()){
+            Log.d(TAG, "param type:" + op.getMParams(i).getType());
+
+            if (op.getMParams(i).getType() == GPDataTypes.TeecParameter.Type.smr) {
+                Log.d(TAG, "Param is smr");
+
+                // the parameter is shared memory reference. Replace the id of shared memory from
+                // to the corresponding shared memory id in JNI.
+                GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
+
+                int smid;
+                if(reversed){
+                    Log.i(TAG, "smid to smidInJni");
+
+                    // find the id in JNI
+                    smid = caller.getSmIdInJniBySmid(smrPara.getParent().getMID());
+                }else{
+                    Log.i(TAG, "smidInJni to smid");
+
+                    smid = caller.getSmIdBySmIdInJni(smrPara.getParent().getMID());
+                }
+
+
+                /**
+                 * replace the id in here. Since the id is changed, a new GP shared memory will
+                 * be created.
+                 */
+                GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
+                        GPDataTypes.TeecSharedMemoryReference.newBuilder(smrPara);
+
+                GPDataTypes.TeecSharedMemory.Builder gpSMBuilder = GPDataTypes.TeecSharedMemory.newBuilder(smrPara.getParent());
+                gpSMBuilder.setMID(smid);
+
+                // replace the share memory in smr
+                smrParaWithReplacedIdBuilder.setParent(gpSMBuilder.build());
+
+                GPDataTypes.TeecParameter.Builder tpBuilder = GPDataTypes.TeecParameter.newBuilder(para);
+                tpBuilder.setTeecSharedMemoryReference(smrParaWithReplacedIdBuilder.build());
+
+
+                GPDataTypes.TeecParameter tmpParam = tpBuilder.build();
+                toBuilder.setMParams(i, tmpParam);
+
+                Log.d(TAG,
+                        "Using shared memory reference in operation. Replace the id "
+                                + smrPara.getParent().getMID()
+                                + " of shared memory to the id "
+                                + tmpParam.getTeecSharedMemoryReference().getParent().getMID()
+                                + " in jni.");
+                modified = true;
+            }
+            i++;
+        }
+
+        if(modified) {
+            // recreate TeecOperation after pid changed.
+            GPDataTypes.TeecOperation newOp = toBuilder.build();
+            opsInBytes = newOp.toByteArray();
+        }
+
+        return opsInBytes;
+    }
+
+    private void print_op(GPDataTypes.TeecOperation opToPrint){
+        if(opToPrint == null){
+            Log.e(TAG, "op is null");
+            return;
+        }
+
+        Log.d(TAG, "started:" + opToPrint.getMStarted());
+        for(GPDataTypes.TeecParameter param: opToPrint.getMParamsList()){
+            if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
+                GPDataTypes.TeecSharedMemory sm = param.getTeecSharedMemoryReference().getParent();
+                Log.d(TAG, "[SMR] flag:" + sm.getMFlag() +
+                           " buffer:" + sm.getMBuffer().toStringUtf8().toString());
+            }
+            else if (param.getType() == GPDataTypes.TeecParameter.Type.val){
+                GPDataTypes.TeecValue var = param.getTeecValue();
+                Log.d(TAG, "[VALUE] flag:" + var.getMFlag() +
+                           " a:" + Integer.toHexString(var.getA()) +
+                           " b:" + Integer.toHexString(var.getB()) );
+            }
+            else{
+                Log.e(TAG, "Incorrect parameter");
+            }
+        }
+    }
+
+    private void print_op_in_bytes(byte[] opInBytes){
+        GPDataTypes.TeecOperation.Builder opBuilder = GPDataTypes.TeecOperation.newBuilder();
+        try {
+            opBuilder.mergeFrom(opInBytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+        print_op(opBuilder.build());
+    }
+
     public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
         OTCaller caller = findCallerById(callerId);
 
-        int retCode = -1;
-        ReturnOriginWrapper retOriginFromJni = new ReturnOriginWrapper(-1); // to receive the return origin from jni layer
+        opsInBytes = replaceSMId(caller, opsInBytes, true);
 
         // generate sid for JNI layer.
         int sidForJni = generateSessionId();
-
-        // recreate the shared memory reference by replacing the memory reference id with the id in
-        // JNI if the operation is referencing registered memory.
-        if ( opsInBytes != null ){
-            // make a deep copy of it in case the binder copy it back. Because it is just memory reference.
-            // there is no need to copy the reference back.
-            //byte[] opsInBytesCopy = opsInBytes.clone();//Arrays.copyOf(opsInBytes, opsInBytes.length);
-
-            GPDataTypes.TeecOperation.Builder opBuilder = GPDataTypes.TeecOperation.newBuilder();
-            try {
-                opBuilder.mergeFrom(opsInBytes);
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-
-                return OTReturnCode.TEEC_ERROR_BAD_PARAMETERS;
-            }
-
-            GPDataTypes.TeecOperation op = opBuilder.build();
-
-            GPDataTypes.TeecOperation.Builder toBuilder = opBuilder;
-
-            boolean modified = false;
-            int i = 0;
-            for(GPDataTypes.TeecParameter para: op.getMParamsList()){
-                Log.d(TAG, "param type:" + op.getMParams(i).getType());
-
-                if (op.getMParams(i).getType() == GPDataTypes.TeecParameter.Type.smr) {
-                    Log.d(TAG, "Param is smr");
-
-                    // the parameter is shared memory reference. Replace the id of shared memory from
-                    // to the corresponding shared memory id in JNI.
-                    GPDataTypes.TeecSharedMemoryReference smrPara = para.getTeecSharedMemoryReference();
-
-                    // find the id in JNI
-                    int idSmJni = caller.getSmIdInJniBySmid(smrPara.getParent().getMID());
-
-                    /**
-                     * replace the id in here. Since the id is changed, a new GP shared memory will
-                     * be created.
-                     */
-                    GPDataTypes.TeecSharedMemoryReference.Builder smrParaWithReplacedIdBuilder =
-                            GPDataTypes.TeecSharedMemoryReference.newBuilder(smrPara);
-
-                    GPDataTypes.TeecSharedMemory.Builder gpSMBuilder = GPDataTypes.TeecSharedMemory.newBuilder(smrPara.getParent());
-                    gpSMBuilder.setMID(idSmJni);
-
-                    // replace the share memory in smr
-                    smrParaWithReplacedIdBuilder.setParent(gpSMBuilder.build());
-
-                    GPDataTypes.TeecParameter.Builder tpBuilder = GPDataTypes.TeecParameter.newBuilder(para);
-                    tpBuilder.setTeecSharedMemoryReference(smrParaWithReplacedIdBuilder.build());
-
-
-                    GPDataTypes.TeecParameter tmpParam = tpBuilder.build();
-                    toBuilder.setMParams(i, tmpParam);
-
-                    Log.d(TAG,
-                            "Using shared memory reference in operation. Replace the id "
-                                    + smrPara.getParent().getMID()
-                                    + " of shared memory to the id "
-                                    + tmpParam.getTeecSharedMemoryReference().getParent().getMID()
-                                    + " in jni.");
-                    modified = true;
-                }
-                i++;
-            }
-
-            if(modified) {
-                // recreate TeecOperation after pid changed.
-                GPDataTypes.TeecOperation newOp = toBuilder.build();
-                opsInBytes = newOp.toByteArray();
-            }
-
-        }
-
+        IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
+        IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
         // call the teecOpenSession in native libtee.
-        retCode = NativeLibtee.teecOpenSession(sidForJni,
+        byte[] newOpInBytes = NativeLibtee.teecOpenSession(sidForJni,
                 uuid,
                 connMethod,
                 connData,
                 opsInBytes,
-                retOriginFromJni);
+                retOriginFromJni,
+                returnCode);
 
-        retOrigin[0] = retOriginFromJni.getReturnOrigin();
+        retOrigin[0] = retOriginFromJni.getValue();
 
         // upon success, add session to that caller.
-        if(retCode == OTReturnCode.TEEC_SUCCESS) {
+        if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) {
             findCallerById(callerId).addSession(sidForJni, new OTCaller.OTCallerSession(sid));
             sessionIdMap.put(sidForJni, sid);
+
+            opsInBytes = replaceSMId(caller, opsInBytes, false);
         }
 
-        return retCode;
+        //test code
+        print_op_in_bytes(newOpInBytes);
+
+        return returnCode.getValue();
     }
 
     public void teecCloseSession(int callerId, int sid){
@@ -317,6 +368,8 @@ public class OTGuard {
         OTCaller caller = findCallerById(callerId);
         // remove session id from caller.
         int sidInJni = caller.removeSessionBySid(sid);
+
+        if(sidInJni == -1) return;
 
         // remove sidInJni from global var.
         sessionIdMap.remove(sidInJni);

@@ -78,6 +78,10 @@ public class OTCaller {
         return -1;
     }
 
+    public int getSmIdBySmIdInJni(int smidInJni){
+        return mSharedMemoryList.get(smidInJni).getId();
+    }
+
     /**
      * OTSession children class
      */

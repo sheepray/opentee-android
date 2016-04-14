@@ -15,8 +15,6 @@ package fi.aalto.ssg.opentee.openteeandroid;
 
 import java.util.UUID;
 
-import fi.aalto.ssg.opentee.imps.OTSharedMemory;
-
 /**
  * wrapper class for libtee
  */
@@ -45,12 +43,13 @@ public class NativeLibtee {
 
     public static synchronized native void teecReleaseSharedMemory(int sharedMemoryID);
 
-    public static synchronized native int teecOpenSession(int sidInJni,
+    public static synchronized native byte[] teecOpenSession(int sidInJni,
                                                           UUID uuid,
                                                           int connMethod,
                                                           int connData,
                                                           byte[] opsInBytes,
-                                                          ReturnOriginWrapper retOriginWrapper);
+                                                          IntWrapper retOriginWrapper,
+                                                          IntWrapper returnCode);
 
     public static synchronized native void teecCloseSession(int sidInJni);
 

@@ -140,6 +140,13 @@ public class ProxyApis {
             throw new GenericErrorException("Service unavailable");
         }
 
+        if(otSharedMemory.asByteArray() == null){
+            Log.e(TAG, "otshared memory is null");
+            return;
+        }else{
+            Log.e(TAG, new String(otSharedMemory.asByteArray()));
+        }
+
         // call IPC
         int return_code = mService.teecRegisterSharedMemory(otSharedMemory);
 
@@ -171,6 +178,8 @@ public class ProxyApis {
             throw new GenericErrorException("Service unavailable");
         }
 
+        //ByteArrayWrapper baw = new ByteArrayWrapper(opInArray);
+
         /**
          * IPC open session call.
          */
@@ -189,6 +198,16 @@ public class ProxyApis {
                     connectionData,
                     opInArray,
                     retOrigin);
+
+            //with byte array wrapper
+            /*
+            rc = mService.teecOpenSessionWithByteArrayWrapper(sessionId,
+                    new ParcelUuid(uuid),
+                    connectionMethod.ordinal(),
+                    connectionData,
+                    baw,
+                    retOrigin);
+                    */
         }
 
         Log.d(TAG, "teecOpenSession return code: " + rc);

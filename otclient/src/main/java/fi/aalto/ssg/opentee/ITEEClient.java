@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
@@ -37,13 +38,31 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
  * Background information<br>
  *    1. what is TEE?
  *    TEE stands for Trusted Execution Environment. There is another notation called Rich Execution
- *    Environment (REE). These two are often brought together to help explain.
+ *    Environment (REE). These two are often brought together to help explain both of them by comparison.
+ *    Before taking a look at TEE, it is better to start explaining from REE which is more closer to our daily sense.
+ *    REE stands for the common operating system along with its hardware, such as devices running Windows, Mac OSX,
+ *    Linux, Android or iOS. It abstracts the underlying hardware and provides resources for the
+ *    applications to run with. As such, it has rich features for applications to utilize. However, the
+ *    REE frequently suffer from different kinds of attacks, such as malware, worm, trojan and ransomware.
+ *    So, in order to protect very sensitive and private information such as encryption private
+ *    keys against these attacks, it is good to keep these information safe in a separate container even
+ *    if the REE is compromised. It is the similar notion as the safe deposit box. For instance, if bad guys broke
+ *    into your home, it is still impossible for them to get all your money in the safe deposit box without
+ *    the right password to open it. So, with such a thought, TEE showed up to meet such needs.
+ *    Currently, the TEE shipped within devices is physically separated with REE by the hardware boundaries.
+ *    Client Application (CA) runs in the REE and Trusted Application (TA) runs in the TEE.
+ *    Compared with the rich features of REE, TEE mostly comes with very limited hardware capabilities.
  *
  *    <p>
- *    2. GP Specification for Trusted Application APIs.
+ *    2. GP Specification for TEE Client API Specification.
+ *    GP is short for GlobalPlatform. It is a non-profit organization that publishes specifications to promote
+ *    security and interoperability of secure devices. One of the specifications it published, named
+ *    "GlobalPlatform Device Technology TEE Client API Specification", standardizes the ways how CAs communicate
+ *    with TAs. GlobalPlatform also have other specifications for TEE but we only focus on this one specifically.
  *
  *    <p>
- *    3.what is OpenTEE.
+ *    3.what is Open-TEE.
+ *
  *
  * Design:<br>
  *    1. What is this APIs?
@@ -174,9 +193,8 @@ public interface ITEEClient {
         /**
          * Get the content of the shared memory. This function returns a reference to the buffer.
          * @return an byte array reference.
-         * @throws Exception if failed to get the shared memory.
          */
-        byte[] asByteArray() throws Exception;
+        byte[] asByteArray();
 
         /**
          * Get the size of the output from Trusted Application if there is such an output.
@@ -646,7 +664,7 @@ public interface ITEEClient {
                               ConnectionMethod connectionMethod,
                               int connectionData,
                               Operation operation
-                              ) throws Exception;
+                              ) throws TEEClientException;
 
 
         /**

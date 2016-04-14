@@ -125,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Log.e(TAG, buffer + " vs " + sharedMemory.asByteArray() + " " +  (buffer == sharedMemory.asByteArray()));
+
 
         /**
          * Register another shared memory.
@@ -150,26 +152,36 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        byte[] msg_to_enc = {
-                0x1, 0x2, 0x3, 0x4,
-                0x5, 0x6, 0x7, 0x8
-        };
-
-        // only encrypt msg_to_enc[1:7]
-        buffer = Arrays.copyOf(msg_to_enc, msg_to_enc.length);
-
         // open session
         UUID uuid = TA_CONN_TEST_UUID;
         int started = 0;
         //ITEEClient.RegisteredMemoryReference rmrOne = new ITEEClient.RegisteredMemoryReference(sharedMemory, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
-        ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
+        //ITEEClient.RegisteredMemoryReference rmrTwo = new ITEEClient.RegisteredMemoryReference(sharedMemory2, ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
         //ITEEClient.Operation op = new ITEEClient.Operation(started, rmrOne, rmrTwo);
         //ITEEClient.Operation op = new ITEEClient.Operation(started, rmrTwo); // omnishare_ta only allows one input parameter.
-        ITEEClient.Operation op = new ITEEClient.Operation(started); // generate_root_key
-        ITEEClient.ISession session = null;
-        ITEEClient.ISession sessionTwo = null;
+
+        // create mem reference to the shared memory.
+        ITEEClient.RegisteredMemoryReference rmr =
+                new ITEEClient.RegisteredMemoryReference(sharedMemory,
+                                                         ITEEClient.RegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT,
+                                                         0);
+        ITEEClient.Value value = new ITEEClient.Value(ITEEClient.Value.Flag.TEEC_VALUE_INOUT, 10, 17);
+        ITEEClient.Operation op = new ITEEClient.Operation(started, rmr, value);
+        ITEEClient.ISession session = null;  // test:open a second session and test sync memory.
 
         try {
+            // test: change the content of buffer
+            byte[] msg_to_enc = {
+                    'x', 'j', 't', 'u'
+            };
+
+            // only encrypt msg_to_enc[1:7]
+            System.arraycopy(msg_to_enc, 0, buffer, 0, buffer.length > msg_to_enc.length? msg_to_enc.length:buffer.length);
+
+            Log.i(TAG, "New buffer:" + new String(buffer));
+            Log.i(TAG, "New buffer in shared memory:" + new String(sharedMemory.asByteArray()));
+            Log.e(TAG, buffer + " vs " + sharedMemory.asByteArray() + " " +  (buffer == sharedMemory.asByteArray()));
+
             session = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,   // public authentication
                     0,   // no login data
@@ -181,15 +193,24 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "Return origin: " + e.getReturnOrigin());
         }
 
+
+        /*
+        ITEEClient.Operation op2 = new ITEEClient.Operation(started); // generate_root_key
+        ITEEClient.ISession sessionTwo = null;
         try {
             sessionTwo = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,
                     0,
-                    op);
+                    op2);
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
-
+        try {
+            sessionTwo.closeSession();
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+        */
         // invoke command.
         try {
             session.invokeCommand(0, // commandId.
@@ -207,11 +228,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        try {
-            sessionTwo.closeSession();
-        } catch (TEEClientException e) {
-            e.printStackTrace();
-        }
+
 
         // release shared memory
         try {

@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
+import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
@@ -128,11 +129,81 @@ public class OTContext implements ITEEClient.IContext {
         mSharedMemory.remove(sharedMemory);
     }
 
+    private byte[] OperationAsByteArray(ITEEClient.Operation teecOperation){
+        if ( teecOperation == null )return null;
+
+        GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder();
+
+        byte[] opInArray = null;
+        if (teecOperation.getParams() != null && teecOperation.getParams().size() > 0){
+            /**
+             * determine which type of parameter to parse.
+             */
+
+            List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
+
+            for ( ITEEClient.Parameter param: parameterList ){
+                if( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId()){
+                    Log.i(TAG, "Param is " + ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE);
+
+                    GPDataTypes.TeecValue.Builder builder = GPDataTypes.TeecValue.newBuilder();
+                    ITEEClient.Value val = (ITEEClient.Value)param;
+
+                    builder.setA(val.getA());
+                    builder.setB(val.getB());
+
+                    int valFlagInInt = val.getFlag().getId();
+                    builder.setMFlag(GPDataTypes.TeecValue.Flag.values()[valFlagInInt]);
+
+                    GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
+                    paramBuilder.setType(GPDataTypes.TeecParameter.Type.val);
+                    paramBuilder.setTeecValue(builder.build());
+                    toBuilder.addMParams(paramBuilder.build());
+                }
+                else if ( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId() ){
+                    Log.i(TAG, "Param is " + ITEEClient.Parameter.Type.TEEC_PTYPE_SMR);
+
+                    GPDataTypes.TeecSharedMemoryReference.Builder builder
+                            = GPDataTypes.TeecSharedMemoryReference.newBuilder();
+                    ITEEClient.RegisteredMemoryReference rmr
+                            = (ITEEClient.RegisteredMemoryReference)param;
+                    OTSharedMemory teecSM = (OTSharedMemory)rmr.getSharedMemory();
+
+                    //create gp shared memory from teec shared memory.
+                    GPDataTypes.TeecSharedMemory.Builder gpSMBuilder = GPDataTypes.TeecSharedMemory.newBuilder();
+                    gpSMBuilder.setSize(teecSM.getSize());
+                    gpSMBuilder.setMID(teecSM.getId());
+                    gpSMBuilder.setMFlag(teecSM.getFlags());
+                    gpSMBuilder.setMBuffer(ByteString.copyFrom(teecSM.asByteArray()));
+                    gpSMBuilder.setMReturnSize(teecSM.getReturnSize());
+
+                    builder.setParent(gpSMBuilder.build());
+                    builder.setMOffset(rmr.getOffset());
+                    builder.setMFlag(GPDataTypes.TeecSharedMemoryReference.Flag.values()[rmr.getFlag().ordinal()]);
+
+                    GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
+                    paramBuilder.setType(GPDataTypes.TeecParameter.Type.smr);
+                    paramBuilder.setTeecSharedMemoryReference(builder.build());
+                    toBuilder.addMParams(paramBuilder.build());
+                }
+                else{
+                    Log.e(TAG, "Unsupported Operation type. Set the operation to null");
+                }
+
+            }
+        }
+
+        toBuilder.setMStarted(teecOperation.getStarted());
+        opInArray = toBuilder.build().toByteArray();
+
+        return opInArray;
+    }
+
     @Override
     public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
-                                ITEEClient.Operation teecOperation) throws Exception {
+                                ITEEClient.Operation teecOperation) throws TEEClientException{
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
@@ -144,63 +215,7 @@ public class OTContext implements ITEEClient.IContext {
         /**
          * parse teecOperation into byte array using protocol buffer.
          */
-        byte[] opInArray = null;
-        if ( teecOperation != null ){
-            GPDataTypes.TeecOperation.Builder toBuilder = GPDataTypes.TeecOperation.newBuilder();
-
-            if (teecOperation.getParams() != null && teecOperation.getParams().size() > 0){
-                /**
-                 * determine which type of parameter to parse.
-                 */
-
-                List<ITEEClient.Parameter> parameterList = teecOperation.getParams();
-
-                for ( ITEEClient.Parameter param: parameterList ){
-                    if( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId()){
-                        GPDataTypes.TeecValue.Builder builder = GPDataTypes.TeecValue.newBuilder();
-                        ITEEClient.Value val = (ITEEClient.Value)param;
-
-                        builder.setA(val.getA());
-                        builder.setB(val.getB());
-
-                        int valFlagInInt = val.getFlag().getId();
-                        builder.setMFlag(GPDataTypes.TeecValue.Flag.values()[valFlagInInt]);
-
-                        GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
-                        paramBuilder.setType(GPDataTypes.TeecParameter.Type.val);
-                        paramBuilder.setTeecValue(builder.build());
-                        toBuilder.addMParams(paramBuilder.build());
-                    }
-                    else if ( param.getType() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId() ){
-                        GPDataTypes.TeecSharedMemoryReference.Builder builder
-                                = GPDataTypes.TeecSharedMemoryReference.newBuilder();
-                        ITEEClient.RegisteredMemoryReference rmr
-                                = (ITEEClient.RegisteredMemoryReference)param;
-
-                        // find the id for the shared memory in rmr.
-                        ByteString bs = null;
-                        bs.copyFrom(rmr.getSharedMemory().asByteArray());
-                        builder.setParent(bs);
-
-                        builder.setMOffset(rmr.getOffset());
-                        builder.setMFlag(GPDataTypes.TeecSharedMemoryReference.Flag.values()[rmr.getFlag().ordinal()]);
-
-                        GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
-                        paramBuilder.setType(GPDataTypes.TeecParameter.Type.smr);
-                        paramBuilder.setTeecSharedMemoryReference(builder.build());
-                        toBuilder.addMParams(paramBuilder.build());
-                    }
-                    else{
-                        Log.e(TAG, "Unsupported Operation type. Set the operation to null");
-                    }
-
-                }
-            }
-
-            toBuilder.setMStarted(teecOperation.getStarted());
-            opInArray = toBuilder.build().toByteArray();
-        }
-
+        byte[] opInArray = OperationAsByteArray(teecOperation);
 
         try {
             mProxyApis.teecOpenSession(sid,
@@ -233,6 +248,8 @@ public class OTContext implements ITEEClient.IContext {
         for(int i = 0; i < tpResults.size(); i++){
             GPDataTypes.TeecParameter tpResult = tpResults.get(i);
             if(tpResult.getType().ordinal() == ITEEClient.Parameter.Type.TEEC_PTYPE_VALUE.getId()){
+                Log.i(TAG, "Param is VALUE");
+
                 // value
                 ITEEClient.Value value = (ITEEClient.Value)params.get(i);
                 // update Value values.
@@ -245,7 +262,8 @@ public class OTContext implements ITEEClient.IContext {
             }
             else if(tpResult.getType().ordinal() == ITEEClient.Parameter.Type.TEEC_PTYPE_SMR.getId()){
                 // registered memory reference
-                //TODO: sync memory or already synced
+                Log.i(TAG, "Param is RMR");
+
 
             }else{
                 Log.e(TAG, "Incorrect param type:" + tpResult.getType());
