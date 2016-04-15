@@ -2,3 +2,12 @@ This project is the re-design and implementation of previous opentee-android pro
 
 Build Environment:
 	protocol buffer version 2.6.1
+
+[How to generate Java Doc pdf version of public APIs]
+	[required packages]
+	1. javadoc: it should come with the Oracle OpenJDK pakcage. Try to issue $javadoc command to check it is ready or not. If not, just install latest OpenJDK package.
+	2. pdfdoclet: download it from here \url{https://sourceforge.net/projects/pdfdoclet/}. After download the zipped file, unzipp it.
+
+	[command to generate java doc]
+	$ javadoc -doclet com.tarsec.javadoc.pdfdoclet.PDFDoclet -docletpath $PDFDOCLET_UNZIPPED_DIR/pdfdoclet-1.0.3-all.jar -pdf $OUTPUT_FILE_WITH_FULL_PATH $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg    /opentee/*.* $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/opentee/exception/*.* 
+	
