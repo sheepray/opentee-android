@@ -86,6 +86,191 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
 public interface ITEEClient {
 
     /**
+     * This interface defines the way to interact with an Operation which is a wrapper for
+     * 0 to 4 IParameter(s). It can be created by calling the factory method ITEEClient.newOperation(...).
+     * After a valid IOperation interface is returned, developers can refer the corresponding Operation
+     * in either openSession or invokeCommand function calls.
+     *
+     * When developers are dealing with multi-threads, one IOperation interface can be shared between
+     * different threads. So it is possible that multiple threads try to access the same IOperation
+     * interface at the same time. If one or some of the IParameters wrapped inside the IOperation
+     * is output for TA, it is highly possible that the IParameter(s) might be in an inconsistent state
+     * which may result in an incorrect read of corresponding wrapped resources within IParameters,
+     * such as Value and SharedMemory. What's more, if one thread try to apply one IOperation interface
+     * in its openSession or InvokeCommand function call while this IOperation interface is being used
+     * by another thread, an BusyException will be threw. In addition, if wrapped resources within
+     * one IOperation interface are modified by another thread, it is the responsibilities of the developers
+     * to avoid such a situation to happen. In order to avoid mis-usage of IOperation interface,
+     * the developers should not access any wrapped resources in one under-usage IOperation interface.
+     * The state of the IOperation can be easily obtained by calling its isStarted function. So, it
+     * is highly recommended for the developers to check the state of the IOperation interface when
+     * passing it into openSession or invokeCommand.
+     */
+    interface IOperation{
+        /**
+         * If one IOperation interface is used in an ongoing operation (either openSession or
+         * invokeCommand) in a separate thread, this function will return true. Developers can
+         * utilize this function to test the availability of the IOperation interface.
+         * @return true if IOperation is under usage. Otherwise false if not being under usage.
+         */
+        boolean isStarted();
+    }
+
+    /**
+     * Factory method to create an Operation without Parameter.
+     * @return the IOperation interface for created Operation.
+     */
+    IOperation newOperation();
+
+    /**
+     * Factory method to create an Operation with one Parameter.
+     *
+     * It is possible to create multiple IOperation interfaces using the same IParameter. But it
+     * is not recommended especially when the I/O directory of IParameter is output for TA since it
+     * is highly possible that such an IParameter is in an inconsistent state. This rule also
+     * apply to other ITEEClient.newOperation overloaded functions which take IParameter(s) as input.
+     * @param firstParam the first IParameter.
+     * @return the IOperation interface for created Operation.
+     */
+    IOperation newOperation(IParameter firstParam);
+
+    /**
+     * Factory method to create an Operation with two Parameters.
+     * The order of input Parameters should be aligned with the order of required Parameters in TA.
+     * This rule also apply to other overloaded newOperation factory function call which takes more than
+     * two Parameters.
+     * @param firstParam the first IParameter.
+     * @param secondParam the second IParameter.
+     * @return the IOperation interface for created Operation.
+     */
+    IOperation newOperation(IParameter firstParam, IParameter secondParam);
+
+    /**
+     * Factory method to create an Operation with three Parameters.
+     * @param firstParam the first IParameter.
+     * @param secondParam the second IParameter.
+     * @param thirdParam the third IParameter.
+     * @return the IOperation interface for created Operation.
+     */
+    IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam);
+
+    /**
+     * Factory method to create an Operation with four Parameters.
+     * @param firstParam the first IParameter.
+     * @param secondParam the second IParameter.
+     * @param thirdParam the third IParameter.
+     * @param forthParam the forth IParameter.
+     * @return the IOperation interface for created Operation.
+     */
+    IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam, IParameter forthParam);
+
+
+    /**
+     * IParameter interface is the parent of IRegisteredMemoryReference and IValue interfaces,
+     * It can passed into the ITEEClient.newOperation to create an IOperation interface.
+     */
+    interface IParameter{
+        /**
+         * The enum to indicates the type of the Parameter.
+         */
+        enum Type{
+            /**
+             * This Parameter is a Value.
+             */
+            TEEC_PTYPE_VAL(0x0000001),
+            /**
+             * This Parameter is a RegisteredMemoryReference.
+             */
+            TEEC_PTYPE_RMR(0x00000002);
+
+            int id;
+            Type(int id){this.id = id;}
+        }
+
+        /**
+         * Get the type of the IParameter interface.
+         * @return an enum value Type which can be either TEEC_PTYPE_VAL or TEEC_PTYPE_RMR.
+         */
+        Type getType();
+    }
+
+    /**
+     * Interface for registered memory reference. It can be only obtained by calling factory method
+     * ITEEClient.newRegisteredMemoryReference(...).
+     */
+    interface IRegisteredMemoryReference extends IParameter{
+        /**
+         * Flag enum indicates the I/O direction of the referenced registered shared memory.
+         */
+        enum Flag{
+            /**
+             * The I/O direction of the referenced registered shared memory is input for
+             * Trusted Application.
+             */
+            TEEC_MEMREF_INPUT(0x0000000D),
+            /**
+             * The I/O direction of the referenced registered shared memory is output for
+             * Trusted Application.
+             */
+            TEEC_MEMREF_OUTPUT(0x0000000E),
+            /**
+             * The I/O directions of the referenced registered shared memory are both input and output
+             * for Trusted Application.
+             */
+            TEEC_MEMREF_INOUT(0x0000000F);
+
+            int id;
+            Flag(int id){this.id = id;}
+        }
+    }
+
+    /**
+     * Factory method to create a registered memory reference with a valid ISharedMemory interface and a
+     * flag to indicate the I/O direction for this memory reference. The flag is only valid when
+     * the corresponding shared memory also has such a flag.
+     * @param sharedMemory
+     * @param flag
+     * @param offset
+     */
+    IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset);
+
+    /**
+     * Interface to access a pair of two integer values. It can be only obtained by calling
+     * ITEEClient.newValue factory method.
+     */
+    interface IValue extends IParameter{
+        /**
+         * Flag enum indicates the I/O direction of Value.
+         */
+        enum Flag{
+            /**
+             * The I/O direction for Value is input for Trusted Application.
+             */
+            TEEC_VALUE_INPUT(0x0000001),
+            /**
+             * The I/O direction for Value is output for Trusted Application.
+             */
+            TEEC_VALUE_OUTPUT(0x00000002),
+            /**
+             * The I/O directions for Value are both input and output for Trusted Application.
+             */
+            TEEC_VALUE_INOUT(0x00000003);
+
+            int id;
+            Flag(int id){this.id = id;}
+        }
+    }
+
+    /**
+     * Factory method to create an interface of a pair of two integer values.
+     * @param flag The I/O directory of IValue for TA.
+     * @param a The first integer value.
+     * @param b The second integer value.
+     * @return a IValue interface.
+     */
+    IValue newValue(IValue.Flag flag, int a, int b);
+
+    /**
      * In order for the CA to communicate with the TA within a TEE, a session must be opened between CA and TA.
      * To open a session, the CA must call openSession within a valid context. When a session is opened,
      * an ISession interface will be returned. It embraces all functions for CA to communicate with TA.
@@ -108,8 +293,9 @@ public interface ITEEClient {
          * @throws exception.BadParametersException:
          * providing parameters with invalid content;
          * @throws exception.BusyException:
-         * the TEE is busy working on something else and does not have the computation power to execute
+         * 1. the TEE is busy working on something else and does not have the computation power to execute
          * requested operation;
+         * 2. the referenced IOperation interface is being used by another thread.
          * @throws exception.CancelErrorException:
          * the provided operation parameter is invalid due to the cancellation from another thread;
          * @throws exception.CommunicationErrorException:
@@ -634,7 +820,8 @@ public interface ITEEClient {
          * @throws exception.BadParametersException:
          * Unexpected value(s) for parameter(s).
          * @throws exception.BadStateException:
-         * TEE is not ready to open a session.
+         * TEE is not ready to open a session or the referenced IOperation interface is occupied by
+         * another thread.
          * @throws exception.BusyException:
          * TEE is busy.
          * @throws exception.CancelErrorException:
