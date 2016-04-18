@@ -207,13 +207,13 @@ void protobuf_AddDesc_GPDataTypes_2eproto() {
     "ecSharedMemory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag"
     "\030\003 \002(\0162E.fi.aalto.ssg.opentee.imps.pbdat"
     "atypes.TeecSharedMemoryReference.Flag\"L\n"
-    "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\000\022\026\n\022TEEC_MEM"
-    "REF_OUTPUT\020\001\022\025\n\021TEEC_MEMREF_INOUT\020\002\"\262\001\n\t"
+    "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\r\022\026\n\022TEEC_MEM"
+    "REF_OUTPUT\020\016\022\025\n\021TEEC_MEMREF_INOUT\020\017\"\262\001\n\t"
     "TeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag"
     "\030\003 \002(\01625.fi.aalto.ssg.opentee.imps.pbdat"
     "atypes.TeecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VA"
-    "LUE_INPUT\020\000\022\025\n\021TEEC_VALUE_OUTPUT\020\001\022\024\n\020TE"
-    "EC_VALUE_INOUT\020\002", 1016);
+    "LUE_INPUT\020\001\022\025\n\021TEEC_VALUE_OUTPUT\020\002\022\024\n\020TE"
+    "EC_VALUE_INOUT\020\003", 1016);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GPDataTypes.proto", &protobuf_RegisterTypes);
   TeecOperation::default_instance_ = new TeecOperation();
@@ -1254,9 +1254,9 @@ const ::google::protobuf::EnumDescriptor* TeecSharedMemoryReference_Flag_descrip
 }
 bool TeecSharedMemoryReference_Flag_IsValid(int value) {
   switch(value) {
-    case 0:
-    case 1:
-    case 2:
+    case 13:
+    case 14:
+    case 15:
       return true;
     default:
       return false;
@@ -1298,7 +1298,7 @@ void TeecSharedMemoryReference::SharedCtor() {
   _cached_size_ = 0;
   parent_ = NULL;
   moffset_ = 0;
-  mflag_ = 0;
+  mflag_ = 13;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1335,26 +1335,13 @@ TeecSharedMemoryReference* TeecSharedMemoryReference::New() const {
 }
 
 void TeecSharedMemoryReference::Clear() {
-#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
-  &reinterpret_cast<TeecSharedMemoryReference*>(16)->f) - \
-   reinterpret_cast<char*>(16))
-
-#define ZR_(first, last) do {                              \
-    size_t f = OFFSET_OF_FIELD_(first);                    \
-    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
-    ::memset(&first, 0, n);                                \
-  } while (0)
-
   if (_has_bits_[0 / 32] & 7) {
-    ZR_(moffset_, mflag_);
     if (has_parent()) {
       if (parent_ != NULL) parent_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemory::Clear();
     }
+    moffset_ = 0;
+    mflag_ = 13;
   }
-
-#undef OFFSET_OF_FIELD_
-#undef ZR_
-
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -1607,9 +1594,9 @@ const ::google::protobuf::EnumDescriptor* TeecValue_Flag_descriptor() {
 }
 bool TeecValue_Flag_IsValid(int value) {
   switch(value) {
-    case 0:
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -1650,7 +1637,7 @@ void TeecValue::SharedCtor() {
   _cached_size_ = 0;
   a_ = 0;
   b_ = 0;
-  mflag_ = 0;
+  mflag_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1696,7 +1683,10 @@ void TeecValue::Clear() {
     ::memset(&first, 0, n);                                \
   } while (0)
 
-  ZR_(a_, mflag_);
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(a_, b_);
+    mflag_ = 1;
+  }
 
 #undef OFFSET_OF_FIELD_
 #undef ZR_

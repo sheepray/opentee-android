@@ -65,9 +65,9 @@ inline bool TeecParameter_Type_Parse(
     TeecParameter_Type_descriptor(), name, value);
 }
 enum TeecSharedMemoryReference_Flag {
-  TeecSharedMemoryReference_Flag_TEEC_MEMREF_INPUT = 0,
-  TeecSharedMemoryReference_Flag_TEEC_MEMREF_OUTPUT = 1,
-  TeecSharedMemoryReference_Flag_TEEC_MEMREF_INOUT = 2
+  TeecSharedMemoryReference_Flag_TEEC_MEMREF_INPUT = 13,
+  TeecSharedMemoryReference_Flag_TEEC_MEMREF_OUTPUT = 14,
+  TeecSharedMemoryReference_Flag_TEEC_MEMREF_INOUT = 15
 };
 bool TeecSharedMemoryReference_Flag_IsValid(int value);
 const TeecSharedMemoryReference_Flag TeecSharedMemoryReference_Flag_Flag_MIN = TeecSharedMemoryReference_Flag_TEEC_MEMREF_INPUT;
@@ -85,9 +85,9 @@ inline bool TeecSharedMemoryReference_Flag_Parse(
     TeecSharedMemoryReference_Flag_descriptor(), name, value);
 }
 enum TeecValue_Flag {
-  TeecValue_Flag_TEEC_VALUE_INPUT = 0,
-  TeecValue_Flag_TEEC_VALUE_OUTPUT = 1,
-  TeecValue_Flag_TEEC_VALUE_INOUT = 2
+  TeecValue_Flag_TEEC_VALUE_INPUT = 1,
+  TeecValue_Flag_TEEC_VALUE_OUTPUT = 2,
+  TeecValue_Flag_TEEC_VALUE_INOUT = 3
 };
 bool TeecValue_Flag_IsValid(int value);
 const TeecValue_Flag TeecValue_Flag_Flag_MIN = TeecValue_Flag_TEEC_VALUE_INPUT;
@@ -1125,7 +1125,7 @@ inline void TeecSharedMemoryReference::clear_has_mflag() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void TeecSharedMemoryReference::clear_mflag() {
-  mflag_ = 0;
+  mflag_ = 13;
   clear_has_mflag();
 }
 inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemoryReference_Flag TeecSharedMemoryReference::mflag() const {
@@ -1202,7 +1202,7 @@ inline void TeecValue::clear_has_mflag() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void TeecValue::clear_mflag() {
-  mflag_ = 0;
+  mflag_ = 1;
   clear_has_mflag();
 }
 inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue_Flag TeecValue::mflag() const {
