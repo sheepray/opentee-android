@@ -1,7 +1,8 @@
 package fi.aalto.ssg.opentee.imps;
 
+import fi.aalto.ssg.opentee.ITEEClient;
+
 /**
- * Created by yangr1 on 4/18/16.
+ * This class implements ITEEClient.IParameter interface.
  */
-public class OTParameter {
-}
+public abstract class OTParameter implements ITEEClient.IParameter {}

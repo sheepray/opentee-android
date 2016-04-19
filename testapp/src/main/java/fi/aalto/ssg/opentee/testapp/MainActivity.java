@@ -152,6 +152,41 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        //open session
+        UUID uuid = TA_CONN_TEST_UUID;
+        ITEEClient.IRegisteredMemoryReference iRmr
+                = client.newRegisteredMemoryReference(sharedMemory,
+                ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
+                0);
+
+        ITEEClient.IValue iValue
+                = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INOUT,
+                                  10,
+                                  17);
+
+        ITEEClient.IOperation iOperation = client.newOperation(iRmr, iValue);
+
+        ITEEClient.ISession session = null;
+        try {
+             session = ctx.openSession(uuid,
+                    ITEEClient.IContext.ConnectionMethod.LoginPublic,
+                    0,
+                    iOperation);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+        //check result
+        Log.d(TAG, "new shared memory=" + new String(iRmr.getSharedMemory().asByteArray()));
+
+        //invoke command
+
+        try {
+            session.closeSession();
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+        /*
         // open session
         UUID uuid = TA_CONN_TEST_UUID;
         int started = 0;
@@ -194,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        /*
+
         ITEEClient.Operation op2 = new ITEEClient.Operation(started); // generate_root_key
         ITEEClient.ISession sessionTwo = null;
         try {
@@ -210,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
-        */
         // invoke command.
         try {
             session.invokeCommand(0, // commandId.
@@ -227,6 +261,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
+        */
 
 
 

@@ -152,6 +152,14 @@ public interface ITEEClient {
             int id;
             Flag(int id){this.id = id;}
         }
+
+        /**
+         * Get the referenced registered shared memory.
+         * @return ISharedMemory interface for the referenced registered shared memory.
+         */
+        ITEEClient.ISharedMemory getSharedMemory();
+
+        int getOffset();
     }
 
     /**
@@ -189,6 +197,9 @@ public interface ITEEClient {
             int id;
             Flag(int id){this.id = id;}
         }
+
+        int getA();
+        int getB();
     }
 
     /**
@@ -252,7 +263,7 @@ public interface ITEEClient {
          * @throws exception.TargetDeadException:
          * the remote TEE or TA crashed.
          */
-        void invokeCommand(int commandId, Operation operation) throws TEEClientException;
+        void invokeCommand(int commandId, IOperation operation) throws TEEClientException;
 
         /**
          * Close the connection to the remote Trusted Application. When dealing with multi-threads,
@@ -383,254 +394,6 @@ public interface ITEEClient {
      * TEE crashed.
      */
     IContext initializeContext(String teeName, Context context) throws TEEClientException;
-
-    /**
-     * Abstract class for Value and RegisteredMemoryReference.
-     */
-    abstract class Parameter{
-        /**
-         * The enum to indicates the type of the Parameter.
-         */
-        public enum  Type{
-            /**
-             * This Parameter is a Value.
-             */
-            TEEC_PTYPE_VALUE(0x0000001),
-            /**
-             * This Parameter is a RegisteredMemoryReference.
-             */
-            TEEC_PTYPE_SMR(0x00000002);
-
-            int id;
-            Type(int id){this.id = id;}
-            public int getId(){return this.id;};
-        }
-
-        public abstract int getType();
-    };
-
-    /**
-     * Reference for registered shared memory.
-     */
-    class RegisteredMemoryReference extends Parameter{
-        /**
-         * Flag enum indicates the I/O direction of the referenced registered shared memory.
-         */
-        public enum Flag{
-            /**
-             * The I/O direction of the referenced registered shared memory is input for
-             * Trusted Application.
-             */
-            TEEC_MEMREF_INPUT(0x0000000),
-            /**
-             * The I/O direction of the referenced registered shared memory is output for
-             * Trusted Application.
-             */
-            TEEC_MEMREF_OUTPUT(0x00000001),
-            /**
-             * The I/O directions of the referenced registered shared memory are both input and output
-             * for Trusted Application.
-             */
-            TEEC_MEMREF_INOUT(0x00000002);
-
-            int id;
-            Flag(int id){this.id = id;}
-        }
-
-        @Override
-        public int getType() {
-            return Type.TEEC_PTYPE_SMR.getId();
-        }
-
-        ISharedMemory mSharedMemory;
-        int mOffset = 0; // initialized to 0.
-        Flag mFlag;
-
-        /**
-         * Create a registered memory reference with a valid ISharedMemory interface and a
-         * flag to indicate the I/O direction for this memory reference. The flag is only valid when
-         * the corresponding shared memory also has such a flag.
-         * @param sharedMemory
-         * @param flag
-         */
-        public RegisteredMemoryReference(ISharedMemory sharedMemory, Flag flag, int offset){
-            this.mSharedMemory = sharedMemory;
-            this.mFlag = flag;
-            this.mOffset = offset;
-        }
-
-        /**
-         * Get the referenced registered shared memory.
-         * @return ISharedMemory interface for the referenced registered shared memory.
-         */
-        public ISharedMemory getSharedMemory(){
-            return this.mSharedMemory;
-        }
-
-        public int getOffset(){return this.mOffset;}
-
-        public Flag getFlag(){return this.mFlag;}
-    }
-
-    /**
-     * This class defines a pair of value which can be passed as a parameter for one Operation.
-     */
-    class Value extends Parameter{
-        /**
-         * Flag enum indicates the I/O direction of Value.
-         */
-        public enum  Flag{
-            /**
-             * The I/O direction for Value is input for Trusted Application.
-             */
-            TEEC_VALUE_INPUT(0x0000000),
-            /**
-             * The I/O direction for Value is output for Trusted Application.
-             */
-            TEEC_VALUE_OUTPUT(0x00000001),
-            /**
-             * The I/O directions for Value are both input and output for Trusted Application.
-             */
-            TEEC_VALUE_INOUT(0x00000002);
-
-            int id;
-            Flag(int id){this.id = id;}
-            public int getId(){return this.id;};
-        }
-
-        Flag mFlag;
-        int mA;
-        int mB;
-
-        /**
-         *
-         * @param flag
-         * @param a
-         * @param b
-         */
-        public Value(Flag flag, int a, int b){
-            this.mFlag = flag;
-            this.mA = a;
-            this.mB = b;
-        }
-
-        /**
-         * Get method for private member A.
-         * @return int
-         */
-        public int getA(){return this.mA;}
-
-        /**
-         * Get method for private member B.
-         * @return int
-         */
-        public int getB(){return this.mB;}
-
-        /**
-         * Get method for flags
-         * @return Value.Flag enum
-         */
-        public Flag getFlag(){
-            return this.mFlag;
-        }
-
-        /**
-         * Get method for the type of the parameter.
-         * @return
-         */
-        @Override
-        public int getType() {return Type.TEEC_PTYPE_VALUE.getId();}
-    }
-
-    /**
-     * This class defines the payload for either an open session or an invoke command operation.
-     */
-    class Operation {
-        int started = 0;
-        List<Parameter> params = new ArrayList<>();
-
-        /**
-         * Public constructor with no Parameter.
-         * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
-         */
-        public Operation(int started){
-            this.started = started;
-        }
-
-
-        /**
-         * Public constructor with 1 Parameter.
-         * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
-         * @param parameter carry the parameters for this Operation.
-         */
-        public Operation(int started,
-                         ITEEClient.Parameter parameter){
-            this.started = started;
-            params.add(parameter);
-        }
-
-
-        /**
-         * Public constructor with 2 Parameters.
-         * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
-         * @param parameter1 carry the first parameters for this Operation.
-         * @param parameter2 carry the second parameters for this Operation.
-         */
-        public Operation(int started,
-                         ITEEClient.Parameter parameter1,
-                         ITEEClient.Parameter parameter2){
-            this.started = started;
-            params.add(parameter1);
-            params.add(parameter2);
-        }
-
-
-        /**
-         * Public constructor with 3 Parameters.
-         * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
-         * @param parameter1 carry the first parameters for this Operation.
-         * @param parameter2 carry the second parameters for this Operation.
-         * @param parameter3 carry the third parameters for this Operation.
-         */
-        public Operation(int started,
-                         ITEEClient.Parameter parameter1,
-                         ITEEClient.Parameter parameter2,
-                         ITEEClient.Parameter parameter3){
-            this.started = started;
-            params.add(parameter1);
-            params.add(parameter2);
-            params.add(parameter3);
-        }
-
-
-        /**
-         * Public constructor with 4 Parameters.
-         * @param started initialized to 0 to indicates this Operation can be cancelled in the future.
-         * @param parameter1 carry the first parameters for this Operation.
-         * @param parameter2 carry the second parameters for this Operation.
-         * @param parameter3 carry the third parameters for this Operation.
-         * @param parameter4 carry the forth parameters for this Operation.
-         */
-        public Operation(int started,
-                         ITEEClient.Parameter parameter1,
-                         ITEEClient.Parameter parameter2,
-                         ITEEClient.Parameter parameter3,
-                         ITEEClient.Parameter parameter4){
-            this.started = started;
-            params.add(parameter1);
-            params.add(parameter2);
-            params.add(parameter3);
-            params.add(parameter4);
-        }
-
-        public int getStarted(){
-            return this.started;
-        }
-
-        public List<Parameter> getParams(){
-            return this.params;
-        }
-    }
 
     /**
      * IContext interface provides all the functions to interact with an initialized context in remote TEE.
@@ -780,7 +543,7 @@ public interface ITEEClient {
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
                               int connectionData,
-                              Operation operation
+                              IOperation operation
                               ) throws TEEClientException;
 
 
@@ -791,6 +554,6 @@ public interface ITEEClient {
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
          */
-        void requestCancellation(Operation operation) throws TEEClientException;
+        void requestCancellation(IOperation operation) throws TEEClientException;
     };
 }

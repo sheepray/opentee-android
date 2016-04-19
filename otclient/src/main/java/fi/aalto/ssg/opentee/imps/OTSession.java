@@ -24,7 +24,7 @@ public class OTSession implements ITEEClient.ISession {
     }
 
     @Override
-    public void invokeCommand(int commandId, ITEEClient.Operation operation) throws TEEClientException {
+    public void invokeCommand(int commandId, ITEEClient.IOperation operation) throws TEEClientException {
         //TODO: remember to update the mReturnOriginCode field when return.
         //TODO: also remember the mReturnCode field.
     }
