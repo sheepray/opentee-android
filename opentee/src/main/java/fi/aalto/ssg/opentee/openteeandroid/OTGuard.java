@@ -1,11 +1,14 @@
 package fi.aalto.ssg.opentee.openteeandroid;
 
 import android.content.Context;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import fi.aalto.ssg.opentee.ISyncOperation;
+import fi.aalto.ssg.opentee.imps.OTFactoryMethods;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
@@ -248,7 +251,6 @@ public class OTGuard {
                     smid = caller.getSmIdBySmIdInJni(smrPara.getParent().getMID());
                 }
 
-
                 /**
                  * replace the id in here. Since the id is changed, a new GP shared memory will
                  * be created.
@@ -289,43 +291,7 @@ public class OTGuard {
         return opsInBytes;
     }
 
-    private void print_op(GPDataTypes.TeecOperation opToPrint){
-        if(opToPrint == null){
-            Log.e(TAG, "op is null");
-            return;
-        }
-
-        Log.d(TAG, "started:" + opToPrint.getMStarted());
-        for(GPDataTypes.TeecParameter param: opToPrint.getMParamsList()){
-            if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
-                GPDataTypes.TeecSharedMemory sm = param.getTeecSharedMemoryReference().getParent();
-                Log.d(TAG, "[SMR] flag:" + sm.getMFlag() +
-                           " buffer:" + sm.getMBuffer().toStringUtf8().toString());
-            }
-            else if (param.getType() == GPDataTypes.TeecParameter.Type.val){
-                GPDataTypes.TeecValue var = param.getTeecValue();
-                Log.d(TAG, "[VALUE] flag:" + var.getMFlag() +
-                           " a:" + Integer.toHexString(var.getA()) +
-                           " b:" + Integer.toHexString(var.getB()) );
-            }
-            else{
-                Log.e(TAG, "Incorrect parameter");
-            }
-        }
-    }
-
-    private void print_op_in_bytes(byte[] opInBytes){
-        GPDataTypes.TeecOperation.Builder opBuilder = GPDataTypes.TeecOperation.newBuilder();
-        try {
-            opBuilder.mergeFrom(opInBytes);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-
-        print_op(opBuilder.build());
-    }
-
-    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin){
+    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin, ISyncOperation iSyncOperation){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
@@ -346,6 +312,8 @@ public class OTGuard {
                 retOriginFromJni,
                 returnCode);
 
+        Log.d(TAG, "teecOpenSession returned.");
+
         retOrigin[0] = retOriginFromJni.getValue();
 
         // upon success, add session to that caller.
@@ -357,7 +325,17 @@ public class OTGuard {
         }
 
         //test code
-        print_op_in_bytes(newOpInBytes);
+        //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
+
+        if(iSyncOperation != null){
+            // sync operation back.
+            try {
+                Log.d(TAG, "Operation sync back using callback function.");
+                iSyncOperation.syncOperation(newOpInBytes);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
         return returnCode.getValue();
     }

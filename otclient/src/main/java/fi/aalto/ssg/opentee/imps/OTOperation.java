@@ -94,6 +94,8 @@ public class OTOperation implements ITEEClient.IOperation {
         return this.params;
     }
 
+    public ITEEClient.IParameter getParam(int index){return this.params.get(index);}
+
     @Override
     public boolean isStarted() {
         return started != 0;

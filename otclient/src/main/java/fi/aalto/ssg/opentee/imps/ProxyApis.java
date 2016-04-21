@@ -5,16 +5,23 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.ParcelUuid;
 import android.os.RemoteException;
 import android.util.Log;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.net.ssl.HandshakeCompletedListener;
+
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
+import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.AccessConflictException;
 import fi.aalto.ssg.opentee.exception.AccessDeniedException;
@@ -170,15 +177,14 @@ public class ProxyApis {
     }
 
     public void teecOpenSession(int sessionId,
-                               UUID uuid,
-                               ITEEClient.IContext.ConnectionMethod connectionMethod,
-                               int connectionData,
-                               byte[] opInArray) throws TEEClientException, RemoteException {
+                                UUID uuid,
+                                ITEEClient.IContext.ConnectionMethod connectionMethod,
+                                int connectionData,
+                                byte[] opInArray,
+                                ISyncOperation syncOperation) throws TEEClientException, RemoteException {
         if ( mService == null ){
             throw new GenericErrorException("Service unavailable");
         }
-
-        //ByteArrayWrapper baw = new ByteArrayWrapper(opInArray);
 
         /**
          * IPC open session call.
@@ -197,17 +203,8 @@ public class ProxyApis {
                     connectionMethod.ordinal(),
                     connectionData,
                     opInArray,
-                    retOrigin);
-
-            //with byte array wrapper
-            /*
-            rc = mService.teecOpenSessionWithByteArrayWrapper(sessionId,
-                    new ParcelUuid(uuid),
-                    connectionMethod.ordinal(),
-                    connectionData,
-                    baw,
-                    retOrigin);
-                    */
+                    retOrigin,
+                    syncOperation);
         }
 
         Log.d(TAG, "teecOpenSession return code: " + rc);

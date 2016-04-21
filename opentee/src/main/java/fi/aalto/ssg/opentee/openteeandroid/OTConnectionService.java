@@ -9,7 +9,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
-import fi.aalto.ssg.opentee.imps.ByteArrayWrapper;
+import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 public class OTConnectionService extends Service {
@@ -74,11 +74,12 @@ public class OTConnectionService extends Service {
                     connMethod,
                     connData,
                     null,
-                    retOrigin);
+                    retOrigin,
+                    null);
         }
 
         @Override
-        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin) throws RemoteException {
+        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin, ISyncOperation iSyncOperation) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to open session with operations.");
 
@@ -88,23 +89,9 @@ public class OTConnectionService extends Service {
                     connMethod,
                     connData,
                     teecOperation,
-                    retOrigin);
+                    retOrigin,
+                    iSyncOperation);
         }
-
-        /*
-        public int teecOpenSessionWithByteArrayWrapper(int sid, ParcelUuid parcelUuid, int connMethod, int connData, ByteArrayWrapper teecOperation, int[] retOrigin) throws RemoteException {
-            Log.d(TAG, Binder.getCallingPid()
-                    + " is calling me to open session with operations and byte array wrapper.");
-
-            return mOTGuard.teecOpenSession(Binder.getCallingPid(),
-                    sid,
-                    parcelUuid.getUuid(),
-                    connMethod,
-                    connData,
-                    teecOperation.asByteArray(),
-                    retOrigin);
-        }
-        */
 
         @Override
         public void teecCloseSession(int sid){

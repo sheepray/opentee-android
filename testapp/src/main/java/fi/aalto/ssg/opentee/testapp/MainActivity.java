@@ -161,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
 
         ITEEClient.IValue iValue
                 = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INOUT,
-                                  10,
-                                  17);
+                                  0x33,
+                                  0x66);
 
         ITEEClient.IOperation iOperation = client.newOperation(iRmr, iValue);
 
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         //check result
         Log.d(TAG, "new shared memory=" + new String(iRmr.getSharedMemory().asByteArray()));
+        Log.d(TAG, "new a " + iValue.getA() + " b " + iValue.getB());
 
         //invoke command
 

@@ -16,6 +16,8 @@ package fi.aalto.ssg.opentee.openteeandroid;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,6 +28,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * This class contains different Open-TEE utility functions

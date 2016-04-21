@@ -367,6 +367,7 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
                 int8_t * smBuffer = (int8_t*)rmr.parent().mbuffer().c_str();
                 LOGE("%s: new buffer:%s", __FUNCTION__ , smBuffer);
                 memcpy(sm->buffer, smBuffer, sizeof(smBuffer));
+                free(smBuffer);
             }
 
             teec_operation->params[i].memref.parent = sm;
@@ -401,7 +402,7 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
         }
         else if(param.has_teecvalue()){
             // param is TEEC_Value.
-            LOGI("%s: param is TEEC_VALUE.", __FUNCTION__);
+            LOGI("%s: param is TEEC_VALUE", __FUNCTION__);
 
             const TeecValue value = param.teecvalue();
             teec_operation->params[i].value.a = value.a();
@@ -419,6 +420,7 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
                     paramTypesArray[i] = TEEC_VALUE_INOUT;
                     break;
                 default:
+                    LOGE("%s: unaccepted flag for Value %x", __FUNCTION__, value.mflag());
                     break;
             }
 
@@ -555,6 +557,7 @@ jbyteArray transfer_TEEC_Operation_to_op(JNIEnv* env, const TEEC_Operation* teec
 
 JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
 (JNIEnv* env, jclass jc, jint sid, jobject uuid, jint connMethod, jint connData, jbyteArray opInBytes, jobject returnOrigin, jobject returnCode){
+    LOGI("[start] %s", __FUNCTION__);
     /*
      * Data structure transfer
      * */
@@ -663,6 +666,9 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
      * sync shared memory and Value back.
     */
     jbyteArray new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
+
+
+    LOGI("[end] %s", __FUNCTION__);
 
     //return teec_ret;
     return new_op_in_bytes;

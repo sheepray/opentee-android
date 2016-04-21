@@ -48,4 +48,8 @@ public class OTValue implements ITEEClient.IValue {
     public Type getType() {
         return Type.TEEC_PTYPE_VAL;
     }
+
+    public void setA(int a){this.mA = a;}
+
+    public void setB(int b){this.mB = b;}
 }

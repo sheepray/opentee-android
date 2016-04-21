@@ -7,6 +7,8 @@ import android.util.Log;
 import java.util.Arrays;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.BadFormatException;
+import fi.aalto.ssg.opentee.exception.ExcessDataException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
@@ -49,9 +51,24 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     public int getId() {
         return this.mId;
     }
+
     public void setId(int id){this.mId = id;}
 
     public int getSize(){return mBuffer.length;}
+
+    public void updateBuffer(byte[] newBuffer, int offset, int sizeToWrite) throws BadFormatException, ExcessDataException {
+        if(newBuffer == null){
+            throw new BadFormatException("new buffer is null", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+        }
+
+        if( (offset + sizeToWrite) > (newBuffer.length > mBuffer.length? mBuffer.length: newBuffer.length) ){
+            throw new ExcessDataException("too much data", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+        }
+
+        for(int i = 0; i < sizeToWrite; i++){
+            mBuffer[i + offset] = newBuffer[i + offset];
+        }
+    }
 
     @Override
     public int describeContents() {

@@ -3,7 +3,7 @@ package fi.aalto.ssg.opentee;
 
 // Declare any non-default types here with import statements
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
-import fi.aalto.ssg.opentee.imps.ByteArrayWrapper;
+import fi.aalto.ssg.opentee.ISyncOperation;
 
 interface IOTConnectionInterface {
     /**
@@ -25,9 +25,8 @@ interface IOTConnectionInterface {
     // open session without operation.
     int teecOpenSessionWithoutOp(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, out int[] retOrigin);
 
-    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout byte[] teecOperation, out int[] retOrigin);
+    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, in byte[] teecOperation, out int[] retOrigin, in ISyncOperation syncOperation);
     //int teecOpenSessionWithByteArrayWrapper(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout ByteArrayWrapper teecOperation, out int[] retOrigin);
 
     void teecCloseSession(int sid);
-
 }
