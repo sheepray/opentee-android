@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.BusyException;
 import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
@@ -27,7 +28,7 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 /**
  * This class implements the IContext interface
  */
-public class OTContext implements ITEEClient.IContext {
+public class OTContext implements ITEEClient.IContext, OTContextCallback {
     String TAG = "OTContext";
 
     String mTeeName;
@@ -137,7 +138,15 @@ public class OTContext implements ITEEClient.IContext {
                                 ConnectionMethod connectionMethod,
                                 int connectionData,
                                 ITEEClient.IOperation teecOperation) throws TEEClientException{
-        //TODO: teecOperation started check?
+        //teecOperation started check
+        if(teecOperation.isStarted()){
+            throw new BusyException("the referenced operation is under usage.", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+        }
+
+        OTOperation otOperation = (OTOperation)teecOperation;
+
+        //update started field.
+        otOperation.setStarted(1);
 
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
@@ -163,12 +172,7 @@ public class OTContext implements ITEEClient.IContext {
 
         openSessionThread.run();
 
-        try {
-            otLock.lock();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new GenericErrorException(e.getMessage());
-        }
+        otLock.lock();
 
         byte[] teecOperationInBytes = openSessionThread.getNewOperationInBytes();
 
@@ -181,7 +185,6 @@ public class OTContext implements ITEEClient.IContext {
         //test code
         OTFactoryMethods.print_op(TAG, op);
 
-        OTOperation otOperation = (OTOperation)teecOperation;
         for(int i = 0; i < op.getMParamsCount(); i++){
             GPDataTypes.TeecParameter param = op.getMParamsList().get(i);
             if(param.getType() == GPDataTypes.TeecParameter.Type.val){
@@ -207,10 +210,12 @@ public class OTContext implements ITEEClient.IContext {
         }
 
         // upon success
-        OTSession otSession =  new OTSession(sid, mProxyApis);
+        OTContextCallback otContextCallback = this;
+        OTSession otSession =  new OTSession(sid, otContextCallback);
         mSessionMap.put(sid, 0);
 
-        //TODO: set started field of Operation to 0;
+        // operation is no longer in use.
+        otOperation.setStarted(0);
 
         return otSession;
     }
@@ -246,5 +251,16 @@ public class OTContext implements ITEEClient.IContext {
 
         Log.i(TAG, "generating session id:" + id);
         return id;
+    }
+
+    @Override
+    public void closeSession(int sid) throws RemoteException {
+        Log.i(TAG, "closing session with id " + sid);
+
+        // call remote to close session.
+        mProxyApis.teecCloseSession(sid);
+
+        // remote session.
+        mSessionMap.remove(sid);
     }
 }

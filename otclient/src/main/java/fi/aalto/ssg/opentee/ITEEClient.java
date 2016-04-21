@@ -1,6 +1,7 @@
 package fi.aalto.ssg.opentee;
 
 import android.content.Context;
+import android.os.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;

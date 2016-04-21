@@ -36,12 +36,7 @@ public class OpenSessionThread implements Runnable {
             Log.e(TAG, "sync op called");
 
             mNewTeecOperation = teecOperationInBytes;
-
-            try {
-                mLock.unlock();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            mLock.unlock();
         }
     };
 

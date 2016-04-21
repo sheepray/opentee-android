@@ -90,6 +90,11 @@ public class OTOperation implements ITEEClient.IOperation {
         return this.started;
     }
 
+    public void setStarted(int val){
+        if(val != 0 || val != 1) return;
+        this.started = val;
+    }
+
     public List<ITEEClient.IParameter> getParams(){
         return this.params;
     }

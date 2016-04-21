@@ -12,11 +12,11 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
 public class OTSession implements ITEEClient.ISession {
     //session identifier
     int mSessionId;
-    ProxyApis mProxyApis = null;
+    OTContextCallback mContextCallback = null;
 
-    public OTSession(int sid, ProxyApis pa){
+    public OTSession(int sid, OTContextCallback contextCallback){
         this.mSessionId = sid;
-        this.mProxyApis = pa;
+        this.mContextCallback = contextCallback;
     }
 
     public int getSessionId(){
@@ -30,11 +30,11 @@ public class OTSession implements ITEEClient.ISession {
     }
 
     @Override
-    public void closeSession() throws TEEClientException{
+    public void closeSession() throws TEEClientException {
         try {
-            mProxyApis.teecCloseSession(mSessionId);
+            this.mContextCallback.closeSession(mSessionId);
         } catch (RemoteException e) {
-            throw new CommunicationErrorException("Communication error with remote TEE service.");
+            throw new CommunicationErrorException(e.getMessage(), ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
         }
     }
 }

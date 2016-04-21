@@ -331,8 +331,14 @@ public class OTGuard {
             // sync operation back.
             try {
                 Log.d(TAG, "Operation sync back using callback function.");
+
+                //test code, wait for 100ms
+                Thread.sleep(2000);
+
                 iSyncOperation.syncOperation(newOpInBytes);
             } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
