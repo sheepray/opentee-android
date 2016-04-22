@@ -176,12 +176,58 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+        ITEEClient.ISession session2 = null;
+        try {
+            session2 = ctx.openSession(uuid,
+                    ITEEClient.IContext.ConnectionMethod.LoginPublic,
+                    0,
+                    null);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            session2.closeSession();
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
         //check result
         Log.d(TAG, "new shared memory=" + new String(iRmr.getSharedMemory().asByteArray()));
         Log.d(TAG, "new a " + iValue.getA() + " b " + iValue.getB());
 
         //invoke command
+        ITEEClient.IRegisteredMemoryReference iRmr2
+                = client.newRegisteredMemoryReference(sharedMemory,
+                ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
+                0);
 
+        ITEEClient.IValue iValue2
+                = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INOUT,
+                0x88,
+                0x66);
+
+        ITEEClient.IOperation iOperation2 = client.newOperation(iRmr2, iValue2);
+
+        int commandId = 0x12345678;
+        try {
+            session.invokeCommand(commandId, iOperation2);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            session.invokeCommand(commandId, null);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+        //check result
+        Log.d(TAG, "new shared memory=" + new String(iRmr2.getSharedMemory().asByteArray()));
+        Log.d(TAG, "new a " + iValue2.getA() + " b " + iValue2.getB());
+
+        // close session
         try {
             session.closeSession();
         } catch (TEEClientException e) {

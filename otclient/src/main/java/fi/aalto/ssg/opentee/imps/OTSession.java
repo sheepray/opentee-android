@@ -10,6 +10,7 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
  * This class implements the ISession interface.
  */
 public class OTSession implements ITEEClient.ISession {
+    final String TAG = "OTSession";
     //session identifier
     int mSessionId;
     OTContextCallback mContextCallback = null;
@@ -27,6 +28,11 @@ public class OTSession implements ITEEClient.ISession {
     public void invokeCommand(int commandId, ITEEClient.IOperation operation) throws TEEClientException {
         //TODO: remember to update the mReturnOriginCode field when return.
         //TODO: also remember the mReturnCode field.
+        ReturnValueWrapper rv = this.mContextCallback.invokeCommand(mSessionId, commandId, operation);
+
+        if(rv.getReturnCode() != OTReturnCode.TEEC_SUCCESS){
+            OTFactoryMethods.throwExceptionWithReturnOrigin(TAG, rv.getReturnCode(), rv.getReturnOrigin());
+        }
     }
 
     @Override

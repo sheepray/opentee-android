@@ -55,6 +55,14 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecCloseSession
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
+ * Method:    teecInvokeCommand
+ * Signature: (II[BLfi/aalto/ssg/opentee/openteeandroid/IntWrapper;Lfi/aalto/ssg/opentee/openteeandroid/IntWrapper;)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInvokeCommand
+  (JNIEnv *, jclass, jint, jint, jbyteArray, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif

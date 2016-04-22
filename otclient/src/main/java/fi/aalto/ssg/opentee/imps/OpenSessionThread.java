@@ -22,8 +22,9 @@ public class OpenSessionThread implements Runnable {
     ITEEClient.IContext.ConnectionMethod mConnectionMethod;
     int mConnectionData;
     byte[] mTeecOperation;
-    byte[] mNewTeecOperation;
+    byte[] mNewTeecOperation = null;
     OTLock mLock;
+    ReturnValueWrapper mReturnValue;
 
     private ISyncOperation mSyncOperationCallBack = new ISyncOperation.Stub(){
         @Override
@@ -36,7 +37,11 @@ public class OpenSessionThread implements Runnable {
             Log.e(TAG, "sync op called");
 
             mNewTeecOperation = teecOperationInBytes;
-            mLock.unlock();
+
+            if(mLock != null) mLock.unlock();
+            else{
+                Log.e(TAG, "[internal error] lock is null");
+            }
         }
     };
 
@@ -60,10 +65,12 @@ public class OpenSessionThread implements Runnable {
         return this.mNewTeecOperation;
     }
 
+    public synchronized ReturnValueWrapper getReturnValue(){ return this.mReturnValue; }
+
     @Override
     public void run() {
         try {
-            mProxyApis.teecOpenSession(mSid,
+            mReturnValue = mProxyApis.teecOpenSession(mSid,
                     mUuid,
                     mConnectionMethod,
                     mConnectionData,

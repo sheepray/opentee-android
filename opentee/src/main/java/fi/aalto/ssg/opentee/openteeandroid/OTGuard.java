@@ -8,7 +8,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
-import fi.aalto.ssg.opentee.imps.OTFactoryMethods;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
@@ -312,36 +311,37 @@ public class OTGuard {
                 retOriginFromJni,
                 returnCode);
 
-        Log.d(TAG, "teecOpenSession returned.");
-
         retOrigin[0] = retOriginFromJni.getValue();
 
         // upon success, add session to that caller.
         if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) {
-            findCallerById(callerId).addSession(sidForJni, new OTCaller.OTCallerSession(sid));
+            //OTCallerSession otCallerSession = new OTCallerSession(sid);
+            //caller.addSession(sidForJni, otCallerSession);
+            caller.addSession(sidForJni, sid);
             sessionIdMap.put(sidForJni, sid);
-
-            opsInBytes = replaceSMId(caller, opsInBytes, false);
         }
+
+        //OTCallerSession otCallerSession = new OTCallerSession(sid); // didn't pass
+        //OTCaller tmp = new OTCaller(1);   // passed
 
         //test code
         //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
+
+        Log.e(TAG, "flag func 3");
 
         if(iSyncOperation != null){
             // sync operation back.
             try {
                 Log.d(TAG, "Operation sync back using callback function.");
 
-                //test code, wait for 100ms
-                Thread.sleep(2000);
+                //test code, wait for 1000ms: worked
 
                 iSyncOperation.syncOperation(newOpInBytes);
             } catch (RemoteException e) {
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
+        Log.e(TAG, "flag func end");
 
         return returnCode.getValue();
     }
@@ -359,6 +359,49 @@ public class OTGuard {
         sessionIdMap.remove(sidInJni);
 
         NativeLibtee.teecCloseSession(sidInJni);
+    }
+
+    public int teecInvokeCommand(int callerId, int sid, int commandId, int[] returnOrigin, byte[] opsInBytes, ISyncOperation iSyncOperation){
+        // known caller?
+        if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
+
+        OTCaller caller = findCallerById(callerId);
+
+        opsInBytes = replaceSMId(caller, opsInBytes, true);
+
+        //get sid
+        int sidInJni = caller.getSidInJniBySid(sid);
+        if(sidInJni == -1){
+            Log.e(TAG, "session with id " + sid + " not found in jni");
+
+            return OTReturnCode.TEEC_ERROR_BAD_PARAMETERS;
+        }
+
+        IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
+        IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
+        // call the teecInvokeCommand in native libtee.
+        byte[] newOpInBytes = NativeLibtee.teecInvokeCommand(sidInJni,
+                commandId,
+                opsInBytes,
+                retOriginFromJni,
+                returnCode);
+
+        returnOrigin[0] = retOriginFromJni.getValue();
+
+        if(iSyncOperation != null){
+            // sync operation back.
+            try {
+                Log.d(TAG, "Operation sync back using callback function.");
+
+                //test code, wait for 1000ms: worked
+
+                iSyncOperation.syncOperation(newOpInBytes);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return returnCode.getValue();
     }
 
     private OTCaller findCallerById(int callerId){

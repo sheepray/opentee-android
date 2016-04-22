@@ -53,4 +53,10 @@ public class NativeLibtee {
 
     public static synchronized native void teecCloseSession(int sidInJni);
 
+    public static synchronized native byte[] teecInvokeCommand(int sidInJni,
+                                                               int commandId,
+                                                               byte[] opsInBytes,
+                                                               IntWrapper retOriginWrapper,
+                                                               IntWrapper returnCode);
+
 }

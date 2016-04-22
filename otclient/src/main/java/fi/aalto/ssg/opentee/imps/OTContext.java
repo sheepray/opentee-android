@@ -19,8 +19,10 @@ import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.BadFormatException;
 import fi.aalto.ssg.opentee.exception.BusyException;
 import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
+import fi.aalto.ssg.opentee.exception.ExcessDataException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
@@ -139,19 +141,19 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
                                 int connectionData,
                                 ITEEClient.IOperation teecOperation) throws TEEClientException{
         //teecOperation started check
-        if(teecOperation.isStarted()){
+        if(teecOperation != null && teecOperation.isStarted()){
             throw new BusyException("the referenced operation is under usage.", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
         }
 
         OTOperation otOperation = (OTOperation)teecOperation;
 
-        //update started field.
-        otOperation.setStarted(1);
-
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
             return null;
         }
+
+        //update started field.
+        if (otOperation != null) otOperation.setStarted(1);
 
         // sid is used to identify different sessions of one context in the OTGuard.
         int sid = generateSessionId();
@@ -161,7 +163,8 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
          */
         byte[] opInArray = OTFactoryMethods.OperationAsByteArray(TAG, teecOperation);
 
-        OTLock otLock = new OTLock();
+        OTLock otLock = null;
+        if (teecOperation != null) otLock = new OTLock();
         OpenSessionThread openSessionThread = new OpenSessionThread(mProxyApis,
                 sid,
                 uuid,
@@ -172,41 +175,47 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
         openSessionThread.run();
 
-        otLock.lock();
+        if (otLock != null) otLock.lock();
 
         byte[] teecOperationInBytes = openSessionThread.getNewOperationInBytes();
+        ReturnValueWrapper rv = openSessionThread.getReturnValue();
 
-        if(teecOperationInBytes == null){
+        if(teecOperationInBytes != null){
+            GPDataTypes.TeecOperation op = OTFactoryMethods.transferOpInBytesToOperation(TAG, teecOperationInBytes);
+
+            //test code
+            OTFactoryMethods.print_op(TAG, op);
+
+            for(int i = 0; i < op.getMParamsCount(); i++){
+                GPDataTypes.TeecParameter param = op.getMParamsList().get(i);
+                if(param.getType() == GPDataTypes.TeecParameter.Type.val){
+                    OTValue otValue = (OTValue)otOperation.getParam(i);
+
+                    otValue.setA(param.getTeecValue().getA());
+                    otValue.setB(param.getTeecValue().getB());
+                }
+                else if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
+                    OTRegisteredMemoryReference otRmr = (OTRegisteredMemoryReference)otOperation.getParam(i);
+                    OTSharedMemory otSm = (OTSharedMemory)otRmr.getSharedMemory();
+
+                    GPDataTypes.TeecSharedMemoryReference teecSmr = param.getTeecSharedMemoryReference();
+
+                    otSm.updateBuffer(teecSmr.getParent().getMBuffer().toByteArray(),
+                            otRmr.getOffset(),
+                            teecSmr.getParent().getMReturnSize());
+
+                }
+                else{
+                    Log.e(TAG, "Unknown type of parameter.");
+                }
+            }
+        }
+        else{
             Log.e(TAG, "op is empty");
         }
 
-        GPDataTypes.TeecOperation op = OTFactoryMethods.transferOpInBytesToOperation(TAG, teecOperationInBytes);
-
-        //test code
-        OTFactoryMethods.print_op(TAG, op);
-
-        for(int i = 0; i < op.getMParamsCount(); i++){
-            GPDataTypes.TeecParameter param = op.getMParamsList().get(i);
-            if(param.getType() == GPDataTypes.TeecParameter.Type.val){
-                OTValue otValue = (OTValue)otOperation.getParam(i);
-
-                otValue.setA(param.getTeecValue().getA());
-                otValue.setB(param.getTeecValue().getB());
-            }
-            else if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
-                OTRegisteredMemoryReference otRmr = (OTRegisteredMemoryReference)otOperation.getParam(i);
-                OTSharedMemory otSm = (OTSharedMemory)otRmr.getSharedMemory();
-
-                GPDataTypes.TeecSharedMemoryReference teecSmr = param.getTeecSharedMemoryReference();
-
-                otSm.updateBuffer(teecSmr.getParent().getMBuffer().toByteArray(),
-                        otRmr.getOffset(),
-                        teecSmr.getParent().getMReturnSize());
-
-            }
-            else{
-                Log.e(TAG, "Unknown type of parameter.");
-            }
+        if(rv.getReturnCode() != OTReturnCode.TEEC_SUCCESS){
+            OTFactoryMethods.throwExceptionWithReturnOrigin(TAG, rv.getReturnCode(), rv.getReturnOrigin());
         }
 
         // upon success
@@ -215,7 +224,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         mSessionMap.put(sid, 0);
 
         // operation is no longer in use.
-        otOperation.setStarted(0);
+        if (otOperation != null) otOperation.setStarted(0);
 
         return otSession;
     }
@@ -254,7 +263,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
     }
 
     @Override
-    public void closeSession(int sid) throws RemoteException {
+    public void closeSession(int sid) throws RemoteException, CommunicationErrorException {
         Log.i(TAG, "closing session with id " + sid);
 
         // call remote to close session.
@@ -262,5 +271,95 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
         // remote session.
         mSessionMap.remove(sid);
+    }
+
+    @Override
+    public ReturnValueWrapper invokeCommand(int sid, int commandId, ITEEClient.IOperation teecOperation) throws BusyException, ExcessDataException, BadFormatException {
+        Log.i(TAG, "invoking command with commandId " + commandId);
+
+        if ( !mInitialized || mProxyApis == null ){
+            Log.i(TAG, "Not ready to open session");
+            return null;
+        }
+
+        InvokeCommandThread invokeCommandThread = null;
+
+        //teecOperation started check
+        if(teecOperation == null){
+            invokeCommandThread = new InvokeCommandThread(mProxyApis,
+                    sid,
+                    commandId,
+                    null,   // no operation
+                    null);  // no lock
+
+            invokeCommandThread.run();
+        }
+        else{
+            if(teecOperation.isStarted()){
+                throw new BusyException("the referenced operation is under usage.", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+            }
+
+            OTOperation otOperation = (OTOperation)teecOperation;
+
+            //update started field.
+            otOperation.setStarted(1);
+
+            /**
+             * parse teecOperation into byte array using protocol buffer.
+             */
+            byte[] opInArray = OTFactoryMethods.OperationAsByteArray(TAG, teecOperation);
+
+            OTLock otLock = new OTLock();
+            invokeCommandThread = new InvokeCommandThread(mProxyApis,
+                    sid,
+                    commandId,
+                    opInArray,
+                    otLock);
+
+            invokeCommandThread.run();
+
+            otLock.lock();
+
+            byte[] teecOperationInBytes = invokeCommandThread.getNewOperationInBytes();
+
+            if(teecOperationInBytes != null){
+                GPDataTypes.TeecOperation op = OTFactoryMethods.transferOpInBytesToOperation(TAG, teecOperationInBytes);
+
+                //test code
+                OTFactoryMethods.print_op(TAG, op);
+
+                for(int i = 0; i < op.getMParamsCount(); i++){
+                    GPDataTypes.TeecParameter param = op.getMParamsList().get(i);
+                    if(param.getType() == GPDataTypes.TeecParameter.Type.val){
+                        OTValue otValue = (OTValue)otOperation.getParam(i);
+
+                        otValue.setA(param.getTeecValue().getA());
+                        otValue.setB(param.getTeecValue().getB());
+                    }
+                    else if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
+                        OTRegisteredMemoryReference otRmr = (OTRegisteredMemoryReference)otOperation.getParam(i);
+                        OTSharedMemory otSm = (OTSharedMemory)otRmr.getSharedMemory();
+
+                        GPDataTypes.TeecSharedMemoryReference teecSmr = param.getTeecSharedMemoryReference();
+
+                        otSm.updateBuffer(teecSmr.getParent().getMBuffer().toByteArray(),
+                                otRmr.getOffset(),
+                                teecSmr.getParent().getMReturnSize());
+
+                    }
+                    else{
+                        Log.e(TAG, "Unknown type of parameter.");
+                    }
+                }
+            }
+            else{
+                Log.e(TAG, "op is empty");
+            }
+
+            // operation is no longer in use.
+            otOperation.setStarted(0);
+        }
+
+        return invokeCommandThread.getReturnValue();
     }
 }

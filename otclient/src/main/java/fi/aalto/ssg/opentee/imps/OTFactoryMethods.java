@@ -8,6 +8,28 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.List;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.AccessConflictException;
+import fi.aalto.ssg.opentee.exception.AccessDeniedException;
+import fi.aalto.ssg.opentee.exception.BadFormatException;
+import fi.aalto.ssg.opentee.exception.BadParametersException;
+import fi.aalto.ssg.opentee.exception.BadStateException;
+import fi.aalto.ssg.opentee.exception.BusyException;
+import fi.aalto.ssg.opentee.exception.CancelErrorException;
+import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
+import fi.aalto.ssg.opentee.exception.ExcessDataException;
+import fi.aalto.ssg.opentee.exception.ExternalCancelException;
+import fi.aalto.ssg.opentee.exception.GenericErrorException;
+import fi.aalto.ssg.opentee.exception.ItemNotFoundException;
+import fi.aalto.ssg.opentee.exception.NoDataException;
+import fi.aalto.ssg.opentee.exception.NoStorageSpaceException;
+import fi.aalto.ssg.opentee.exception.NotImplementedException;
+import fi.aalto.ssg.opentee.exception.NotSupportedException;
+import fi.aalto.ssg.opentee.exception.OutOfMemoryException;
+import fi.aalto.ssg.opentee.exception.OverflowException;
+import fi.aalto.ssg.opentee.exception.SecurityErrorException;
+import fi.aalto.ssg.opentee.exception.ShortBufferException;
+import fi.aalto.ssg.opentee.exception.TEEClientException;
+import fi.aalto.ssg.opentee.exception.TargetDeadException;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
@@ -132,5 +154,120 @@ public class OTFactoryMethods {
         opInArray = toBuilder.build().toByteArray();
 
         return opInArray;
+    }
+
+    //note: switch statement can also apply in here.
+    public static void throwExceptionBasedOnReturnCode(int return_code) throws TEEClientException {
+        switch (return_code){
+            case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
+                throw new AccessConflictException("Access conflict.");
+            case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
+                throw new AccessDeniedException("Access denied.");
+            case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
+                throw new BadFormatException("Bad format");
+            case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
+                throw new BadParametersException("Bad parameters.");
+            case OTReturnCode.TEEC_ERROR_BAD_STATE:
+                throw new BadStateException("Bad state");
+            case OTReturnCode.TEEC_ERROR_BUSY:
+                throw new BusyException("Busy");
+            case OTReturnCode.TEEC_ERROR_CANCEL:
+                throw new CancelErrorException("Cancel");
+            case OTReturnCode.TEEC_ERROR_COMMUNICATION:
+                throw new CommunicationErrorException("Communication error");
+            case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
+                throw new ExcessDataException("Excess data");
+            case OTReturnCode.TEEC_ERROR_GENERIC:
+                throw new GenericErrorException("Generic error");
+            case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
+                throw new ItemNotFoundException("Item not found");
+            case OTReturnCode.TEEC_ERROR_NO_DATA:
+                throw new NoDataException("Not data provided");
+            case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
+                throw new NotImplementedException("Not impelemented");
+            case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
+                throw new NotSupportedException("Not supported");
+            case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
+                throw new OutOfMemoryException("Out of memory");
+            case OTReturnCode.TEEC_ERROR_SECURITY:
+                throw new SecurityErrorException("Security check failed");
+            case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
+                throw new ShortBufferException("Short buffer");
+            case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
+                throw new ExternalCancelException("External cancel");
+            case OTReturnCode.TEE_ERROR_OVERFLOW:
+                throw new OverflowException("Overflow");
+            case OTReturnCode.TEE_ERROR_TARGET_DEAD:
+                throw new TargetDeadException("TEE: target dead");
+            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
+                throw new NoStorageSpaceException("Storage no space");
+            default:
+                break;
+            //throw new TEEClientException("Unknown error");
+        }
+
+    }
+
+    private static ITEEClient.ReturnOriginCode intToReturnOrigin(int roInt){
+        int len = ITEEClient.ReturnOriginCode.values().length;
+        if( len <= roInt || roInt <= 0) return null;
+
+        return ITEEClient.ReturnOriginCode.values()[roInt - 1];
+    }
+
+    public static void throwExceptionWithReturnOrigin(String TAG, int return_code, int retOrigin) throws TEEClientException{
+        ITEEClient.ReturnOriginCode returnOriginCode = intToReturnOrigin(retOrigin);
+
+        if ( returnOriginCode == null ){
+            Log.e(TAG, "Incorrect return origin " + retOrigin);
+        }
+
+        switch (return_code){
+            case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
+                throw new AccessConflictException("Access conflict.", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
+                throw new AccessDeniedException("Access denied.", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
+                throw new BadFormatException("Bad format", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
+                throw new BadParametersException("Bad parameters.", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_BAD_STATE:
+                throw new BadStateException("Bad state", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_BUSY:
+                throw new BusyException("Busy", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_CANCEL:
+                throw new CancelErrorException("Cancel", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_COMMUNICATION:
+                throw new CommunicationErrorException("Communication error", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
+                throw new ExcessDataException("Excess data", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_GENERIC:
+                throw new GenericErrorException("Generic error", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
+                throw new ItemNotFoundException("Item not found", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_NO_DATA:
+                throw new NoDataException("Not data provided", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
+                throw new NotImplementedException("Not impelemented", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
+                throw new NotSupportedException("Not supported", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
+                throw new OutOfMemoryException("Out of memory", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_SECURITY:
+                throw new SecurityErrorException("Security check failed", returnOriginCode);
+            case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
+                throw new ShortBufferException("Short buffer", returnOriginCode);
+            case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
+                throw new ExternalCancelException("External cancel", returnOriginCode);
+            case OTReturnCode.TEE_ERROR_OVERFLOW:
+                throw new OverflowException("Overflow", returnOriginCode);
+            case OTReturnCode.TEE_ERROR_TARGET_DEAD:
+                throw new TargetDeadException("TEE: target dead", returnOriginCode);
+            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
+                throw new NoStorageSpaceException("Storage no space", returnOriginCode);
+            default:
+                break;
+            //throw new TEEClientException("Unknown error", returnOriginCode);
+        }
     }
 }

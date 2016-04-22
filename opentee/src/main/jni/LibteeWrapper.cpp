@@ -440,7 +440,7 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
 /**
  * transfer the operation in jbyteArray into TEEC_Operation.
  */
-void transfer_op_to_TEEC_Operation(JNIEnv* env, const jbyteArray& opInBytes, TEEC_Operation* teec_operation){
+void transfer_op_to_TEEC_Operation(JNIEnv* env, const jbyteArray opInBytes, TEEC_Operation* teec_operation){
     LOGD("[start]%s", __FUNCTION__);
 
     if(opInBytes == NULL){
@@ -603,58 +603,67 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 
     printClockSeqAndNode(teec_uuid.clockSeqAndNode);
 
-    /**
-     * Parsing TEEC_Operation from op in bytes.
-     */
-    TEEC_Operation teec_operation = {0};
-    transfer_op_to_TEEC_Operation(env, opInBytes, &teec_operation);
-
-    printTeecOperation(&teec_operation);
-
-    TEEC_Session teec_session = {0};
+    jbyteArray new_op_in_bytes = NULL;
     uint32_t teec_ret_ori = 0;
 
-    /**
-     * call TEEC_OpenSession.
-     */
-    /* Dont call open session right now to test shared memory synchronization.
-    TEEC_Result teec_ret = TEEC_OpenSession(
-            &g_contextRecord,
-            &teec_session,
-            &teec_uuid,
-            (uint32_t)connMethod,
-            //TEEC_LOGIN_PUBLIC,
-            &connData,
-            //NULL,
-            &teec_operation,
-            //NULL,
-            &teec_ret_ori
-    );
+    if( opInBytes != NULL ){
+        /**
+         * Parsing TEEC_Operation from op in bytes.
+         */
+        TEEC_Operation teec_operation = {0};
+        transfer_op_to_TEEC_Operation(env, opInBytes, &teec_operation);
+
+        printTeecOperation(&teec_operation);
+
+        TEEC_Session teec_session = {0};
+
+        /**
+         * call TEEC_OpenSession.
+         */
+        /* Dont call open session right now to test shared memory synchronization.
+        TEEC_Result teec_ret = TEEC_OpenSession(
+                &g_contextRecord,
+                &teec_session,
+                &teec_uuid,
+                (uint32_t)connMethod,
+                //TEEC_LOGIN_PUBLIC,
+                &connData,
+                //NULL,
+                &teec_operation,
+                //NULL,
+                &teec_ret_ori
+        );
 
 
-    LOGD("%s: connMethod:%.8x, connData:%.8x, return code:%.8x, return origin:%.8x",
-         __FUNCTION__,
-         connMethod,
-         connData,
-         teec_ret,
-         teec_ret_ori
-    );
-
-
-    //store the session upon success.
-    if( teec_ret == TEEC_SUCCESS ){
-        //TODO: potential issue with teec_session when out of this function. Needs to check.
-        sessions_map.emplace((int)sid, teec_session);
-    }
+        LOGD("%s: connMethod:%.8x, connData:%.8x, return code:%.8x, return origin:%.8x",
+             __FUNCTION__,
+             connMethod,
+             connData,
+             teec_ret,
+             teec_ret_ori
+        );
+        //store the session upon success.
+        if( teec_ret == TEEC_SUCCESS ){
+            //TODO: potential issue with teec_session when out of this function. Needs to check.
+            sessions_map.emplace((int)sid, NULL);
+        }
     */
+        //simulate TEEC_SharedMemory and TEEC_Value have been changed.
+        memcpy(teec_operation.params[0].memref.parent->buffer, "LOVE", 4);
 
-    //simulate TEEC_SharedMemory and TEEC_Value have been changed.
-    memcpy(teec_operation.params[0].memref.parent->buffer, "LOVE", 4);
+        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        teec_operation.params[1].value.a = 0x520;
+        teec_operation.params[1].value.b = 0x1314;
+        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
 
-    LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
-    teec_operation.params[1].value.a = 0x520;
-    teec_operation.params[1].value.b = 0x1314;
-    LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        //test code TODO: remove
+         sessions_map.emplace((int)sid, teec_session);
+
+        /**
+        * sync shared memory and Value back.
+        */
+        new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
+    }
 
     /**
      * Prepare the variables to return.
@@ -662,11 +671,9 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
     // set return origin
     set_return_origin(env, returnOrigin, teec_ret_ori);
 
-    /**
-     * sync shared memory and Value back.
-    */
-    jbyteArray new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
-
+    // set return code
+    //set_return_code(env, returnCode, teec_ret);
+    set_return_code(env, returnCode, 0);
 
     LOGI("[end] %s", __FUNCTION__);
 
@@ -685,6 +692,85 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     TEEC_CloseSession(&(sessionWithId->second));
     LOGI("Session with id %d is closed.", sidInJni);
+}
+
+TEEC_Session* find_session_by_id(int sid){
+    LOGI("[start] %s", __FUNCTION__);
+
+    unordered_map<int,TEEC_Session>::iterator session = sessions_map.find(sid);
+
+    if(session == sessions_map.end()){
+        LOGE("\tcannot find session with id %d", sid);
+        return NULL;
+    }
+
+    LOGI("[End] %s", __FUNCTION__);
+
+    return &session->second;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInvokeCommand
+(JNIEnv* env, jclass jc, jint sid, jint commandId, jbyteArray opInBytes, jobject returnOrigin, jobject returnCode){
+    LOGE("start] %s", __FUNCTION__);
+    jbyteArray new_op_in_bytes = NULL;
+    uint32_t teec_ret_ori = 0;
+    if(opInBytes != NULL){
+        /**
+         * Parsing TEEC_Operation from op in bytes.
+         */
+        TEEC_Operation teec_operation = {0};
+        transfer_op_to_TEEC_Operation(env, opInBytes, &teec_operation);
+
+        printTeecOperation(&teec_operation);
+
+        TEEC_Session* teec_session = NULL;
+        //find session.
+        teec_session = find_session_by_id(sid);
+
+
+
+        /**
+         * call TEEC_InvokeCommand.
+         */
+        /* Dont call open session right now to test shared memory synchronization.
+        TEEC_Result teec_ret = TEEC_InvokeCommand(
+                &g_contextRecord,
+                &teec_session,
+                //NULL,
+                &teec_operation,
+                //NULL,
+                &teec_ret_ori
+        );
+
+        //store the session upon success.
+        if( teec_ret == TEEC_SUCCESS ){
+            //TODO: potential issue with teec_session when out of this function. Needs to check.
+            sessions_map.emplace((int)sid, NULL);
+        }
+        */
+        //simulate TEEC_SharedMemory and TEEC_Value have been changed.
+        memcpy(teec_operation.params[0].memref.parent->buffer, "YANG", 4);
+
+        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        teec_operation.params[1].value.a = 0x8888;
+        teec_operation.params[1].value.b = 0x6666;
+        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+
+        // sync shared memory and Value back.
+        new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
+    }
+
+    // set return origin
+    set_return_origin(env, returnOrigin, teec_ret_ori);
+
+    // set return code
+    //set_return_code(env, returnCode, teec_ret);
+    set_return_code(env, returnCode, 0);
+
+    LOGI("[end] %s", __FUNCTION__);
+
+    //return teec_ret;
+    return new_op_in_bytes;
 }
 
 #ifdef __cplusplus

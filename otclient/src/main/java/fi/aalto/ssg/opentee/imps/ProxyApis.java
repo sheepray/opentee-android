@@ -130,7 +130,7 @@ public class ProxyApis {
         Log.d(TAG, "Return code from OT: " + Integer.toHexString(return_code));
 
         if ( return_code != OTReturnCode.TEEC_SUCCESS ){
-            throwExceptionBasedOnReturnCode(return_code);
+            OTFactoryMethods.throwExceptionBasedOnReturnCode(return_code);
         }
 
         return this;
@@ -163,7 +163,7 @@ public class ProxyApis {
             return;
         }
         else{
-            throwExceptionBasedOnReturnCode(return_code);
+            OTFactoryMethods.throwExceptionBasedOnReturnCode(return_code);
         }
 
     }
@@ -176,14 +176,14 @@ public class ProxyApis {
         mService.teecReleaseSharedMemory(smId);
     }
 
-    public void teecOpenSession(int sessionId,
+    public ReturnValueWrapper teecOpenSession(int sessionId,
                                 UUID uuid,
                                 ITEEClient.IContext.ConnectionMethod connectionMethod,
                                 int connectionData,
                                 byte[] opInArray,
                                 ISyncOperation syncOperation) throws TEEClientException, RemoteException {
         if ( mService == null ){
-            throw new GenericErrorException("Service unavailable");
+            throw new CommunicationErrorException("Service unavailable");
         }
 
         /**
@@ -209,134 +209,42 @@ public class ProxyApis {
 
         Log.d(TAG, "teecOpenSession return code: " + rc);
 
-        /**
-         * dealing with return code.
-         */
-        if ( rc != OTReturnCode.TEEC_SUCCESS ){
-            // throw exceptions with return origin.
-            throwExceptionWithReturnOrigin(rc, retOrigin[0]);
-        }
+        ReturnValueWrapper returnValueWrapper = new ReturnValueWrapper(rc, retOrigin[0]);
+
+        return returnValueWrapper;
     }
 
-    public void teecCloseSession(int sessionId) throws RemoteException {
-        //TODO:
+    public void teecCloseSession(int sessionId) throws RemoteException, CommunicationErrorException {
+        if ( mService == null ){
+            throw new CommunicationErrorException("Service unavailable");
+        }
+
         mService.teecCloseSession(sessionId);
     }
 
-    //note: switch statement can also apply in here.
-    public static void throwExceptionBasedOnReturnCode(int return_code) throws TEEClientException{
-        switch (return_code){
-            case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
-                throw new AccessConflictException("Access conflict.");
-            case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
-                throw new AccessDeniedException("Access denied.");
-            case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
-                throw new BadFormatException("Bad format");
-            case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
-                throw new BadParametersException("Bad parameters.");
-            case OTReturnCode.TEEC_ERROR_BAD_STATE:
-                throw new BadStateException("Bad state");
-            case OTReturnCode.TEEC_ERROR_BUSY:
-                throw new BusyException("Busy");
-            case OTReturnCode.TEEC_ERROR_CANCEL:
-                throw new CancelErrorException("Cancel");
-            case OTReturnCode.TEEC_ERROR_COMMUNICATION:
-                throw new CommunicationErrorException("Communication error");
-            case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
-                throw new ExcessDataException("Excess data");
-            case OTReturnCode.TEEC_ERROR_GENERIC:
-                throw new GenericErrorException("Generic error");
-            case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
-                throw new ItemNotFoundException("Item not found");
-            case OTReturnCode.TEEC_ERROR_NO_DATA:
-                throw new NoDataException("Not data provided");
-            case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
-                throw new NotImplementedException("Not impelemented");
-            case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
-                throw new NotSupportedException("Not supported");
-            case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
-                throw new OutOfMemoryException("Out of memory");
-            case OTReturnCode.TEEC_ERROR_SECURITY:
-                throw new SecurityErrorException("Security check failed");
-            case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
-                throw new ShortBufferException("Short buffer");
-            case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
-                throw new ExternalCancelException("External cancel");
-            case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new OverflowException("Overflow");
-            case OTReturnCode.TEE_ERROR_TARGET_DEAD:
-                throw new TargetDeadException("TEE: target dead");
-            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new NoStorageSpaceException("Storage no space");
-            default:
-                break;
-                //throw new TEEClientException("Unknown error");
+    public ReturnValueWrapper teecInvokeCommand(int sid, int commandId, byte[] opInArray, ISyncOperation iSyncOperation) throws CommunicationErrorException, RemoteException {
+        if ( mService == null ){
+            throw new CommunicationErrorException("Service unavailable");
         }
 
-    }
+        int rc = -1;
+        int returnOrigin[] = new int[1];
 
-    public static void throwExceptionWithReturnOrigin(int return_code, int retOrigin) throws TEEClientException{
-        ITEEClient.ReturnOriginCode returnOriginCode = intToReturnOrigin(retOrigin);
-
-        if ( returnOriginCode == null ){
-            Log.e(TAG, "Incorrect return origin " + retOrigin);
+        if(opInArray == null){
+            //no operation
+            rc = mService.teecInvokeCommandWithoutOp(sid, commandId, returnOrigin);
+        }
+        else{
+            rc = mService.teecInvokeCommand(sid, commandId, opInArray, returnOrigin, iSyncOperation);
         }
 
-        switch (return_code){
-            case OTReturnCode.TEEC_ERROR_ACCESS_CONFLICT:
-                throw new AccessConflictException("Access conflict.", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_ACCESS_DENIED:
-                throw new AccessDeniedException("Access denied.", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_BAD_FORMAT:
-                throw new BadFormatException("Bad format", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_BAD_PARAMETERS:
-                throw new BadParametersException("Bad parameters.", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_BAD_STATE:
-                throw new BadStateException("Bad state", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_BUSY:
-                throw new BusyException("Busy", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_CANCEL:
-                throw new CancelErrorException("Cancel", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_COMMUNICATION:
-                throw new CommunicationErrorException("Communication error", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_EXCESS_DATA:
-                throw new ExcessDataException("Excess data", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_GENERIC:
-                throw new GenericErrorException("Generic error", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_ITEM_NOT_FOUND:
-                throw new ItemNotFoundException("Item not found", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_NO_DATA:
-                throw new NoDataException("Not data provided", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_NOT_IMPLEMENTED:
-                throw new NotImplementedException("Not impelemented", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_NOT_SUPPORTED:
-                throw new NotSupportedException("Not supported", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_OUT_OF_MEMORY:
-                throw new OutOfMemoryException("Out of memory", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_SECURITY:
-                throw new SecurityErrorException("Security check failed", returnOriginCode);
-            case OTReturnCode.TEEC_ERROR_SHORT_BUFFER:
-                throw new ShortBufferException("Short buffer", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
-                throw new ExternalCancelException("External cancel", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new OverflowException("Overflow", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_TARGET_DEAD:
-                throw new TargetDeadException("TEE: target dead", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new NoStorageSpaceException("Storage no space", returnOriginCode);
-            default:
-                break;
-                //throw new TEEClientException("Unknown error", returnOriginCode);
-        }
+        Log.d(TAG, "teecInvokeCommand return code: " + rc);
+
+        ReturnValueWrapper returnValueWrapper = new ReturnValueWrapper(rc, returnOrigin[0]);
+
+        return returnValueWrapper;
     }
 
     public boolean getConnected(){ return this.mConnected; }
 
-    private static ITEEClient.ReturnOriginCode intToReturnOrigin(int roInt){
-        int len = ITEEClient.ReturnOriginCode.values().length;
-        if( len <= roInt || roInt <= 0) return null;
-
-        return ITEEClient.ReturnOriginCode.values()[roInt - 1];
-    }
 }

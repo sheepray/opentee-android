@@ -32,21 +32,21 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecInitializeContext(String teeName) throws RemoteException {
+        public synchronized int teecInitializeContext(String teeName) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to initialize context.");
 
             return mOTGuard.initializeContext(Binder.getCallingPid(), teeName);
         }
 
         @Override
-        public void teecFinalizeContext() throws RemoteException {
+        public synchronized void teecFinalizeContext() throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to finalize context.");
 
             mOTGuard.teecFinalizeContext(Binder.getCallingPid());
         }
 
         @Override
-        public int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
+        public synchronized int teecRegisterSharedMemory(OTSharedMemory sharedMemory) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid() + " is calling me to register shared memory.");
 
             return mOTGuard.teecRegisterSharedMemory(Binder.getCallingPid(), sharedMemory);
@@ -54,7 +54,7 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public void teecReleaseSharedMemory(int smId){
+        public synchronized void teecReleaseSharedMemory(int smId){
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to release shared memory with id:"
                     + smId);
@@ -64,7 +64,7 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData, int[] retOrigin) throws RemoteException {
+        public synchronized int teecOpenSessionWithoutOp(int sid, ParcelUuid parcelUuid, int connMethod, int connData, int[] retOrigin) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to open session without operation.");
 
@@ -79,7 +79,7 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin, ISyncOperation iSyncOperation) throws RemoteException {
+        public synchronized int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin, ISyncOperation iSyncOperation) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to open session with operations.");
 
@@ -94,11 +94,37 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public void teecCloseSession(int sid){
+        public synchronized void teecCloseSession(int sid){
             Log.d(TAG, Binder.getCallingPid()
                     + " is calling me to close session.");
 
             mOTGuard.teecCloseSession(Binder.getCallingPid(), sid);
+        }
+
+        @Override
+        public synchronized int teecInvokeCommandWithoutOp(int sid, int commandId, int[] returnOrigin){
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to invoke command without operation.");
+
+            return mOTGuard.teecInvokeCommand(Binder.getCallingPid(),
+                    sid,
+                    commandId,
+                    returnOrigin,
+                    null,
+                    null);
+        }
+
+        @Override
+        public synchronized int teecInvokeCommand(int sid, int commandId, byte[] teecOperation, int[] returnOrigin, ISyncOperation syncOperation){
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to invoke command with operations.");
+
+            return mOTGuard.teecInvokeCommand(Binder.getCallingPid(),
+                    sid,
+                    commandId,
+                    returnOrigin,
+                    teecOperation,
+                    syncOperation);
         }
     };
 
