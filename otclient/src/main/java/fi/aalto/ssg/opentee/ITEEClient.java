@@ -246,7 +246,7 @@ public interface ITEEClient {
          * @throws exception.ExcessDataException:
          * providing too much parameters in the operation parameter.
          * @throws exception.ExternalCancelException:
-         * current operation cancelled by external signal in the remote TEE or TA side.
+         * current operation cancelled by external signal in the CA, remote TEE or TA side.
          * @throws exception.GenericErrorException:
          * non-specific error.
          * @throws exception.ItemNotFoundException:
@@ -494,6 +494,8 @@ public interface ITEEClient {
          * @param sharedMemory the reference the ISharedMemory instance.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
+         * @throws exception.BadParametersException:
+         * Incorrect ISharedMemory instance.
          */
         void releaseSharedMemory(ISharedMemory sharedMemory) throws TEEClientException;
 
@@ -522,8 +524,10 @@ public interface ITEEClient {
          * Current operation is cancelled by another thread.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
+         * @throws exception.ExternalCancelException:
+         * Cancelled by external interrupt.
          * @throws exception.GenericErrorException:
-         * No specific cause error.
+         * The thread to open session catches an keyboard interrupt .
          * @throws exception.ItemNotFoundException:
          * Referred shared memory not found.
          * @throws exception.NoDataException:

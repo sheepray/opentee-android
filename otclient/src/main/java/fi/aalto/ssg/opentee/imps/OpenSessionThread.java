@@ -7,24 +7,22 @@ import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.ITEEClient;
-import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
-import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * Created by yangr1 on 4/20/16.
  */
 public class OpenSessionThread implements Runnable {
     final String TAG = "OpenSessionThread";
-    ProxyApis mProxyApis;
+    ProxyApis mProxyApis = null;
     int mSid;
     UUID mUuid;
     ITEEClient.IContext.ConnectionMethod mConnectionMethod;
     int mConnectionData;
-    byte[] mTeecOperation;
+    byte[] mTeecOperation = null;
     byte[] mNewTeecOperation = null;
-    OTLock mLock;
-    ReturnValueWrapper mReturnValue;
+    OTLock mLock = null;
+    ReturnValueWrapper mReturnValue = null;
 
     private ISyncOperation mSyncOperationCallBack = new ISyncOperation.Stub(){
         @Override
@@ -34,7 +32,7 @@ public class OpenSessionThread implements Runnable {
 
         @Override
         public void syncOperation(byte[] teecOperationInBytes) throws RemoteException {
-            Log.e(TAG, "sync op called");
+            Log.e(TAG, "sync op called in thread with id " + Thread.currentThread().getId());
 
             mNewTeecOperation = teecOperationInBytes;
 
@@ -69,6 +67,8 @@ public class OpenSessionThread implements Runnable {
 
     @Override
     public void run() {
+        if (mLock != null) mLock.lock();
+
         try {
             mReturnValue = mProxyApis.teecOpenSession(mSid,
                     mUuid,

@@ -7,10 +7,10 @@ import android.content.Context;
  * remote service.
  */
 public class ServiceGetterThread implements Runnable {
-    Object mLock;
     ProxyApis mProxyApis = null;
-    String mTeeName;
-    Context mContext;
+    String mTeeName = null;
+    Context mContext = null;
+    Object mLock = null;
 
     public ServiceGetterThread(String teeName, Context context, Object lock){
         this.mTeeName = teeName;

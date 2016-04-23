@@ -52,6 +52,8 @@ public class InvokeCommandThread implements Runnable {
 
     @Override
     public void run() {
+        if(mLock != null) mLock.lock();
+
         try {
             mReturnValue = mProxyApis.teecInvokeCommand(mSid, mCommandId, mTeecOperation, mSyncOperationCallBack);
         } catch (CommunicationErrorException e) {
