@@ -2,25 +2,22 @@ package fi.aalto.ssg.opentee.testapp;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import java.sql.Array;
 import java.util.Arrays;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
-import fi.aalto.ssg.opentee.imps.OTClient;
-import fi.aalto.ssg.opentee.imps.OTSharedMemory;
+import fi.aalto.ssg.opentee.OpenTEE;
 
 public class MainActivity extends AppCompatActivity {
     public final String TAG = "Test_APP";
     public final String TEE_NAME = null;   //currently only one default TEE
 
-    // uuid for ta_conn_test in OpenTEE:
+    // uuid for ta_conn_test in IOpenTEE:
     // uuid = {0x12345678, 0x8765, 0x4321, {'T','A','C','O','N','N','T','E'}}
     public UUID TA_CONN_TEST_UUID;
 
@@ -99,13 +96,10 @@ public class MainActivity extends AppCompatActivity {
     void newTest() {
         Log.d(TAG, "******* Starting test ********");
 
-        ITEEClient client = new OTClient();
+        ITEEClient client = OpenTEE.newTEEClient();
         ITEEClient.IContext ctx = null;
         try {
             if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
-
-            //test code
-            //if (client != null) ctx = client.initializeContext(TEE_NAME, getApplication());
         } catch (TEEClientException e) {
             e.printStackTrace();
         }

@@ -327,8 +327,6 @@ public class OTGuard {
         //test code
         //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
 
-        Log.e(TAG, "flag func 3");
-
         if(iSyncOperation != null){
             // sync operation back.
             try {
@@ -341,7 +339,6 @@ public class OTGuard {
                 e.printStackTrace();
             }
         }
-        Log.e(TAG, "flag func end");
 
         return returnCode.getValue();
     }

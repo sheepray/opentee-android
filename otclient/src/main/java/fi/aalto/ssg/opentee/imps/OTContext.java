@@ -40,7 +40,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         this.smIdGenerator = new Random();
 
         /**
-         * connect to the OpenTEE
+         * connect to the IOpenTEE
          */
         Object lock = new Object();
         ServiceGetterThread serviceGetterThread = new ServiceGetterThread(teeName, context, lock);

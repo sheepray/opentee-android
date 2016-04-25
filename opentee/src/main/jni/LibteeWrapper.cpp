@@ -189,6 +189,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     //clean resources
     sharedMemoryWithIdList.clear();
+    sessions_map.clear();
 
     TEEC_FinalizeContext(&g_contextRecord);
     g_contextRecord = {0};
@@ -535,12 +536,6 @@ jbyteArray transfer_TEEC_Operation_to_op(JNIEnv* env, const TEEC_Operation* teec
     op.SerializeToString(&new_op);
 
     LOGD("\tnew_op len:%d", new_op.length());
-
-    //test code
-    for(int i = 0; i < new_op.length(); i++){
-        LOGE("\t%d = %d", i, new_op.at(i));
-    }
-
 
     jbyteArray new_op_in_bytes = env->NewByteArray(new_op.length());
     env->SetByteArrayRegion(new_op_in_bytes, 0, new_op.length(), (jbyte*)new_op.c_str());
