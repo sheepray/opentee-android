@@ -30,6 +30,7 @@ extern "C" {
 #endif
 #include "tee_client_api.h"
 
+/*
 class TEEC_SharedMemoryWithId{
 private:
     TEEC_SharedMemory mSharedMemory;
@@ -50,6 +51,7 @@ public:
 
 };
 TEEC_SharedMemoryWithId NULLSharedMemoryWithId({0}, 0);
+*/
 
 /*
  * Global Var. All contexts and sessions should be kept record in here.
@@ -58,7 +60,9 @@ TEEC_SharedMemoryWithId NULLSharedMemoryWithId({0}, 0);
 static TEEC_Context g_contextRecord = {0};
 
 ///TODO: replace vector with unordered_map
-static vector<TEEC_SharedMemoryWithId> sharedMemoryWithIdList;
+//static vector<TEEC_SharedMemoryWithId> sharedMemoryWithIdList;
+
+static unordered_map<int, TEEC_SharedMemory> sharedmemory_map;
 
 //<session_id, teec_session>
 static unordered_map<int, TEEC_Session> sessions_map;
@@ -66,6 +70,7 @@ static unordered_map<int, TEEC_Session> sessions_map;
 int open_tee_socket_env_set = 0;
 
 //test code.
+/*
 void printSharedMemoryList(){
     if ( sharedMemoryWithIdList.size() == 0 ){
         LOGI("%s: shared memory with id list is empty", __FUNCTION__);
@@ -83,7 +88,26 @@ void printSharedMemoryList(){
              sm->buffer);
     }
 }
+*/
 
+//test code
+void print_sharedmemory_map(){
+    if ( sharedmemory_map.empty() ){
+        LOGI("%s: shared memory map is empty", __FUNCTION__);
+    }
+
+    for(unordered_map<int, TEEC_SharedMemory>::iterator sm = sharedmemory_map.begin(); sm != sharedmemory_map.end(); sm++){
+        LOGI("%s: [%p] shared memory id:%d, size:%d, flag:%d buffer:%s",
+                     __FUNCTION__,
+                     &sm->second,
+                     sm->first,
+                     sm->second.size,
+                     sm->second.flags,
+                     sm->second.buffer);
+    }
+}
+
+/*
 TEEC_SharedMemoryWithId* findSharedMemoryById(int smId){
     for (auto&sm : sharedMemoryWithIdList ){
         if ( sm.getId() == smId ){
@@ -95,7 +119,17 @@ TEEC_SharedMemoryWithId* findSharedMemoryById(int smId){
     LOGI("%s: shared memory with id:%d not found.", __FUNCTION__, smId);
     return &NULLSharedMemoryWithId;
 }
+*/
+TEEC_SharedMemory* find_sharedmemory_by_id(int smid){
+    unordered_map<int, TEEC_SharedMemory>::iterator sm = sharedmemory_map.find(smid);
+    if(sm == sharedmemory_map.end()){
+        LOGE("%s: unable to find shared memory with id %d", __FUNCTION__, smid);
+        return NULL;
+    }
+    return &sm->second;
+}
 
+/*
 bool removeSharedMemoryById(int smId){
     for ( vector<TEEC_SharedMemoryWithId>::iterator s = sharedMemoryWithIdList.begin();
           s != sharedMemoryWithIdList.end(); s++ ){
@@ -109,15 +143,35 @@ bool removeSharedMemoryById(int smId){
         }
     }
 
+    LOGE("%s: incorrect shared memory id.", __FUNCTION__);
+
+    return false;
+}
+*/
+
+bool remove_sharedmemory_by_id(int smid){
+    TEEC_SharedMemory* sm = find_sharedmemory_by_id(smid);
+    if ( sm != NULL ){
+        free(sm->buffer);
+        sharedmemory_map.erase(smid);
+        return true;
+    }
+
     return false;
 }
 
+/*
 bool compareSharedMemoryWithId(TEEC_SharedMemoryWithId* sm1, TEEC_SharedMemoryWithId* sm2){
     if ( sm1->getId() == sm2->getId()) return true;
     return false;
 }
+*/
 
 void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
+    // Verify that the version of the library that we linked against is
+    // compatible with the version of the headers we compiled against.
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+
     /**
      * set up OPENTEE_SOCKET_FILE_PATH env var.
      */
@@ -177,6 +231,12 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     return tmpResult;
 }
 
+void clean_sharedmemory_buffer(){
+    for(unordered_map<int, TEEC_SharedMemory>::iterator sm = sharedmemory_map.begin(); sm != sharedmemory_map.end(); sm++){
+        free(sm->second.buffer);
+    }
+}
+
 /*
  * Finalize Context.
  */
@@ -188,7 +248,9 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     google::protobuf::ShutdownProtobufLibrary();
 
     //clean resources
-    sharedMemoryWithIdList.clear();
+    clean_sharedmemory_buffer();
+    sharedmemory_map.clear();
+
     sessions_map.clear();
 
     TEEC_FinalizeContext(&g_contextRecord);
@@ -205,10 +267,6 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     int l = env->GetArrayLength(jOTSharedMemory);
     uint8_t otSharedMemory[l];
     env->GetByteArrayRegion(jOTSharedMemory, 0, l, (jbyte* )otSharedMemory);
-
-    // Verify that the version of the library that we linked against is
-    // compatible with the version of the headers we compiled against.
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // transfer java type shared memory into c type.
     Message* message = new TeecSharedMemory;
@@ -244,12 +302,13 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     // if register shared memory succeed, add it to the global shared memory array.
     if ( return_code == TEEC_SUCCESS ){
-        TEEC_SharedMemoryWithId sm(cOTSharedMemory, jSmId);
-        sharedMemoryWithIdList.push_back(sm);
+        //TEEC_SharedMemoryWithId sm(cOTSharedMemory, jSmId);
+        //sharedMemoryWithIdList.push_back(sm);
+        sharedmemory_map.emplace(jSmId, cOTSharedMemory);
     }
 
     //test code.
-    printSharedMemoryList();
+    print_sharedmemory_map();
 
     free(cOTSharedMemory.buffer);
     delete message;
@@ -260,12 +319,13 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecReleaseSharedMemory
         (JNIEnv* env, jclass jc, jint jsmId){
     //test code.
-    printSharedMemoryList();
+    print_sharedmemory_map();
 
-    TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(jsmId);
-    if ( compareSharedMemoryWithId( &NULLSharedMemoryWithId, smWithId) ) return;
-
-    TEEC_SharedMemory* sm = smWithId->getSharedMemory();
+    //TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(jsmId);
+    //if ( compareSharedMemoryWithId( &NULLSharedMemoryWithId, smWithId) ) return;
+    //TEEC_SharedMemory* sm = smWithId->getSharedMemory();
+    TEEC_SharedMemory* sm = find_sharedmemory_by_id(jsmId);
+    if(sm == NULL) return;
 
     LOGI("%s: %s is to be released.", __FUNCTION__, sm->buffer);
 
@@ -274,10 +334,11 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     LOGI("%s: %d is released.", __FUNCTION__, jsmId);
 
     // remove shared memory from shared memory list.
-    removeSharedMemoryById(jsmId);
+    //removeSharedMemoryById(jsmId);
+    remove_sharedmemory_by_id(jsmId);
 
     //test code.
-    printSharedMemoryList();
+    print_sharedmemory_map();
 }
 
 //test code
@@ -318,7 +379,7 @@ void printTeecOperation(const TEEC_Operation* op){
 
 //test func
 void printClockSeqAndNode(uint8_t vars[8]){
-    LOGI("ClockSeqAndNode:%s", (char*)vars);
+    LOGI("ClockSeqAndNode:%.*s", 8, (char*)vars);
 }
 
 __inline void set_return_origin(JNIEnv* env, jobject returnOrigin, int var){
@@ -331,7 +392,7 @@ __inline void set_return_code(JNIEnv* env, jobject returnCode, int var){
     set_return_origin(env, returnCode, var);
 }
 
-void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, TEEC_Operation* teec_operation){
+bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, TEEC_Operation* teec_operation){
     TeecOperation op;
     op.ParseFromString(opsInString);
 
@@ -357,10 +418,18 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
              * get TEEC_SharedMemory and sync the content if the flag is TEEC_MEM_INPUT.
              */
             int smId = rmr.parent().mid();
-            TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(smId);
-            TEEC_SharedMemory* sm = smWithId->getSharedMemory();
+            //TEEC_SharedMemoryWithId* smWithId = findSharedMemoryById(smId);
+            //TEEC_SharedMemory* sm = smWithId->getSharedMemory();
+            TEEC_SharedMemory* sm = find_sharedmemory_by_id(smId);
+            if(sm == NULL){
+                LOGE("%s: internal error -- unable to find shared memory with id.", __FUNCTION__, smId);
+                return false;
+            }
 
-            LOGE("%s: old buffer:%s with flag:%x", __FUNCTION__, sm->buffer, sm->flags);
+            //test code
+            print_sharedmemory_map();
+
+            LOGE("%s: old buffer[%p]:%s with flag:%x", __FUNCTION__, sm, sm->buffer, sm->flags);
 
             if(rmr.parent().mflag() != JavaConstants::MEMREF_OUTPUT){
                 //the share memory is not only for output.
@@ -436,6 +505,8 @@ void transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
                                                  paramTypesArray[1],
                                                  paramTypesArray[2],
                                                  paramTypesArray[3]);
+
+    return true;
 }
 
 /**
@@ -600,6 +671,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 
     jbyteArray new_op_in_bytes = NULL;
     uint32_t teec_ret_ori = 0;
+    TEEC_Session teec_session = {0};
 
     if( opInBytes != NULL ){
         /**
@@ -609,8 +681,6 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         transfer_op_to_TEEC_Operation(env, opInBytes, &teec_operation);
 
         printTeecOperation(&teec_operation);
-
-        TEEC_Session teec_session = {0};
 
         /**
          * call TEEC_OpenSession.
@@ -637,11 +707,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
              teec_ret,
              teec_ret_ori
         );
-        //store the session upon success.
-        if( teec_ret == TEEC_SUCCESS ){
-            //TODO: potential issue with teec_session when out of this function. Needs to check.
-            sessions_map.emplace((int)sid, NULL);
-        }
+
     */
         //simulate TEEC_SharedMemory and TEEC_Value have been changed.
         memcpy(teec_operation.params[0].memref.parent->buffer, "LOVE", 4);
@@ -651,14 +717,22 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         teec_operation.params[1].value.b = 0x1314;
         LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
 
-        //test code TODO: remove
-         sessions_map.emplace((int)sid, teec_session);
-
         /**
         * sync shared memory and Value back.
         */
         new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
     }
+
+   /*
+    //store the session upon success.
+    if( teec_ret == TEEC_SUCCESS ){
+        //TODO: potential issue with teec_session when out of this function. Needs to check.
+        sessions_map.emplace((int)sid, NULL);
+    }
+    */
+    
+    //test code TODO: remove
+    sessions_map.emplace((int)sid, teec_session);
 
     /**
      * Prepare the variables to return.
@@ -706,7 +780,7 @@ TEEC_Session* find_session_by_id(int sid){
 
 JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInvokeCommand
 (JNIEnv* env, jclass jc, jint sid, jint commandId, jbyteArray opInBytes, jobject returnOrigin, jobject returnCode){
-    LOGE("start] %s", __FUNCTION__);
+    LOGE("[start] %s", __FUNCTION__);
     jbyteArray new_op_in_bytes = NULL;
     uint32_t teec_ret_ori = 0;
     if(opInBytes != NULL){
@@ -740,10 +814,9 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         //store the session upon success.
         if( teec_ret == TEEC_SUCCESS ){
             //TODO: potential issue with teec_session when out of this function. Needs to check.
-            sessions_map.emplace((int)sid, NULL);
         }
         */
-        //simulate TEEC_SharedMemory and TEEC_Value have been changed.
+        //simulate that TEEC_SharedMemory and TEEC_Value have been changed.
         memcpy(teec_operation.params[0].memref.parent->buffer, "YANG", 4);
 
         LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);

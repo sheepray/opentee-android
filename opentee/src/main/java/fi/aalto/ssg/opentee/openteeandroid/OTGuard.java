@@ -8,6 +8,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
+import fi.aalto.ssg.opentee.imps.OTFactoryMethods;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 import java.io.IOException;
@@ -298,6 +299,9 @@ public class OTGuard {
 
         opsInBytes = replaceSMId(caller, opsInBytes, true);
 
+        //test code
+        OTFactoryMethods.print_op_in_bytes(TAG, opsInBytes);
+
         // generate sid for JNI layer.
         int sidForJni = generateSessionId();
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
@@ -325,7 +329,7 @@ public class OTGuard {
         //OTCaller tmp = new OTCaller(1);   // passed
 
         //test code
-        //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
+        OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
 
         if(iSyncOperation != null){
             // sync operation back.
