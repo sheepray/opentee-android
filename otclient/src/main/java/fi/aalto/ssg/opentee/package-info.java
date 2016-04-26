@@ -67,7 +67,7 @@
  *    In GP TEE Client Specification, it only specify the C data types and APIs which limit or complicate
  *    the development of CAs which aim for Android devices. Since Java is the mainstream programming
  *    language to develop Android applications, for Android developers who wants to utilize
- *    the GP C APIs to enable the communications between CAs and TAs, it would be a pain-in-the-ass
+ *    the GP C APIs to enable the communications between CAs and TAs, it would be troublesome
  *    to deal with NDK especially for those who are not familiar with it, which may result in more
  *    potential bugs and unexpected behaviours if not handled correctly. Under such a circumstance,
  *    every developers have to re-write these codes with the similar functionalities which can be a waste
@@ -114,6 +114,8 @@
  *<pre>
  * <code>
  *   ITEEClient.IContext ctx = null;
+ *  final String param_TEE_NAME = null; // connect to the default TEE.
+ *  final Context param_app_context = getApplication(); // get the context of CA.
  *  try {
  *      ctx = client.initializeContext(param_TEE_NAME,
  *                                     param_app_context);
@@ -129,9 +131,15 @@
  * definition in <code>ITEEClient.IContext</code> interface.
  *<pre>
  * <code>
- *   ITEEClient.ISession session = null;
+ *   ITEEClient.ISession ses = null;
+ *
+ *  final UUID param_uuid = new UUID(0x1234567887654321L, 0x0102030405060708L);
+ *  final ConnectionMethod param_conn_method = ITEEClient.IContext.ConnectionMethod.LoginPublic; // public authentication.
+ *  final Integer param_conn_data = null;   // no data for public authentication.
+ *  // the creation of param_operation parameter please refer to the example code which create an <code>IOperation</code> interface using the factory method newOperation.
+ *
  *  try {
- *      session = ctx.openSession(param_uuid,
+ *      ses = ctx.openSession(param_uuid,
  *                  param_conn_method,
  *                  param_conn_data,
  *                  param_operation);
@@ -145,9 +153,12 @@
  * So we can interact with TA by using <code>invokeCommand</code> API within the <code>ITEEClient.ISession</code> interface.
  *<pre>
  * <code>
- *   try{
- *      session.invokeCommand(param_comm_id,
- *                            param_operation);
+ *   final int param_comm_id = 0x12345678;
+ *  // the creation of param_operation please also refer to the example code which create an IOperation interface using the factory method newOperation.
+ *
+ *  try{
+ *      ses.invokeCommand(param_comm_id,
+ *                        param_operation);
  *  }catch (TEEClientException e) {
  *      // handle TEEClientException here.
  *  }
@@ -164,9 +175,14 @@
  * further interactions with this pair of values are defined in the <code>ITEEClient.IValue</code> interface.
  *<pre>
  * <code>
- *   ITEEClient.IValue iValue = client.newValue(param_flag,
- *                                              param_value_A,
- *                                              param_value_B);
+ *   final ITEEClient.IValue.Flag param_flag = ITEEClient.IValue.Flag.TEEC_VALUE_INOUT; // the I/O directions of this pair of values are both in and out for TA.
+ *
+ *  int param_value_A = 66;
+ *  int param_value_B = 88;
+ *
+ *  ITEEClient.IValue val = client.newValue(param_flag,
+ *                                          param_value_A,
+ *                                          param_value_B);
  * </code>
  *</pre>
  *
@@ -177,10 +193,15 @@
  * An <code>ITEEClient.ISharedMemory</code> interface will be returned.
  *<pre>
  * <code>
- *   ITEEClient.ISharedMemory sharedMemory = null;
+ *   ITEEClient.ISharedMemory sm = null;
+ *
+ *  byte[] param_byte_array = new byte[256]; // allocate a byte array with a length of 256 as the buffer for the shared memory.
+ *
+ *  ITEEClient.ISharedMemory param_flags = ITEEClient.ISharedMemory.TEEC_MEM_INPUT | ITEEClient.ISharedMemory.TEEC_MEM_OUTPUT; // I/O directions of the referred shared memory are both in and out for TA.
+ *
  *  try{
- *      sharedMemory = ctx.registerSharedMemory(param_byte_array,
- *                                              param_flags);
+ *      sm = ctx.registerSharedMemory(param_byte_array,
+ *                                    param_flags);
  *  } catch (TEEClientException e) {
  *      // handle TEEClientException here.
  *  }
@@ -197,8 +218,12 @@
  * within <code>ITEEClient</code> must be called.
  *<pre>
  * <code>
- *   ITEEClient.IRegisteredMemoryReference iRmr =
- *          client.newRegisteredMemoryReference(param_ISharedMemory,
+ *   ITEEClient.IRegisteredMemoryReference.Flag param_flags = ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT; // in and out for TA.
+ *
+ *  final param_offset = 0; // using the shared memory from its beginning.
+ *
+ *  ITEEClient.IRegisteredMemoryReference rmr =
+ *          client.newRegisteredMemoryReference(sm,
  *                                              param_flags,
  *                                              param_offset);
  * </code>
@@ -209,7 +234,7 @@
  * or <code>IRegisteredMemoryReference</code> interfaces.
  *<pre>
  * <code>
- *   ITEEClient.IOperation iOperation = client.newOperation(param_1, ...);
+ *   ITEEClient.IOperation op = client.newOperation(rmr, val); // wrap the val and rmr into an IOperation. The op can be used as the input parameter for both openSession and invokeCommand function as stated above.
  * </code>
  *</pre>
  *
@@ -221,7 +246,7 @@
  *<pre>
  * <code>
  *   try {
- *      ctx.releaseSharedMemory(param_shared_memory);
+ *      ctx.releaseSharedMemory(sm);
  *  } catch (TEEClientException e) {
  *      // handle TEEClientException here.
  *  }
@@ -232,7 +257,7 @@
  *<pre>
  * <code>
  *   try {
- *      session.closeSession();
+ *      ses.closeSession();
  *  } catch (TEEClientException e) {
  *      // handle TEEClientException here.
  *  }

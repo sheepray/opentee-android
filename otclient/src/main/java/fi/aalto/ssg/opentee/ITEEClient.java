@@ -169,8 +169,8 @@ public interface ITEEClient {
 
     /**
      * Factory method to create a registered memory reference with a valid <code>ISharedMemory</code> interface and a
-     * flag to indicate the I/O direction for this memory reference. The flag is only valid when
-     * the corresponding shared memory also has such a flag.
+     * flag to indicate the I/O direction for the referred shared memory. The flag is only valid when
+     * the corresponding shared memory also has such a flag. It will not override the flags which the shared memory already have.
      * @param sharedMemory the shared memory to refer.
      * @param flag the flag for referenced shared memory.
      * @param offset the offset from the beginning of the buffer of shared memory.
@@ -556,7 +556,7 @@ public interface ITEEClient {
          */
         ISession openSession (final UUID uuid,
                               ConnectionMethod connectionMethod,
-                              int connectionData,
+                              Integer connectionData,
                               IOperation operation
                               ) throws TEEClientException;
 

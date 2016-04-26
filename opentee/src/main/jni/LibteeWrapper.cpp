@@ -730,7 +730,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         sessions_map.emplace((int)sid, NULL);
     }
     */
-    
+
     //test code TODO: remove
     sessions_map.emplace((int)sid, teec_session);
 

@@ -181,7 +181,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
     @Override
     public ITEEClient.ISession openSession(UUID uuid,
                                 ConnectionMethod connectionMethod,
-                                int connectionData,
+                                Integer connectionData,
                                 ITEEClient.IOperation teecOperation) throws TEEClientException{
         if ( !mInitialized || mProxyApis == null ){
             Log.i(TAG, "Not ready to open session");
@@ -194,6 +194,8 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         OpenSessionThread openSessionThread = null;
         Thread opWorker = null;
         ReturnValueWrapper rv = null;
+
+        if(connectionData == null) connectionData = 0;
 
         if(teecOperation == null){
             openSessionThread = new OpenSessionThread(mProxyApis,

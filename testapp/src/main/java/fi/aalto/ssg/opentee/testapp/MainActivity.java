@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         try {
              session = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,
-                    0,
+                    null,
                     iOperation);
         } catch (TEEClientException e) {
             e.printStackTrace();
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             session2 = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,
-                    0,
+                    null,
                     null);
         } catch (TEEClientException e) {
             e.printStackTrace();
