@@ -10,13 +10,13 @@ public class OTLock{
     private Object lock = new Object();
     private boolean locked = false;
 
-    public synchronized void lock(){
+    public void lock(){
         Log.i(TAG, "lock");
 
         try {
             while(locked) {
                 synchronized (lock) {
-                    Log.d(TAG, "wating to get lock...");
+                    Log.d(TAG, "waiting to get lock...");
 
                     lock.wait();
                 }
@@ -27,7 +27,7 @@ public class OTLock{
         }
     }
 
-    public synchronized void unlock(){
+    public void unlock(){
         Log.i(TAG, "unlock");
 
         synchronized (lock){

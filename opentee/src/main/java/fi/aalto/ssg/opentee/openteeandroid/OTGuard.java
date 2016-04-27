@@ -307,7 +307,7 @@ public class OTGuard {
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
         IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
         // call the teecOpenSession in native libtee.
-        byte[] newOpInBytes = NativeLibtee.teecOpenSession(sidForJni,
+        byte[] newOpInByte = NativeLibtee.teecOpenSession(sidForJni,
                 uuid,
                 connMethod,
                 connData,
@@ -328,10 +328,12 @@ public class OTGuard {
         //OTCallerSession otCallerSession = new OTCallerSession(sid); // didn't pass
         //OTCaller tmp = new OTCaller(1);   // passed
 
-        //test code
-        OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
-
         if(iSyncOperation != null){
+            byte[] newOpInBytes = newOpInByte.clone();
+
+            //test code
+            OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
+
             // sync operation back.
             try {
                 Log.d(TAG, "Operation sync back using callback function.");

@@ -241,6 +241,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
             opWorker = new Thread(openSessionThread);
             opWorker.start();
+
             try {
                 opWorker.join();
             } catch (InterruptedException e) {

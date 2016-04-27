@@ -114,8 +114,10 @@
  *<pre>
  * <code>
  *   ITEEClient.IContext ctx = null;
+ *
  *  final String param_TEE_NAME = null; // connect to the default TEE.
- *  final Context param_app_context = getApplication(); // get the context of CA.
+ *  final android.context.Context param_app_context = getApplication();
+ *
  *  try {
  *      ctx = client.initializeContext(param_TEE_NAME,
  *                                     param_app_context);
@@ -128,15 +130,16 @@
  * we must open a session to the TA by providing correct authentication data. To open a session,
  * the function <code>openSession</code> within <code>IContext</code> interface must be called. For
  * the input parameters for the API and possible exceptions threw by it, please refer to the API
- * definition in <code>ITEEClient.IContext</code> interface.
+ * definition in <code>ITEEClient.IContext</code> interface. For the creation of param_operation parameter,
+ * please refer to the example code which creates an <code>IOperation</code> interface using the factory method <code>newOperation</code>.
  *<pre>
  * <code>
  *   ITEEClient.ISession ses = null;
  *
  *  final UUID param_uuid = new UUID(0x1234567887654321L, 0x0102030405060708L);
- *  final ConnectionMethod param_conn_method = ITEEClient.IContext.ConnectionMethod.LoginPublic; // public authentication.
- *  final Integer param_conn_data = null;   // no data for public authentication.
- *  // the creation of param_operation parameter please refer to the example code which create an <code>IOperation</code> interface using the factory method newOperation.
+ *  final ConnectionMethod param_conn_method =
+ *          ITEEClient.IContext.ConnectionMethod.LoginPublic;
+ *  final Integer param_conn_data = null;
  *
  *  try {
  *      ses = ctx.openSession(param_uuid,
@@ -151,10 +154,10 @@
  *
  * After successfully opened a session to a specific TA, a valid <code>ITEEClient.ISession</code> interface will be returned.
  * So we can interact with TA by using <code>invokeCommand</code> API within the <code>ITEEClient.ISession</code> interface.
+ * The creation of param_operation please also refer to the same example code which creates an <code>IOperation</code> interface.
  *<pre>
  * <code>
  *   final int param_comm_id = 0x12345678;
- *  // the creation of param_operation please also refer to the example code which create an IOperation interface using the factory method newOperation.
  *
  *  try{
  *      ses.invokeCommand(param_comm_id,
@@ -175,7 +178,7 @@
  * further interactions with this pair of values are defined in the <code>ITEEClient.IValue</code> interface.
  *<pre>
  * <code>
- *   final ITEEClient.IValue.Flag param_flag = ITEEClient.IValue.Flag.TEEC_VALUE_INOUT; // the I/O directions of this pair of values are both in and out for TA.
+ *   final ITEEClient.IValue.Flag param_flag = ITEEClient.IValue.Flag.TEEC_VALUE_INOUT;
  *
  *  int param_value_A = 66;
  *  int param_value_B = 88;
@@ -195,9 +198,11 @@
  * <code>
  *   ITEEClient.ISharedMemory sm = null;
  *
- *  byte[] param_byte_array = new byte[256]; // allocate a byte array with a length of 256 as the buffer for the shared memory.
+ *  byte[] param_byte_array = new byte[256];
  *
- *  ITEEClient.ISharedMemory param_flags = ITEEClient.ISharedMemory.TEEC_MEM_INPUT | ITEEClient.ISharedMemory.TEEC_MEM_OUTPUT; // I/O directions of the referred shared memory are both in and out for TA.
+ *  ITEEClient.ISharedMemory param_flags =
+ *          ITEEClient.ISharedMemory.TEEC_MEM_INPUT |
+ *          ITEEClient.ISharedMemory.TEEC_MEM_OUTPUT;
  *
  *  try{
  *      sm = ctx.registerSharedMemory(param_byte_array,
@@ -218,9 +223,10 @@
  * within <code>ITEEClient</code> must be called.
  *<pre>
  * <code>
- *   ITEEClient.IRegisteredMemoryReference.Flag param_flags = ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT; // in and out for TA.
+ *   ITEEClient.IRegisteredMemoryReference.Flag param_flags =
+ *          ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT;
  *
- *  final param_offset = 0; // using the shared memory from its beginning.
+ *  final param_offset = 0;
  *
  *  ITEEClient.IRegisteredMemoryReference rmr =
  *          client.newRegisteredMemoryReference(sm,
@@ -234,7 +240,7 @@
  * or <code>IRegisteredMemoryReference</code> interfaces.
  *<pre>
  * <code>
- *   ITEEClient.IOperation op = client.newOperation(rmr, val); // wrap the val and rmr into an IOperation. The op can be used as the input parameter for both openSession and invokeCommand function as stated above.
+ *   ITEEClient.IOperation op = client.newOperation(rmr, val);
  * </code>
  *</pre>
  *

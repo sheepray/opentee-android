@@ -104,6 +104,17 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+        byte[] buffer0 = {'f', 'i', 'r', 's', 't', ',', 's', 'm'};
+        ITEEClient.ISharedMemory sm0 = null;
+
+        try {
+            sm0 = ctx.registerSharedMemory(buffer0, ITEEClient.ISharedMemory.TEEC_MEM_INPUT);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+
         // let's create a shared memory;
         byte[] buffer = {
                 's', 's', 'g',
@@ -160,7 +171,9 @@ public class MainActivity extends AppCompatActivity {
 
         ITEEClient.IOperation iOperation = client.newOperation(iRmr, iValue);
 
+
         ITEEClient.ISession session = null;
+
         try {
              session = ctx.openSession(uuid,
                     ITEEClient.IContext.ConnectionMethod.LoginPublic,
@@ -169,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
+
+
 
 
         ITEEClient.ISession session2 = null;
@@ -221,9 +236,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "new shared memory=" + new String(iRmr2.getSharedMemory().asByteArray()));
         Log.d(TAG, "new a " + iValue2.getA() + " b " + iValue2.getB());
 
+
         // close session
         try {
-            session.closeSession();
+            if (session != null) session.closeSession();
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
@@ -315,6 +331,12 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             ctx.releaseSharedMemory(sharedMemory);
+        } catch (TEEClientException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ctx.releaseSharedMemory(sm0);
         } catch (TEEClientException e) {
             e.printStackTrace();
         }

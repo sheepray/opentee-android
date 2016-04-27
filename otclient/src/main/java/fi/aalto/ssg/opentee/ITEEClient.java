@@ -536,7 +536,7 @@ public interface ITEEClient {
          * @throws exception.ExternalCancelException:
          * Cancelled by external interrupt.
          * @throws exception.GenericErrorException:
-         * The thread to open session catches an keyboard interrupt .
+         * Non-specific cause.
          * @throws exception.ItemNotFoundException:
          * Referred shared memory not found.
          * @throws exception.NoDataException:
