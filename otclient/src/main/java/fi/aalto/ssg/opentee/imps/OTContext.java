@@ -284,7 +284,18 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
     @Override
     public void requestCancellation(ITEEClient.IOperation iOperation) {
-        //TODO:
+        if ( !mInitialized || mProxyApis == null ){
+            Log.i(TAG, "Not ready to cancel operation");
+            return;
+        }
+
+        // check whether operation is in use.
+        if(!iOperation.isStarted()){
+            Log.i(TAG, "operation is not in use. No need to cancel.");
+            return;
+        }
+
+
     }
 
     private int generateSmId(){
