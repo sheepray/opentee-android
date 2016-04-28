@@ -57,7 +57,7 @@ void print_sharedmemory_map(){
                      sm->second.size,
                      sm->second.buffer);
     }
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 TEEC_SharedMemory* find_sharedmemory_by_id(int smid){
@@ -65,11 +65,11 @@ TEEC_SharedMemory* find_sharedmemory_by_id(int smid){
 
     unordered_map<int, TEEC_SharedMemory>::iterator sm = sharedmemory_map.find(smid);
     if(sm == sharedmemory_map.end()){
-        LOGE("%s: unable to find shared memory with id %d", __FUNCTION__, smid);
+        LOGE("\tunable to find shared memory with id %d", smid);
         return NULL;
     }
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return &sm->second;
 }
@@ -82,7 +82,7 @@ bool remove_sharedmemory_by_id(int smid){
         free(sm->buffer);
         sharedmemory_map.erase(smid);
 
-        LOGD("[end]%s", __FUNCTION__);
+        LOGD("[end  ]%s\n\r", __FUNCTION__);
         return true;
     }
 
@@ -102,7 +102,7 @@ void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
     char *tmpEnv = getenv("OPENTEE_SOCKET_FILE_PATH");
 
     if (NULL == tmpEnv) {
-        LOGE("%s: OPENTEE_SOCKET_FILE_PATH not set. Try to overwrite.", __FUNCTION__);
+        LOGE("\tOPENTEE_SOCKET_FILE_PATH not set. Try to overwrite.");
 
         const char *otSocketFilePath = env->GetStringUTFChars(otSocketFilePathInJava, 0);
 
@@ -112,17 +112,17 @@ void preparationFunc(JNIEnv *env, jstring otSocketFilePathInJava) {
         env->ReleaseStringUTFChars(otSocketFilePathInJava, otSocketFilePath);
 
         if (return_code == 0) {
-            LOGI("%s: Set socket env val succeed.", __FUNCTION__);
+            LOGI("\tSet socket env val succeed.");
             open_tee_socket_env_set = 1;
         } else {
-            LOGE("%s: Set socket env val failed", __FUNCTION__);
+            LOGE("\tSet socket env val failed");
         }
     }
     else {
-        LOGI("%s: %s is already set.", __FUNCTION__, tmpEnv);
+        LOGI("\t%s is already set.", tmpEnv);
     }
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 /**
@@ -156,7 +156,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
         env->ReleaseStringUTFChars(teeName, teeNameInC);
     }
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return tmpResult;
 }
@@ -168,7 +168,7 @@ void clean_sharedmemory_buffer(){
         free(sm->second.buffer);
     }
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 /*
@@ -235,8 +235,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 
     TEEC_Result return_code = TEEC_RegisterSharedMemory(&g_contextRecord, &cOTSharedMemory);
 
-    LOGI("%s: flag: %x, buffer:%s, return_code:%x",
-         __FUNCTION__,
+    LOGI("\t flag: %x, buffer:%s, return_code:%x",
          mFlag,
          cOTSharedMemory.buffer,
          return_code);
@@ -254,7 +253,7 @@ JNIEXPORT jint JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     // test code
     print_sharedmemory_map();
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return return_code;
 }
@@ -272,11 +271,11 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     TEEC_SharedMemory* sm = find_sharedmemory_by_id(jsmId);
     if(sm == NULL) return;
 
-    LOGI("%s: %s is to be released.", __FUNCTION__, sm->buffer);
+    LOGI("\t%s is to be released.", sm->buffer);
 
     TEEC_ReleaseSharedMemory(sm);
 
-    LOGI("%s: %d is released.", __FUNCTION__, jsmId);
+    LOGI("\t%d is released.", jsmId);
 
     // remove shared memory from shared memory list.
     //removeSharedMemoryById(jsmId);
@@ -285,7 +284,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     //test code.
     print_sharedmemory_map();
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 //test code
@@ -296,25 +295,25 @@ void flagFunc(){
 //test code
 void printSharedMemory(TEEC_SharedMemory* sm){
     if(sm == NULL) return;
-    LOGI("%s: buffer:%s, flag:%x, size:%d", __FUNCTION__, sm->buffer, sm->flags, sm->size);
+    LOGI("\tbuffer:%s, flag:%x, size:%d", sm->buffer, sm->flags, sm->size);
 }
 
 //test code
 void printTeecOperation(const TEEC_Operation* op){
     LOGD("[start]%s", __FUNCTION__);
 
-    LOGE("%s: started:%d, paraType:%x", __FUNCTION__, op->started, op->paramTypes);
+    LOGE("\tstarted:%d, paraType:%x", op->started, op->paramTypes);
 
     for(int i = 0; i < 4; i++){
         uint32_t  type = TEEC_PARAM_TYPE_GET(op->paramTypes, i);
         if( type == 0){
-            LOGI("Param is none");
+            LOGI("\t\tParam is none");
         }
         else if(type == TEEC_VALUE_INPUT ||
                 type == TEEC_VALUE_OUTPUT ||
                 type == TEEC_VALUE_INOUT){
             TEEC_Value value = op->params[i].value;
-            LOGI("[Value]a:0x%x, b:0x%x", value.a, value.b);
+            LOGI("\t\t[Value]a:0x%x, b:0x%x", value.a, value.b);
         }
         else if(type == TEEC_MEMREF_WHOLE ||
                 type == TEEC_MEMREF_PARTIAL_INPUT ||
@@ -325,7 +324,7 @@ void printTeecOperation(const TEEC_Operation* op){
         }
     }
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 //test func
@@ -352,7 +351,7 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
     TeecOperation op;
     op.ParseFromString(opsInString);
 
-    LOGI( "%s: started %d. num of params:%d %d", __FUNCTION__,
+    LOGI("\tstarted %d. num of params:%d %d",
           op.mstarted(),
           op.mparams_size(),
           sizeof(TEEC_NONE) / sizeof(uint8_t));
@@ -367,7 +366,7 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
         const TeecParameter param = op.mparams(i);
         if( param.has_teecsharedmemoryreference() ){
             // param is TEEC_RegisteredMemoryReference.
-            LOGI("%s: param is TEEC_RMR.", __FUNCTION__);
+            LOGI("\t\tparam is TEEC_RMR.");
             const TeecSharedMemoryReference rmr = param.teecsharedmemoryreference();
 
             /*
@@ -378,20 +377,20 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
             //TEEC_SharedMemory* sm = smWithId->getSharedMemory();
             TEEC_SharedMemory* sm = find_sharedmemory_by_id(smId);
             if(sm == NULL){
-                LOGE("%s: internal error -- unable to find shared memory with id.", __FUNCTION__, smId);
+                LOGE("\t\tinternal error -- unable to find shared memory with id.", smId);
                 return false;
             }
 
             //test code
             //print_sharedmemory_map();
 
-            LOGE("%s: old buffer[%p]:%s with flag:%x", __FUNCTION__, sm, sm->buffer, sm->flags);
+            LOGE("\t\told buffer[%p]:%s with flag:%x", sm, sm->buffer, sm->flags);
 
             if(rmr.parent().mflag() != JavaConstants::MEMREF_OUTPUT){
                 //the share memory is not only for output.
 
                 int8_t * smBuffer = (int8_t*)rmr.parent().mbuffer().c_str();
-                LOGE("%s: new buffer:%s", __FUNCTION__ , smBuffer);
+                LOGE("\t\tnew buffer:%s", smBuffer);
                 memcpy(sm->buffer, smBuffer, sizeof(smBuffer));
                 free(smBuffer);
             }
@@ -428,7 +427,7 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
         }
         else if(param.has_teecvalue()){
             // param is TEEC_Value.
-            LOGI("%s: param is TEEC_VALUE", __FUNCTION__);
+            LOGI("\t\tparam is TEEC_VALUE");
 
             const TeecValue value = param.teecvalue();
             teec_operation->params[i].value.a = value.a();
@@ -446,12 +445,12 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
                     paramTypesArray[i] = TEEC_VALUE_INOUT;
                     break;
                 default:
-                    LOGE("%s: unaccepted flag for Value %x", __FUNCTION__, value.mflag());
+                    LOGE("\t\t\tunaccepted flag for Value %x", value.mflag());
                     break;
             }
 
         }else{
-            LOGE("%s: Incorrect param. Ignore it.", __FUNCTION__);
+            LOGE("\t\tIncorrect param. Ignore it.");
             continue;
         }
     }
@@ -462,7 +461,7 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
                                                  paramTypesArray[2],
                                                  paramTypesArray[3]);
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return true;
 }
@@ -474,7 +473,7 @@ void transfer_op_to_TEEC_Operation(JNIEnv* env, const jbyteArray opInBytes, TEEC
     LOGD("[start]%s", __FUNCTION__);
 
     if(opInBytes == NULL){
-        LOGI("[%s] op is null", __FUNCTION__);
+        LOGI("\top is null");
         return;
     }
     // get length.
@@ -490,7 +489,7 @@ void transfer_op_to_TEEC_Operation(JNIEnv* env, const jbyteArray opInBytes, TEEC
 
     transfer_opString_to_TEEC_Operation(env, opsInString, teec_operation);
 
-    LOGD("[end]%s", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
 /**
@@ -574,7 +573,7 @@ jbyteArray transfer_TEEC_Operation_to_op(JNIEnv* env, const TEEC_Operation* teec
     //transfer_opString_to_TEEC_Operation(env, new_op, &teec_operation2);
     //LOGE("a:%x, b:%x", teec_operation2.params[1].value.a, teec_operation2.params[1].value.b);
 
-    LOGD("[end]%s\n", __FUNCTION__);
+    LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return new_op_in_bytes;
 }
@@ -612,7 +611,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
     lsBits = env->CallLongMethod(uuid, jmGetLeastSignificantBits);
     msBits = env->CallLongMethod(uuid, jmGetMostSignificantBits);
 
-    LOGI("%s: uuid:%llx %llx.", __FUNCTION__, msBits, lsBits);
+    LOGI("\tuuid:%llx %llx.", msBits, lsBits);
 
     TEEC_UUID teec_uuid = { .timeLow = (uint32_t)(msBits >> 32),
                             .timeMid = (uint16_t)(msBits >> 16),
@@ -623,8 +622,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         lsBits = lsBits >> 8;
     }
 
-    LOGI("%s: timeLow:%x, timeMid:%x, timeHighAndVersion:%x",
-                        __FUNCTION__,
+    LOGI("\ttimeLow:%x, timeMid:%x, timeHighAndVersion:%x",
                         teec_uuid.timeLow,
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
@@ -682,10 +680,10 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         //simulate TEEC_SharedMemory and TEEC_Value have been changed.
         memcpy(teec_operation.params[0].memref.parent->buffer, "SUN", 3);
 
-        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
         teec_operation.params[1].value.a = 0x520;
         teec_operation.params[1].value.b = 0x1314;
-        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
 
         /**
         * sync shared memory and Value back.
@@ -708,7 +706,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 
     //store the session upon success.
     if( teec_ret == TEEC_SUCCESS ){
-        LOGI("%s: succeed", __FUNCTION__);
+        LOGI("\tsucceed");
         sessions_map.emplace((int)sid, teec_session);
     }
 
@@ -721,7 +719,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
     // set return code
     set_return_code(env, returnCode, teec_ret);
 
-    LOGI("[end] %s", __FUNCTION__);
+    LOGI("[end  ] %s\n\r", __FUNCTION__);
 
     //return teec_ret;
     return new_op_in_bytes;
@@ -750,7 +748,7 @@ TEEC_Session* find_session_by_id(int sid){
         return NULL;
     }
 
-    LOGI("[End] %s", __FUNCTION__);
+    LOGI("[end  ] %s\n\r", __FUNCTION__);
 
     return &session->second;
 }
@@ -810,10 +808,10 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         //simulate that TEEC_SharedMemory and TEEC_Value have been changed.
         memcpy(teec_operation.params[0].memref.parent->buffer, "RUI", 3);
 
-        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
         teec_operation.params[1].value.a = 0x8888;
         teec_operation.params[1].value.b = 0x6666;
-        LOGE("a:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
+        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
 
         // sync shared memory and Value back.
         new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
@@ -835,7 +833,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
     // set return code
     set_return_code(env, returnCode, teec_ret);
 
-    LOGI("[end] %s", __FUNCTION__);
+    LOGI("[end  ] %s\n\r", __FUNCTION__);
 
     //return teec_ret;
     return new_op_in_bytes;
@@ -847,6 +845,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
     unordered_map<int, TEEC_Operation*>::iterator iOp = operations_map.find(opHashCodeWithPid);
     if( iOp == operations_map.end() ){
         LOGI("\tUnable to find the operation with hash code %d. Maybe it is already finished", opHashCodeWithPid);
+        LOGI("[end  ] %s\n\r", __FUNCTION__);
         return;
     }
 
@@ -858,7 +857,7 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
         LOGE("\t internal error, operation is null");
     }
 
-    LOGI("[end] %s", __FUNCTION__);
+    LOGI("[end  ] %s\n\r", __FUNCTION__);
 }
 
 #ifdef __cplusplus
