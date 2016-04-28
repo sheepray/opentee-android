@@ -8,14 +8,15 @@ import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
- * Thread for invokeCommand
+ * Task for invokeCommand
  */
-public class InvokeCommandThread implements Runnable {
-    final String TAG = "InvokeCommandThread";
+public class InvokeCommandTask implements Runnable {
+    final String TAG = "InvokeCommandTask";
     ProxyApis mProxyApis;
     int mSid;
     int mCommandId;
     byte[] mTeecOperation = null;
+    int opHashCode = 0;
     byte[] mNewTeecOperation = null;
     OTLock mLock;
     ReturnValueWrapper mReturnValue = null;
@@ -36,12 +37,13 @@ public class InvokeCommandThread implements Runnable {
         }
     };
 
-    public InvokeCommandThread(ProxyApis proxyApis, int sid, int commandId, byte[] teecOperation, OTLock lock){
+    public InvokeCommandTask(ProxyApis proxyApis, int sid, int commandId, byte[] teecOperation, OTLock lock, int opHashCode){
         this.mProxyApis = proxyApis;
         this.mSid = sid;
         this.mCommandId = commandId;
         this.mTeecOperation = teecOperation;
         this.mLock = lock;
+        this.opHashCode = opHashCode;
     }
 
     public synchronized byte[] getNewOperationInBytes(){
@@ -55,7 +57,7 @@ public class InvokeCommandThread implements Runnable {
         if(mLock != null) mLock.lock();
 
         try {
-            mReturnValue = mProxyApis.teecInvokeCommand(mSid, mCommandId, mTeecOperation, mSyncOperationCallBack);
+            mReturnValue = mProxyApis.teecInvokeCommand(mSid, mCommandId, mTeecOperation, mSyncOperationCallBack, opHashCode);
         } catch (CommunicationErrorException e) {
             e.printStackTrace();
         } catch (RemoteException e) {

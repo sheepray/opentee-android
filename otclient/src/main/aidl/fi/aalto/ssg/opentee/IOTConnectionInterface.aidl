@@ -25,12 +25,14 @@ interface IOTConnectionInterface {
     // open session without operation.
     int teecOpenSessionWithoutOp(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, out int[] retOrigin);
 
-    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, in byte[] teecOperation, out int[] retOrigin, in ISyncOperation syncOperation);
+    int teecOpenSession(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, in byte[] teecOperation, out int[] retOrigin, in ISyncOperation syncOperation, int opHashCode);
     //int teecOpenSessionWithByteArrayWrapper(int sid, in ParcelUuid parcelUuid, int connMethod, int connData, inout ByteArrayWrapper teecOperation, out int[] retOrigin);
 
     void teecCloseSession(int sid);
 
     int teecInvokeCommandWithoutOp(int sid, int commandId, out int[] returnOrigin);
 
-    int teecInvokeCommand(int sid, int commandId, in byte[] teecOperation, out int[] returnOrigin, in ISyncOperation syncOperation);
+    int teecInvokeCommand(int sid, int commandId, in byte[] teecOperation, out int[] returnOrigin, in ISyncOperation syncOperation, int opHashCode);
+
+    void teecRequestCancellation(int opId);
 }

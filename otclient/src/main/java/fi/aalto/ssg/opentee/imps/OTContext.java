@@ -31,6 +31,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
     boolean mInitialized = false;
     ProxyApis mProxyApis = null; // one service connection per context
     Random smIdGenerator = null;
+    Context mContext;
 
     List<OTSharedMemory> mSharedMemory = new ArrayList<>();
     HashMap<Integer, Integer> mSessionMap = new HashMap<>(); // <sessionId, placeHolder>
@@ -38,6 +39,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
     public OTContext(String teeName, Context context) throws TEEClientException {
         this.mTeeName = teeName;
         this.smIdGenerator = new Random();
+        this.mContext = context;
 
         /**
          * connect to the IOpenTEE
@@ -191,20 +193,21 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         // sid is used to identify different sessions of one context in the OTGuard.
         int sid = generateSessionId();
 
-        OpenSessionThread openSessionThread = null;
+        OpenSessionTask openSessionThread = null;
         Thread opWorker = null;
         ReturnValueWrapper rv = null;
 
         if(connectionData == null) connectionData = 0;
 
         if(teecOperation == null){
-            openSessionThread = new OpenSessionThread(mProxyApis,
+            openSessionThread = new OpenSessionTask(mProxyApis,
                     sid,
                     uuid,
                     connectionMethod,
                     connectionData,
                     null,   // without operation.
-                    null);  // without lock.
+                    null,
+                    0);  // without lock.
 
             opWorker = new Thread(openSessionThread);
             opWorker.start();
@@ -231,13 +234,14 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             byte[] opInArray = OTFactoryMethods.OperationAsByteArray(TAG, teecOperation);
 
             OTLock otLock = new OTLock();
-            openSessionThread = new OpenSessionThread(mProxyApis,
+            openSessionThread = new OpenSessionTask(mProxyApis,
                     sid,
                     uuid,
                     connectionMethod,
                     connectionData,
                     opInArray,
-                    otLock);
+                    otLock,
+                    otOperation.hashCode());
 
             opWorker = new Thread(openSessionThread);
             opWorker.start();
@@ -284,18 +288,16 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
     @Override
     public void requestCancellation(ITEEClient.IOperation iOperation) {
-        if ( !mInitialized || mProxyApis == null ){
-            Log.i(TAG, "Not ready to cancel operation");
-            return;
+        //new thread to cancel operation.
+        Thread rc = new Thread(new RequestCancellationTask(mContext, (OTOperation)iOperation ));
+        rc.start();
+        try {
+            rc.join();
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
         }
 
-        // check whether operation is in use.
-        if(!iOperation.isStarted()){
-            Log.i(TAG, "operation is not in use. No need to cancel.");
-            return;
-        }
-
-
+        Log.i(TAG, "sending request cancellation finished");
     }
 
     private int generateSmId(){
@@ -346,18 +348,19 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             return null;
         }
 
-        InvokeCommandThread invokeCommandThread = null;
+        InvokeCommandTask invokeCommandTask = null;
         Thread opWorker = null;
 
         //teecOperation started check
         if(teecOperation == null){
-            invokeCommandThread = new InvokeCommandThread(mProxyApis,
+            invokeCommandTask = new InvokeCommandTask(mProxyApis,
                     sid,
                     commandId,
                     null,   // no operation
-                    null);  // no lock
+                    null,
+                    0);  // no lock
 
-            opWorker = new Thread(invokeCommandThread);
+            opWorker = new Thread(invokeCommandTask);
             opWorker.start();
             try {
                 opWorker.join();
@@ -381,13 +384,14 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             byte[] opInArray = OTFactoryMethods.OperationAsByteArray(TAG, teecOperation);
 
             OTLock otLock = new OTLock();
-            invokeCommandThread = new InvokeCommandThread(mProxyApis,
+            invokeCommandTask = new InvokeCommandTask(mProxyApis,
                     sid,
                     commandId,
                     opInArray,
-                    otLock);
+                    otLock,
+                    otOperation.hashCode());
 
-            opWorker = new Thread(invokeCommandThread);
+            opWorker = new Thread(invokeCommandTask);
             opWorker.start();
             try {
                 opWorker.join();
@@ -399,7 +403,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             otLock.lock();
             otLock.unlock();
 
-            byte[] teecOperationInBytes = invokeCommandThread.getNewOperationInBytes();
+            byte[] teecOperationInBytes = invokeCommandTask.getNewOperationInBytes();
 
             if(teecOperationInBytes != null){
                 updateOperation(otOperation, teecOperationInBytes);
@@ -412,6 +416,6 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             otOperation.setStarted(0);
         }
 
-        return invokeCommandThread.getReturnValue();
+        return invokeCommandTask.getReturnValue();
     }
 }

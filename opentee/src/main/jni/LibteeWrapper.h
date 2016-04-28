@@ -42,10 +42,10 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
  * Method:    teecOpenSession
- * Signature: (ILjava/util/UUID;II[BLfi/aalto/ssg/opentee/openteeandroid/IntWrapper;Lfi/aalto/ssg/opentee/openteeandroid/IntWrapper;)[B
+ * Signature: (ILjava/util/UUID;II[BLfi/aalto/ssg/opentee/openteeandroid/IntWrapper;Lfi/aalto/ssg/opentee/openteeandroid/IntWrapper;I)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
-  (JNIEnv *, jclass, jint, jobject, jint, jint, jbyteArray, jobject, jobject);
+  (JNIEnv *, jclass, jint, jobject, jint, jint, jbyteArray, jobject, jobject, jint);
 
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
@@ -58,10 +58,18 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 /*
  * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
  * Method:    teecInvokeCommand
- * Signature: (II[BLfi/aalto/ssg/opentee/openteeandroid/IntWrapper;Lfi/aalto/ssg/opentee/openteeandroid/IntWrapper;)[B
+ * Signature: (II[BLfi/aalto/ssg/opentee/openteeandroid/IntWrapper;Lfi/aalto/ssg/opentee/openteeandroid/IntWrapper;I)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInvokeCommand
-  (JNIEnv *, jclass, jint, jint, jbyteArray, jobject, jobject);
+  (JNIEnv *, jclass, jint, jint, jbyteArray, jobject, jobject, jint);
+
+/*
+ * Class:     fi_aalto_ssg_opentee_openteeandroid_NativeLibtee
+ * Method:    teecRequestCancellation
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecRequestCancellation
+  (JNIEnv *, jclass, jint);
 
 #ifdef __cplusplus
 }

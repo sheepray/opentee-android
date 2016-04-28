@@ -49,7 +49,8 @@ public class NativeLibtee {
                                                           int connData,
                                                           byte[] opsInBytes,
                                                           IntWrapper retOriginWrapper,
-                                                          IntWrapper returnCode);
+                                                          IntWrapper returnCode,
+                                                          int opHashCodeWithPid);
 
     public static synchronized native void teecCloseSession(int sidInJni);
 
@@ -57,6 +58,9 @@ public class NativeLibtee {
                                                                int commandId,
                                                                byte[] opsInBytes,
                                                                IntWrapper retOriginWrapper,
-                                                               IntWrapper returnCode);
+                                                               IntWrapper returnCode,
+                                                               int opHashCodeWithPid);
+
+    public static synchronized native void teecRequestCancellation(int opId);
 
 }

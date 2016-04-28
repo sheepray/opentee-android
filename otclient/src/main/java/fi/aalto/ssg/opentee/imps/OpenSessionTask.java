@@ -10,10 +10,10 @@ import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
- * Created by yangr1 on 4/20/16.
+ * Task to open a session.
  */
-public class OpenSessionThread implements Runnable {
-    final String TAG = "OpenSessionThread";
+public class OpenSessionTask implements Runnable {
+    final String TAG = "OpenSessionTask";
     ProxyApis mProxyApis = null;
     int mSid;
     UUID mUuid;
@@ -23,6 +23,7 @@ public class OpenSessionThread implements Runnable {
     byte[] mNewTeecOperation = null;
     OTLock mLock = null;
     ReturnValueWrapper mReturnValue = null;
+    int opHashCode = 0;
 
     private ISyncOperation mSyncOperationCallBack = new ISyncOperation.Stub(){
         @Override
@@ -43,13 +44,14 @@ public class OpenSessionThread implements Runnable {
         }
     };
 
-    public OpenSessionThread(ProxyApis proxyApis,
-                             int sid,
-                             UUID uuid,
-                             ITEEClient.IContext.ConnectionMethod connectionMethod,
-                             int connectionData,
-                             byte[] teecOperation,
-                             OTLock lock){
+    public OpenSessionTask(ProxyApis proxyApis,
+                           int sid,
+                           UUID uuid,
+                           ITEEClient.IContext.ConnectionMethod connectionMethod,
+                           int connectionData,
+                           byte[] teecOperation,
+                           OTLock lock,
+                           int opHashCode){
         this.mProxyApis = proxyApis;
         this.mSid = sid;
         this.mUuid = uuid;
@@ -57,6 +59,7 @@ public class OpenSessionThread implements Runnable {
         this.mConnectionData = connectionData;
         this.mTeecOperation = teecOperation;
         this.mLock = lock;
+        this.opHashCode = opHashCode;
     }
 
     public synchronized byte[] getNewOperationInBytes(){
@@ -75,7 +78,8 @@ public class OpenSessionThread implements Runnable {
                     mConnectionMethod,
                     mConnectionData,
                     mTeecOperation,
-                    mSyncOperationCallBack);
+                    mSyncOperationCallBack,
+                    opHashCode);
         } catch (RemoteException e) {
             Log.e(TAG, "Communication error with remote TEE service.");
         } catch (TEEClientException e) {

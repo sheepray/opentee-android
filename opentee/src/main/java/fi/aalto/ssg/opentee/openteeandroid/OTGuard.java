@@ -291,7 +291,7 @@ public class OTGuard {
         return opsInBytes;
     }
 
-    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin, ISyncOperation iSyncOperation){
+    public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin, ISyncOperation iSyncOperation, int opHashCode){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
@@ -313,7 +313,8 @@ public class OTGuard {
                 connData,
                 opsInBytes,
                 retOriginFromJni,
-                returnCode);
+                returnCode,
+                opHashCode + callerId);
 
         retOrigin[0] = retOriginFromJni.getValue();
 
@@ -364,7 +365,7 @@ public class OTGuard {
         NativeLibtee.teecCloseSession(sidInJni);
     }
 
-    public int teecInvokeCommand(int callerId, int sid, int commandId, int[] returnOrigin, byte[] opsInBytes, ISyncOperation iSyncOperation){
+    public int teecInvokeCommand(int callerId, int sid, int commandId, int[] returnOrigin, byte[] opsInBytes, ISyncOperation iSyncOperation, int opHashCode){
         // known caller?
         if ( !mOTCallerList.containsKey(callerId) ) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
 
@@ -387,7 +388,8 @@ public class OTGuard {
                 commandId,
                 opsInBytes,
                 retOriginFromJni,
-                returnCode);
+                returnCode,
+                opHashCode + callerId);
 
         returnOrigin[0] = retOriginFromJni.getValue();
 
@@ -405,6 +407,18 @@ public class OTGuard {
         }
 
         return returnCode.getValue();
+    }
+
+    public void teecRequestCancellation(final int callerId, final int opId){
+        // needed to be dealing within another thread.
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NativeLibtee.teecRequestCancellation(opId + callerId);
+            }
+        });
+
+        t.start();
     }
 
     private OTCaller findCallerById(int callerId){

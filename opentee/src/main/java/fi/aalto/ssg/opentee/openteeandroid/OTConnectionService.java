@@ -14,6 +14,7 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 public class OTConnectionService extends Service {
     String TAG = "OTConnectionService.Imp";
+    boolean mAllowRebind = false;
     String mQuote = "You Shall Not Pass!";
     static OTGuard mOTGuard = null; // only need one OTGuard.
 
@@ -21,6 +22,8 @@ public class OTConnectionService extends Service {
         super();
         Log.d(TAG, "creating OTConnectionService");
         this.mOTGuard = new OTGuard(this.mQuote, this);
+        //note: if this function called multiple times, move the construction of OTGuard into onCreate
+        // function.
     }
 
 
@@ -75,13 +78,16 @@ public class OTConnectionService extends Service {
                     connData,
                     null,
                     retOrigin,
-                    null);
+                    null,
+                    0);
         }
 
         @Override
-        public synchronized int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin, ISyncOperation iSyncOperation) throws RemoteException {
+        public synchronized int teecOpenSession(int sid, ParcelUuid parcelUuid, int connMethod, int connData, byte[] teecOperation, int[] retOrigin, ISyncOperation iSyncOperation, int opHashcode) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
-                    + " is calling me to open session with operations.");
+                    + " is calling me to open session with operations " + opHashcode);
+
+            Log.d(TAG, "OTGuard hash code " + mOTGuard.hashCode());
 
             return mOTGuard.teecOpenSession(Binder.getCallingPid(),
                     sid,
@@ -90,7 +96,8 @@ public class OTConnectionService extends Service {
                     connData,
                     teecOperation,
                     retOrigin,
-                    iSyncOperation);
+                    iSyncOperation,
+                    opHashcode);
         }
 
         @Override
@@ -111,20 +118,33 @@ public class OTConnectionService extends Service {
                     commandId,
                     returnOrigin,
                     null,
-                    null);
+                    null,
+                    0);
         }
 
         @Override
-        public synchronized int teecInvokeCommand(int sid, int commandId, byte[] teecOperation, int[] returnOrigin, ISyncOperation syncOperation){
+        public synchronized int teecInvokeCommand(int sid, int commandId, byte[] teecOperation, int[] returnOrigin, ISyncOperation syncOperation, int opHashCode){
             Log.d(TAG, Binder.getCallingPid()
-                    + " is calling me to invoke command with operations.");
+                    + " is calling me to invoke command with operations " + opHashCode);
 
             return mOTGuard.teecInvokeCommand(Binder.getCallingPid(),
                     sid,
                     commandId,
                     returnOrigin,
                     teecOperation,
-                    syncOperation);
+                    syncOperation,
+                    opHashCode);
+        }
+
+        @Override
+        public void teecRequestCancellation(int opId){
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to request cancellation operation with id " + opId);
+
+            Log.d(TAG, "OTGuard hash code " + mOTGuard.hashCode());
+
+            mOTGuard.teecRequestCancellation(Binder.getCallingPid(),
+                    opId);
         }
     };
 
@@ -132,5 +152,25 @@ public class OTConnectionService extends Service {
     public IBinder onBind(Intent intent) {
         //Log.d(TAG, intent.get)
         return mBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        // All clients have unbound with unbindService()
+
+        Log.i(TAG, Binder.getCallingPid() + " unbind the service ");
+
+        //TODO: clean up resources in OTGuard.
+
+        return mAllowRebind;
+    }
+
+    @Override
+    public void onDestroy(){
+        mOTGuard = null;
+
+        Log.i(TAG, "OTGuard destroyed");
+
+        super.onDestroy();
     }
 }

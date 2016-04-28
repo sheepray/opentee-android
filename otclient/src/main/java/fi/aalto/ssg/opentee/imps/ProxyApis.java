@@ -181,7 +181,8 @@ public class ProxyApis {
                                 ITEEClient.IContext.ConnectionMethod connectionMethod,
                                 int connectionData,
                                 byte[] opInArray,
-                                ISyncOperation syncOperation) throws TEEClientException, RemoteException {
+                                ISyncOperation syncOperation,
+                                int opHashCode) throws TEEClientException, RemoteException {
         if ( mService == null ){
             throw new CommunicationErrorException("Service unavailable");
         }
@@ -204,7 +205,8 @@ public class ProxyApis {
                     connectionData,
                     opInArray,
                     retOrigin,
-                    syncOperation);
+                    syncOperation,
+                    opHashCode);
         }
 
         Log.d(TAG, "teecOpenSession return code: " + rc);
@@ -222,7 +224,7 @@ public class ProxyApis {
         mService.teecCloseSession(sessionId);
     }
 
-    public ReturnValueWrapper teecInvokeCommand(int sid, int commandId, byte[] opInArray, ISyncOperation iSyncOperation) throws CommunicationErrorException, RemoteException {
+    public ReturnValueWrapper teecInvokeCommand(int sid, int commandId, byte[] opInArray, ISyncOperation iSyncOperation, int opHashCode) throws CommunicationErrorException, RemoteException {
         if ( mService == null ){
             throw new CommunicationErrorException("Service unavailable");
         }
@@ -235,7 +237,7 @@ public class ProxyApis {
             rc = mService.teecInvokeCommandWithoutOp(sid, commandId, returnOrigin);
         }
         else{
-            rc = mService.teecInvokeCommand(sid, commandId, opInArray, returnOrigin, iSyncOperation);
+            rc = mService.teecInvokeCommand(sid, commandId, opInArray, returnOrigin, iSyncOperation, opHashCode);
         }
 
         Log.d(TAG, "teecInvokeCommand return code: " + rc);
