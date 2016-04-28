@@ -330,10 +330,13 @@ public class OTGuard {
         //OTCaller tmp = new OTCaller(1);   // passed
 
         if(iSyncOperation != null){
-            byte[] newOpInBytes = newOpInByte.clone();
+            byte[] newOpInBytes = {' '};
+
+            // only sync ops if succeed.
+            if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) newOpInBytes = newOpInByte.clone();
 
             //test code
-            OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
+            //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
 
             // sync operation back.
             try {
@@ -384,7 +387,7 @@ public class OTGuard {
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
         IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
         // call the teecInvokeCommand in native libtee.
-        byte[] newOpInBytes = NativeLibtee.teecInvokeCommand(sidInJni,
+        byte[] newOpInByte = NativeLibtee.teecInvokeCommand(sidInJni,
                 commandId,
                 opsInBytes,
                 retOriginFromJni,
@@ -394,6 +397,11 @@ public class OTGuard {
         returnOrigin[0] = retOriginFromJni.getValue();
 
         if(iSyncOperation != null){
+            byte[] newOpInBytes = {' '};
+
+            // only sync ops if succeed.
+            if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) newOpInBytes = newOpInByte.clone();
+
             // sync operation back.
             try {
                 Log.d(TAG, "Operation sync back using callback function.");

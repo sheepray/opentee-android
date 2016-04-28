@@ -219,7 +219,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         }
         else{
             //teecOperation started field check
-            if(teecOperation != null && teecOperation.isStarted()){
+            if(teecOperation.isStarted()){
                 throw new BusyException("the referenced operation is under usage.", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
             }
 
@@ -261,11 +261,12 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
             byte[] teecOperationInBytes = openSessionThread.getNewOperationInBytes();
 
-            if(teecOperationInBytes != null){
+            if(teecOperationInBytes != null &&
+               openSessionThread.getReturnValue().getReturnCode() == OTReturnCode.TEEC_SUCCESS){
                 updateOperation(otOperation, teecOperationInBytes);
             }
             else{
-                Log.e(TAG, "op is empty");
+                Log.e(TAG, "op is empty or open session failed");
             }
 
             // operation is no longer in use.
@@ -288,14 +289,15 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
     @Override
     public void requestCancellation(ITEEClient.IOperation iOperation) {
+        // don't call if it is not started.
+        if(!iOperation.isStarted()) {
+            Log.i(TAG, "operation not started yet. No need to cancel");
+            return;
+        }
+
         //new thread to cancel operation.
         Thread rc = new Thread(new RequestCancellationTask(mContext, (OTOperation)iOperation ));
         rc.start();
-        try {
-            rc.join();
-        } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage());
-        }
 
         Log.i(TAG, "sending request cancellation finished");
     }
@@ -405,11 +407,12 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
             byte[] teecOperationInBytes = invokeCommandTask.getNewOperationInBytes();
 
-            if(teecOperationInBytes != null){
+            if(teecOperationInBytes != null &&
+               invokeCommandTask.getReturnValue().getReturnCode() == OTReturnCode.TEEC_SUCCESS){
                 updateOperation(otOperation, teecOperationInBytes);
             }
             else{
-                Log.e(TAG, "op is empty");
+                Log.e(TAG, "op is empty or invoke command failed");
             }
 
             // operation is no longer in use.

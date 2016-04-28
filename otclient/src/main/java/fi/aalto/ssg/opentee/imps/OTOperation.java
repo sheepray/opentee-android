@@ -9,7 +9,7 @@ import fi.aalto.ssg.opentee.ITEEClient;
  * OTOperation implements the ITEEClient.IOperation interface.
  */
 public class OTOperation implements ITEEClient.IOperation {
-    int started = 0;
+    volatile int started = 0;
     List<ITEEClient.IParameter> params = new ArrayList<>();
 
     /**

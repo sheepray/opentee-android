@@ -171,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
 
         final ITEEClient.IOperation iOperation = client.newOperation(iRmr, iValue);
 
+        // request cancellation in a seperate thread.
+        Thread stt = new Thread(
+                new SecondTask(ctx, iOperation)
+        );
+        stt.start();
 
         ITEEClient.ISession session = null;
 
@@ -182,15 +187,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
-
-
-        // request cancellation in a seperate thread.
-        Thread stt = new Thread(
-                new SecondTask(ctx, iOperation)
-        );
-        stt.start();
-
-
 
         ITEEClient.ISession session2 = null;
         try {
@@ -225,18 +221,18 @@ public class MainActivity extends AppCompatActivity {
 
         ITEEClient.IOperation iOperation2 = client.newOperation(iRmr2, iValue2);
 
+        // request cancellation in a separate thread.
+        Thread stt2 = new Thread(
+                new SecondTask(ctx, iOperation2)
+        );
+        stt2.start();
+
         int commandId = 0x12345678;
         try {
             session.invokeCommand(commandId, iOperation2);
         } catch (TEEClientException e) {
             e.printStackTrace();
         }
-
-        // request cancellation in a separate thread.
-        Thread stt2 = new Thread(
-                new SecondTask(ctx, iOperation2)
-        );
-        stt2.start();
 
         try {
             session.invokeCommand(commandId, null);
