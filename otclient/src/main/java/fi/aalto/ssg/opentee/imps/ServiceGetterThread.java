@@ -10,9 +10,9 @@ public class ServiceGetterThread implements Runnable {
     ProxyApis mProxyApis = null;
     String mTeeName = null;
     Context mContext = null;
-    Object mLock = null;
+    OTLock mLock = null;
 
-    public ServiceGetterThread(String teeName, Context context, Object lock){
+    public ServiceGetterThread(String teeName, Context context, OTLock lock){
         this.mTeeName = teeName;
         this.mContext = context;
         this.mLock = lock;
@@ -20,6 +20,7 @@ public class ServiceGetterThread implements Runnable {
 
     @Override
     public void run(){
+        this.mLock.lock();
         mProxyApis = new ProxyApis(this.mTeeName, this.mContext, this.mLock);
     }
 

@@ -44,18 +44,20 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         /**
          * connect to the IOpenTEE
          */
-        Object lock = new Object();
+        OTLock lock = new OTLock();
         ServiceGetterThread serviceGetterThread = new ServiceGetterThread(teeName, context, lock);
-        serviceGetterThread.run();
+        Thread st = new Thread(serviceGetterThread);
+        st.start();
 
-        synchronized (lock) {
-            // wait 10000 til service connected.
-            try {
-                lock.wait(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            st.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        // wait until service bound.
+        lock.lock();
+        lock.unlock();
 
         mProxyApis = serviceGetterThread.getProxyApis();
 
@@ -152,7 +154,10 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
     private void updateOperation(OTOperation otOperation, byte[] opInBytes) throws ExcessDataException, BadFormatException {
         GPDataTypes.TeecOperation op = OTFactoryMethods.transferOpInBytesToOperation(TAG, opInBytes);
 
+        if(op == null) return;
+
         //test code
+        Log.d(TAG, "length of operation " + opInBytes.length);
         OTFactoryMethods.print_op(TAG, op);
 
         for(int i = 0; i < op.getMParamsCount(); i++){
@@ -168,6 +173,8 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
                 OTSharedMemory otSm = (OTSharedMemory)otRmr.getSharedMemory();
 
                 GPDataTypes.TeecSharedMemoryReference teecSmr = param.getTeecSharedMemoryReference();
+
+                Log.d(TAG, "size of returned buffer " + teecSmr.getParent().getMBuffer().toByteArray().length);
 
                 otSm.updateBuffer(teecSmr.getParent().getMBuffer().toByteArray(),
                         otRmr.getOffset(),
@@ -275,15 +282,15 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
         rv = openSessionThread.getReturnValue();
 
-        if(rv.getReturnCode() != OTReturnCode.TEEC_SUCCESS){
+        if(rv != null && rv.getReturnCode() != OTReturnCode.TEEC_SUCCESS){
             OTFactoryMethods.throwExceptionWithReturnOrigin(TAG, rv.getReturnCode(), rv.getReturnOrigin());
+
         }
 
         // upon success
         OTContextCallback otContextCallback = this;
         OTSession otSession =  new OTSession(sid, otContextCallback);
         mSessionMap.put(sid, 0);
-
         return otSession;
     }
 

@@ -47,7 +47,8 @@ public class OTFactoryMethods {
             if (param.getType() == GPDataTypes.TeecParameter.Type.smr){
                 GPDataTypes.TeecSharedMemory sm = param.getTeecSharedMemoryReference().getParent();
                 Log.d(tag, "[SMR] flag:" + sm.getMFlag() +
-                        " buffer:" + sm.getMBuffer().toStringUtf8().toString());
+                        " buffer:" + sm.getMBuffer().toStringUtf8().toString() +
+                        " size:" + sm.getMBuffer().size());
             }
             else if (param.getType() == GPDataTypes.TeecParameter.Type.val){
                 GPDataTypes.TeecValue var = param.getTeecValue();

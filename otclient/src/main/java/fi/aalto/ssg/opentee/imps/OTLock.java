@@ -7,19 +7,15 @@ import android.util.Log;
  */
 public class OTLock{
     final String TAG = "OTLock";
-    private Object lock = new Object();
     private boolean locked = false;
 
-    public void lock(){
-        Log.i(TAG, "lock");
+    public synchronized void lock(){
+        Log.i(TAG, "lock in " + Thread.currentThread().getId());
 
         try {
             while(locked) {
-                synchronized (lock) {
-                    Log.d(TAG, "waiting to get lock...");
-
-                    lock.wait();
-                }
+                Log.d(TAG, "waiting to get lock...");
+                wait();
             }
             locked = true;
         } catch (InterruptedException e) {
@@ -27,12 +23,10 @@ public class OTLock{
         }
     }
 
-    public void unlock(){
-        Log.i(TAG, "unlock");
+    public synchronized void unlock(){
+        Log.i(TAG, "unlock" + Thread.currentThread().getId());
 
-        synchronized (lock){
-            locked = false;
-            lock.notify();
-        }
+        locked = false;
+        notify();
     }
 }

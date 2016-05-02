@@ -34,6 +34,58 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "OTConnectionService";
 
     private HandlerThread mWorkerHandler;
+    Handler handler;
+
+    Runnable installationTask = new Runnable() {
+        @Override
+        public void run() {
+            Worker worker = new Worker();
+            Context context = getApplicationContext();
+
+            Log.d(TAG, "Ready files for opentee to run");
+
+            //fresh copy
+            boolean overwrite = true;
+
+            //install configuration file
+            worker.installConfigToHomeDir(context, OTConstants.OPENTEE_CONF_NAME);
+
+            //install opentee
+            worker.installAssetToHomeDir(context, OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OT_BIN_DIR, overwrite);
+            worker.installAssetToHomeDir(context, OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
+            worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
+
+            //install TA
+            //worker.installAssetToHomeDir(context, OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
+            worker.installAssetToHomeDir(context, OTConstants.LIB_TA_OMNISHARE_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
+
+            //put the status of the opentee engine to setting
+            SharedPreferences.Editor editor = getSharedPreferences(SETTING_FILE_NAME, 0).edit();
+            editor.putBoolean(OT_ENGINE_STATUS, true);
+            editor.commit();
+
+            //start the opentee engine
+            try {
+                worker.startOpenTEEEngine(context);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            worker.stopExecutor();
+
+            Log.d(TAG, "Installation ready");
+
+        }
+    };
+
+    Runnable stopEngineTask = new Runnable() {
+        @Override
+        public void run() {
+            Worker worker = new Worker();
+            worker.stopOpenTEEEngine(getApplicationContext());
+            worker.stopExecutor();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,70 +98,36 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
 
         //create another thread to avoid too much in main thread
-        mWorkerHandler = new HandlerThread("tought worker");
+        mWorkerHandler = new HandlerThread("tough worker");
         mWorkerHandler.start();
 
         //install and start the opentee-engine
-        Handler handler = new Handler(mWorkerHandler.getLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Worker worker = new Worker();
-                Context context = getApplicationContext();
-
-                Log.d(TAG, "Ready files for opentee to run");
-
-                //fresh copy
-                boolean overwrite = true;
-
-                //install configuration file
-                worker.installConfigToHomeDir(context, OTConstants.OPENTEE_CONF_NAME);
-
-                //install opentee
-                worker.installAssetToHomeDir(context, OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OT_BIN_DIR, overwrite);
-                worker.installAssetToHomeDir(context, OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
-                worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
-
-                //install TA
-                //worker.installAssetToHomeDir(context, OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
-                worker.installAssetToHomeDir(context, OTConstants.LIB_TA_OMNISHARE_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
-
-                //put the status of the opentee engine to setting
-                SharedPreferences.Editor editor = getSharedPreferences(SETTING_FILE_NAME, 0).edit();
-                editor.putBoolean(OT_ENGINE_STATUS, true);
-                editor.commit();
-
-                //start the opentee engine
-                try {
-                    worker.startOpenTEEEngine(context);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                worker.stopExecutor();
-
-                Log.d(TAG, "Installation ready");
-
-            }
-        });
+        handler = new Handler(mWorkerHandler.getLooper());
+        handler.post(installationTask);
 
     }
 
     @Override
     protected void onDestroy() {
-        if ( mWorkerHandler != null ){
-            mWorkerHandler.quitSafely();
-        }
-
         //stop the open-tee engine if still running
         final SharedPreferences pref = getSharedPreferences(SETTING_FILE_NAME, 0);
         if ( pref.getBoolean(OT_ENGINE_STATUS, false) ){
             //open-tee engine still running, kill it.
+
+            /*
             Worker worker = new Worker();
             worker.stopOpenTEEEngine(getApplicationContext());
             worker.stopExecutor();
+            */
 
-            Log.d(TAG, "Stopping the engine");
+        }
+
+        handler.post(stopEngineTask);
+
+        Log.d(TAG, "Stopping the engine");
+
+        if ( mWorkerHandler != null ){
+            mWorkerHandler.quitSafely();
         }
 
         super.onDestroy();

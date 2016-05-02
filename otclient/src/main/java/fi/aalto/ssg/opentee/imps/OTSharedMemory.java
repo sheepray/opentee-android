@@ -16,6 +16,8 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
  * this class implements the ISharedMemory interface
  */
 public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
+    final String TAG = "OTSharedMemory";
+
     int mId;
     byte[] mBuffer;
     int mFlag;
@@ -59,11 +61,24 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     public void updateBuffer(byte[] newBuffer, int offset, int sizeToWrite) throws BadFormatException, ExcessDataException {
         if(newBuffer == null){
             throw new BadFormatException("new buffer is null", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+        }else{
+            Log.d(TAG, "len of new buffer " + newBuffer.length);
+            Log.d(TAG, "len of mbuffer " + this.mBuffer.length);
+            Log.d(TAG, "sizeToWrite " + sizeToWrite);
         }
 
-        if( (offset + sizeToWrite) > (newBuffer.length > mBuffer.length? mBuffer.length: newBuffer.length) ){
+        if( (offset + sizeToWrite) > ( mBuffer.length > newBuffer.length? newBuffer.length : mBuffer.length ) ){
+            throw new ExcessDataException("incorrect data, try again.\n" +
+                    " [size to write] = " + sizeToWrite + "\n" +
+                    " [size of src  ] = " + newBuffer.length + "\n" +
+                    " [size of des  ] = " + this.mBuffer.length);
+        }
+
+        /*
+        if( (offset + sizeToWrite) > mBuffer.length ){
             throw new ExcessDataException("too much data", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
         }
+        */
 
         for(int i = 0; i < sizeToWrite; i++){
             mBuffer[i + offset] = newBuffer[i + offset];

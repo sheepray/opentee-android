@@ -2,9 +2,13 @@ package fi.aalto.ssg.opentee.testapp;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -21,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     // uuid = {0x12345678, 0x8765, 0x4321, {'T','A','C','O','N','N','T','E'}}
     public UUID TA_CONN_TEST_UUID;
 
-    HandlerThread mHandler;
+    //HandlerThread mHandler;
 
     /**
      * Take a string and transfer its each char to a byte. Then combine all the bytes to a long var.
@@ -61,19 +65,131 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "******* End preparing global vars ********");
     }
 
+
+
+
+
+
+    /* RSA wrapped root key blob */
+    private byte[] rootKey;
+
+    /* Chain of directory key blobs wrapped with the root key */
+    private Keychain keychain;
+
+    /* Data buffer used for testing */
+    private byte data[] =  new byte[]{
+            (byte)0xdDE, (byte)0xAD, (byte)0xBE, (byte)0xAF,
+            (byte)0xdDE, (byte)0xAD, (byte)0xBE, (byte)0xAF,
+            (byte)0xdDE, (byte)0xAD, (byte)0xBE, (byte)0xAF
+    };
+
+    /* UI Elements */
+    private Button InitializeButton;
+    private Button FinalizeButton;
+    private Button CreateDirectoryKeyButton;
+    private Button EncryptFileButton;
+    private Button DecryptFileButton;
+
+    private TextView logView;
+
+
+
+
+    public static final int CMD_UPDATE_LOGVIEW = 1;
+
+    public static final int ID_CREATE_ROOT_KEY_BUTTON = 0xffff0000;
+    public static final int ID_INI_BUTTON = 0xffff0001;
+    public static final int ID_FINALIZE_BUTTON = 0xffff0002;
+    public static final int ID_DO_ENCRY_BUTTON = 0xffff0003;
+    public static final int ID_DO_DECRY_BUTTON = 0xffff0004;
+
+    Handler.Callback updateUiCallBack = new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what){
+                case CMD_UPDATE_LOGVIEW:
+                    if(msg.obj != null){
+                        Log.d(TAG, "update logview with " + msg.obj);
+
+                        switch (msg.arg1){
+                            case ID_CREATE_ROOT_KEY_BUTTON:
+                                if(msg.arg2 == 1) InitializeButton.setEnabled(true);
+                                break;
+                            case ID_INI_BUTTON:
+                                if(msg.arg2 == 1){
+                                    CreateDirectoryKeyButton.setEnabled(true);
+                                    EncryptFileButton.setEnabled(true);
+                                    InitializeButton.setEnabled(false);
+                                    FinalizeButton.setEnabled(true);
+                                }
+                                break;
+                            case ID_FINALIZE_BUTTON:
+                                if(msg.arg2 == 1){
+                                    CreateDirectoryKeyButton.setEnabled(false);
+                                    EncryptFileButton.setEnabled(false);
+                                    DecryptFileButton.setEnabled(false);
+                                    InitializeButton.setEnabled(true);
+
+                                }
+                                break;
+
+                            case ID_DO_ENCRY_BUTTON:
+                                if(msg.arg2 == 1){
+                                    DecryptFileButton.setEnabled(true);
+                                }
+                                break;
+
+                            default:
+                                Log.e(TAG, "unknown id");
+                                break;
+                        }
+
+                        logView.append( msg.obj + "\n");
+                    }
+                    break;
+
+                default:
+                    Log.e(TAG, "unknown msg");
+                    break;
+            }
+            return true;
+        }
+    };
+
+    Handler mUpdateUi;
+    Worker mWorker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        keychain = new Keychain();
+
+        InitializeButton = (Button) findViewById(R.id.button_initialize);
+        FinalizeButton = (Button) findViewById(R.id.button_finalize);
+        CreateDirectoryKeyButton = (Button) findViewById(R.id.button_create_directory_key);
+        EncryptFileButton = (Button) findViewById(R.id.button_encrypt_file);
+        DecryptFileButton = (Button) findViewById(R.id.button_decrypt_file);
+
+        logView = (TextView)findViewById(R.id.view_log);
+        //logView.append("OmniShare Trustlet Tester App\n");
+        logView.append("Data buffer: " + HexUtils.encodeHexString(data) + "\n");
+
+        mUpdateUi = new Handler(updateUiCallBack);
+
+        mWorker = new Worker("LOL tough worker", mUpdateUi, getApplicationContext());
+        mWorker.start();
+
+
+
         /**
          * prepare global vars.
          */
-        prepareGlobalVars();
+        //prepareGlobalVars();
 
-        /**
-         * put the test in a separate thread. And developers are suggested to do so.
-         */
+        /*
+        //put the test in a separate thread. And developers are suggested to do so.
         mHandler = new HandlerThread("Tough worker");
         mHandler.start();
 
@@ -85,8 +201,79 @@ public class MainActivity extends AppCompatActivity {
                 newTest();
             }
         });
+        */
+    }
+
+
+    /**
+     * Trigger root key generation from UI.
+     *
+     * @param v Parent view
+     */
+    public void doCreateRootKey(View v) {
+        Log.d(TAG, "Generate root key in " + Thread.currentThread().getId() );
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_GENERATE_ROOT_KEY);
+        workerHandler.sendMessage(msg);
+    }
+
+    /**
+     * Trigger trustlet initialization from UI.
+     *
+     * @param v Parent view
+     */
+    public void doInitialize(View v) {
+        Log.d(TAG, "doInitialize");
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_INIT);
+        workerHandler.sendMessage(msg);
 
     }
+
+    /**
+     * Trigger trustlet finalization from UI.
+     *
+     * @param v Parent view
+     */
+    public void doFinalize(View v) {
+        //TODO:
+    }
+
+    /**
+     * Trigger directory key generation from UI.
+     *
+     * @param v Parent view
+     */
+    public void doCreateDirectoryKey(View v) {
+        //TODO:
+    }
+
+    /**
+     * Trigger encrypt operation from UI.
+     *
+     * @param v Parent view.
+     */
+    public void doEncryptFile(View v) {
+        //TODO:
+    }
+
+    /**
+     * Trigger decrypt operation from UI.
+     *
+     * @param v Parent view.
+     */
+    public void doDecryptFile(View v) {
+        //TODO:
+    }
+
+
+
+
+
+
+
 
 
     /**

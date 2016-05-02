@@ -59,9 +59,9 @@ public class ProxyApis {
     boolean mConnected;
     String mTeeName;
     IOTConnectionInterface mService;
-    Object mLock;
+    OTLock mLock;
 
-    public ProxyApis(String teeName, Context context, Object lock){
+    public ProxyApis(String teeName, Context context, OTLock lock){
         this.mContext = context;
         this.mTeeName = teeName;
         this.mLock = lock;
@@ -87,10 +87,9 @@ public class ProxyApis {
                 e.printStackTrace();
             }
 
-            synchronized (mLock) {
-                // release the lock from another thread.
-                mLock.notifyAll();
-            }
+            Log.d(TAG, Thread.currentThread().getId() + " try to call unlock");
+
+            mLock.unlock();
         }
 
         @Override
@@ -108,9 +107,11 @@ public class ProxyApis {
             intent.setClassName(TeecConstants.OT_SERVICE_PACK_NAME,
                     TeecConstants.OT_SERVICE_CLASS_NAME);
             this.mContext.bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
-        }
 
-        Log.d(TAG, "Trying to create connection");
+            Log.d(TAG, "Trying to create connection");
+        }else{
+            Log.e(TAG, "Already connected.");
+        }
     }
 
     public void terminateConnection(){
@@ -120,6 +121,8 @@ public class ProxyApis {
     }
 
     public ProxyApis teecInitializeContext() throws TEEClientException {
+        if(mService == null) return null;
+
         int return_code = 0;
         try {
             return_code = mService.teecInitializeContext(mTeeName);

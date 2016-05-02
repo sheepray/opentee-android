@@ -33,7 +33,7 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
  * In sum, for one shared memory, there are two ids for it in OTGuard.
  */
 public class OTGuard {
-    String TAG = "OTGuard";
+    final String TAG = "OTGuard";
     String mQuote;
     Map<Integer, OTCaller> mOTCallerList; // <pid, caller>
     boolean mConnectedToOT = false;
@@ -387,7 +387,7 @@ public class OTGuard {
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
         IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
         // call the teecInvokeCommand in native libtee.
-        byte[] newOpInByte = NativeLibtee.teecInvokeCommand(sidInJni,
+        byte[] newOpInBytes = NativeLibtee.teecInvokeCommand(sidInJni,
                 commandId,
                 opsInBytes,
                 retOriginFromJni,
@@ -397,16 +397,13 @@ public class OTGuard {
         returnOrigin[0] = retOriginFromJni.getValue();
 
         if(iSyncOperation != null){
-            byte[] newOpInBytes = {' '};
-
-            // only sync ops if succeed.
-            if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) newOpInBytes = newOpInByte.clone();
-
             // sync operation back.
             try {
-                Log.d(TAG, "Operation sync back using callback function.");
+                Log.d(TAG, "Operation sync back using callback function with return code " + returnCode.getValue());
 
                 //test code, wait for 1000ms: worked
+
+                Log.i(TAG, "len of op to sync back = " + newOpInBytes.length);
 
                 iSyncOperation.syncOperation(newOpInBytes);
             } catch (RemoteException e) {

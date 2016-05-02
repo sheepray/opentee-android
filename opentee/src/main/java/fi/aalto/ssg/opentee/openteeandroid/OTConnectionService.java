@@ -150,7 +150,8 @@ public class OTConnectionService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        //Log.d(TAG, intent.get)
+        Log.i(TAG, "Service bound for " + Binder.getCallingPid());
+
         return mBinder;
     }
 
