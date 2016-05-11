@@ -57,13 +57,17 @@ public class OTFactoryMethods {
                         " b:" + Integer.toHexString(var.getB()) );
             }
             else{
-                Log.e(tag, "Incorrect parameter");
+                Log.d(tag, "param is null");
             }
         }
     }
 
     public static void print_op_in_bytes(String tag, byte[] opInBytes){
         Log.i(tag, "[start] print_op_in_bytes");
+
+        if (opInBytes == null){
+            Log.e(tag, "op is null");
+        }
 
         print_op(tag, transferOpInBytesToOperation(tag, opInBytes));
 
@@ -85,6 +89,8 @@ public class OTFactoryMethods {
         return opBuilder.build();
     }
 
+//    public static final GPDataTypes.TeecParameter paramPlaceHolder = GPDataTypes.TeecParameter.newBuilder().build();
+
     public static byte[] OperationAsByteArray(String TAG, ITEEClient.IOperation iOperation){
         if ( iOperation == null )return null;
         OTOperation teecOperation = (OTOperation)iOperation;
@@ -99,7 +105,17 @@ public class OTFactoryMethods {
 
             List<ITEEClient.IParameter> parameterList = teecOperation.getParams();
 
-            for ( ITEEClient.IParameter param: parameterList ){
+            for(int i = 0 ; i < parameterList.size(); i++){
+                ITEEClient.IParameter param = parameterList.get(i);
+            //for ( ITEEClient.IParameter param: parameterList ){
+                if(param == null){
+                    Log.i(TAG, "Param is null");
+                    GPDataTypes.TeecParameter.Builder paramBuilder = GPDataTypes.TeecParameter.newBuilder();
+                    paramBuilder.setType(GPDataTypes.TeecParameter.Type.empty);
+                    toBuilder.addMParams(paramBuilder.build());
+                    continue;
+                }
+
                 if( param.getType() == ITEEClient.IParameter.Type.TEEC_PTYPE_VAL){
                     Log.i(TAG, "Param is " + ITEEClient.IParameter.Type.TEEC_PTYPE_VAL);
 
@@ -211,7 +227,11 @@ public class OTFactoryMethods {
 
     private static ITEEClient.ReturnOriginCode intToReturnOrigin(int roInt){
         int len = ITEEClient.ReturnOriginCode.values().length;
-        if( len <= roInt || roInt <= 0) return null;
+        if( len < roInt || roInt <= 0) {
+            Log.e("intToReturnOrigin", "return origin in int = " + roInt);
+
+            return null;
+        }
 
         return ITEEClient.ReturnOriginCode.values()[roInt - 1];
     }
@@ -220,7 +240,7 @@ public class OTFactoryMethods {
         ITEEClient.ReturnOriginCode returnOriginCode = intToReturnOrigin(retOrigin);
 
         if ( returnOriginCode == null ){
-            Log.e(TAG, "Incorrect return origin " + retOrigin);
+            Log.e(TAG, "Incorrect return code with return origin =  " + retOrigin);
         }
 
         switch (return_code){

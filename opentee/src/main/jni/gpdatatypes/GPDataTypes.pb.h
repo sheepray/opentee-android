@@ -47,11 +47,12 @@ class TeecValue;
 
 enum TeecParameter_Type {
   TeecParameter_Type_smr = 1,
-  TeecParameter_Type_val = 2
+  TeecParameter_Type_val = 2,
+  TeecParameter_Type_empty = 3
 };
 bool TeecParameter_Type_IsValid(int value);
 const TeecParameter_Type TeecParameter_Type_Type_MIN = TeecParameter_Type_smr;
-const TeecParameter_Type TeecParameter_Type_Type_MAX = TeecParameter_Type_val;
+const TeecParameter_Type TeecParameter_Type_Type_MAX = TeecParameter_Type_empty;
 const int TeecParameter_Type_Type_ARRAYSIZE = TeecParameter_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* TeecParameter_Type_descriptor();
@@ -252,6 +253,7 @@ class TeecParameter : public ::google::protobuf::Message {
   typedef TeecParameter_Type Type;
   static const Type smr = TeecParameter_Type_smr;
   static const Type val = TeecParameter_Type_val;
+  static const Type empty = TeecParameter_Type_empty;
   static inline bool Type_IsValid(int value) {
     return TeecParameter_Type_IsValid(value);
   }
@@ -300,6 +302,13 @@ class TeecParameter : public ::google::protobuf::Message {
   inline ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue* release_teecvalue();
   inline void set_allocated_teecvalue(::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue* teecvalue);
 
+  // optional int32 placeHolder = 4;
+  inline bool has_placeholder() const;
+  inline void clear_placeholder();
+  static const int kPlaceHolderFieldNumber = 4;
+  inline ::google::protobuf::int32 placeholder() const;
+  inline void set_placeholder(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter)
  private:
   inline void set_has_type();
@@ -308,14 +317,17 @@ class TeecParameter : public ::google::protobuf::Message {
   inline void clear_has_teecsharedmemoryreference();
   inline void set_has_teecvalue();
   inline void clear_has_teecvalue();
+  inline void set_has_placeholder();
+  inline void clear_has_placeholder();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemoryReference* teecsharedmemoryreference_;
-  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue* teecvalue_;
   int type_;
+  ::google::protobuf::int32 placeholder_;
+  ::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue* teecvalue_;
   friend void  protobuf_AddDesc_GPDataTypes_2eproto();
   friend void protobuf_AssignDesc_GPDataTypes_2eproto();
   friend void protobuf_ShutdownFile_GPDataTypes_2eproto();
@@ -867,6 +879,30 @@ inline void TeecParameter::set_allocated_teecvalue(::fi::aalto::ssg::opentee::im
     clear_has_teecvalue();
   }
   // @@protoc_insertion_point(field_set_allocated:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter.teecValue)
+}
+
+// optional int32 placeHolder = 4;
+inline bool TeecParameter::has_placeholder() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void TeecParameter::set_has_placeholder() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void TeecParameter::clear_has_placeholder() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void TeecParameter::clear_placeholder() {
+  placeholder_ = 0;
+  clear_has_placeholder();
+}
+inline ::google::protobuf::int32 TeecParameter::placeholder() const {
+  // @@protoc_insertion_point(field_get:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter.placeHolder)
+  return placeholder_;
+}
+inline void TeecParameter::set_placeholder(::google::protobuf::int32 value) {
+  set_has_placeholder();
+  placeholder_ = value;
+  // @@protoc_insertion_point(field_set:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter.placeHolder)
 }
 
 // -------------------------------------------------------------------

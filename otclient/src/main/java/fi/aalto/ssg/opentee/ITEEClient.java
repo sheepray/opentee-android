@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import fi.aalto.ssg.opentee.exception.BadParametersException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
@@ -164,7 +165,26 @@ public interface ITEEClient {
          */
         ITEEClient.ISharedMemory getSharedMemory();
 
+        /**
+         * Get the offset set previously.
+         * @return an integer with a value ranging from 0 to the size of referenced shared memory.
+         */
         int getOffset();
+
+        /**
+         * Get the size of returned buffer from TEE/TA. This function will return a valid value ( >= 0) only
+         * when the following two requirements are met at the same time:
+         * <ul>
+         *     <li> either TEEC_MEMREF_OUTPUT or TEEC_MEMREF_INOUT is marked as the flag of referenced shared memory;</li>
+         *     <li> the referenced shared memory also can be used as output for TAs.</li>
+         * </ul>
+         * Otherwise, 0 will be returned.
+         *
+         * This function is normally called after the TA or TEE writes some data back to the referenced shared memory
+         * so that CA can know how big is the returned size of the data.
+         * @return an integer value as the returned size.
+         */
+        int getReturnSize();
     }
 
     /**
@@ -175,7 +195,7 @@ public interface ITEEClient {
      * @param flag the flag for referenced shared memory.
      * @param offset the offset from the beginning of the buffer of shared memory.
      */
-    IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset);
+    IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) throws BadParametersException;
 
     /**
      * Interface to access a pair of two integer values. It can be only obtained by calling
@@ -464,7 +484,7 @@ public interface ITEEClient {
          * a valid TEE context. When this function tries to register a buffer as a shared memory which
          * is already used by another shared memory, this function will also return a valid <code>ISharedMemory</code> interface. The
          * TEE will regard this buffer as two identical shared memory. Under such a circumstance,
-         * it can easily cause problems such as <code>AccessConflictException</code> etc. So, it is not recommended
+         * it can easily cause problems such as <code>MacInvalidException</code> etc. So, it is not recommended
          * to do so. However, when a shared memory is released, the buffer it holds can be registered
          * again as a new shared memory. For the CA, the buffer is the same but it is identical for
          * the TEE.
@@ -504,7 +524,7 @@ public interface ITEEClient {
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
          * @throws exception.BadParametersException:
-         * Incorrect ISharedMemory instance.
+         * Incorrect ISharedMemory instance such as passing a null object.
          */
         void releaseSharedMemory(ISharedMemory sharedMemory) throws TEEClientException;
 

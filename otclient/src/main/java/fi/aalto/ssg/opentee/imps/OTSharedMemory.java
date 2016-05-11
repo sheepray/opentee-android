@@ -61,24 +61,23 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
     public void updateBuffer(byte[] newBuffer, int offset, int sizeToWrite) throws BadFormatException, ExcessDataException {
         if(newBuffer == null){
             throw new BadFormatException("new buffer is null", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
-        }else{
-            Log.d(TAG, "len of new buffer " + newBuffer.length);
-            Log.d(TAG, "len of mbuffer " + this.mBuffer.length);
-            Log.d(TAG, "sizeToWrite " + sizeToWrite);
         }
 
+
+        //TODO: the following code should be changed un-commented.
         if( (offset + sizeToWrite) > ( mBuffer.length > newBuffer.length? newBuffer.length : mBuffer.length ) ){
-            throw new ExcessDataException("incorrect data, try again.\n" +
+            throw new BadFormatException("incorrect data, try again.\n" +
                     " [size to write] = " + sizeToWrite + "\n" +
                     " [size of src  ] = " + newBuffer.length + "\n" +
                     " [size of des  ] = " + this.mBuffer.length);
         }
 
-        /*
-        if( (offset + sizeToWrite) > mBuffer.length ){
-            throw new ExcessDataException("too much data", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
-        }
-        */
+        //set returned size
+        this.mReturnSize = sizeToWrite;
+
+
+        ///TODO: delete the following line.
+        //sizeToWrite = sizeToWrite > newBuffer.length? newBuffer.length : sizeToWrite;
 
         for(int i = 0; i < sizeToWrite; i++){
             mBuffer[i + offset] = newBuffer[i + offset];

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.BadParametersException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 import fi.aalto.ssg.opentee.OpenTEE;
 
@@ -71,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     /* RSA wrapped root key blob */
-    private byte[] rootKey;
+    //private byte[] rootKey;
 
     /* Chain of directory key blobs wrapped with the root key */
-    private Keychain keychain;
+    //private Keychain keychain;
 
     /* Data buffer used for testing */
     private byte data[] =  new byte[]{
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                                     EncryptFileButton.setEnabled(false);
                                     DecryptFileButton.setEnabled(false);
                                     InitializeButton.setEnabled(true);
-
+                                    FinalizeButton.setEnabled(false);
                                 }
                                 break;
 
@@ -164,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        keychain = new Keychain();
+        //keychain = new Keychain();
 
         InitializeButton = (Button) findViewById(R.id.button_initialize);
         FinalizeButton = (Button) findViewById(R.id.button_finalize);
@@ -238,7 +239,11 @@ public class MainActivity extends AppCompatActivity {
      * @param v Parent view
      */
     public void doFinalize(View v) {
-        //TODO:
+        Log.d(TAG, "doFinalize");
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_FINALIZE);
+        workerHandler.sendMessage(msg);
     }
 
     /**
@@ -247,7 +252,11 @@ public class MainActivity extends AppCompatActivity {
      * @param v Parent view
      */
     public void doCreateDirectoryKey(View v) {
-        //TODO:
+        Log.d(TAG, "doCreateDirectoryKey");
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_CREATE_DIR_KEY);
+        workerHandler.sendMessage(msg);
     }
 
     /**
@@ -256,7 +265,11 @@ public class MainActivity extends AppCompatActivity {
      * @param v Parent view.
      */
     public void doEncryptFile(View v) {
-        //TODO:
+        Log.d(TAG, "doEncryptFile");
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_DO_ENC);
+        workerHandler.sendMessage(msg);
     }
 
     /**
@@ -265,7 +278,11 @@ public class MainActivity extends AppCompatActivity {
      * @param v Parent view.
      */
     public void doDecryptFile(View v) {
-        //TODO:
+        Log.d(TAG, "doDecryptFile");
+
+        Handler workerHandler = mWorker.getHandler();
+        Message msg = workerHandler.obtainMessage(Worker.CMD_DO_DEC);
+        workerHandler.sendMessage(msg);
     }
 
 
@@ -346,10 +363,15 @@ public class MainActivity extends AppCompatActivity {
 
         //open session
         UUID uuid = TA_CONN_TEST_UUID;
-        ITEEClient.IRegisteredMemoryReference iRmr
-                = client.newRegisteredMemoryReference(sharedMemory,
-                ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
-                0);
+        ITEEClient.IRegisteredMemoryReference iRmr = null;
+
+        try {
+            iRmr = client.newRegisteredMemoryReference(sharedMemory,
+                    ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
+                    0);
+        } catch (BadParametersException e) {
+            e.printStackTrace();
+        }
 
         ITEEClient.IValue iValue
                 = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INOUT,
@@ -396,10 +418,14 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "new a " + iValue.getA() + " b " + iValue.getB());
 
         //invoke command
-        ITEEClient.IRegisteredMemoryReference iRmr2
-                = client.newRegisteredMemoryReference(sharedMemory,
-                ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
-                0);
+        ITEEClient.IRegisteredMemoryReference iRmr2 = null;
+        try {
+            iRmr2 = client.newRegisteredMemoryReference(sharedMemory,
+                    ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INOUT,
+                    0);
+        } catch (BadParametersException e) {
+            e.printStackTrace();
+        }
 
         ITEEClient.IValue iValue2
                 = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INOUT,

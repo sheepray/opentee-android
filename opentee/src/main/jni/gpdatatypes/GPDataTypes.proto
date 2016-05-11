@@ -7,11 +7,12 @@ message TeecOperation{
 }
 
 message TeecParameter{
-    enum Type { smr = 1; val = 2;}
+    enum Type { smr = 1; val = 2; empty = 3;}
 
     required Type type = 1;
     optional TeecSharedMemoryReference teecSharedMemoryReference = 2;
     optional TeecValue teecValue = 3;
+    optional int32 placeHolder = 4;
 }
 
 message TeecSharedMemory{

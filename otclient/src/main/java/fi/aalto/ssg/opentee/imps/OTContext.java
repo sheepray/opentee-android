@@ -77,7 +77,6 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             return;
         }
 
-        if ( mInitialized ) mInitialized = false;
         if ( mProxyApis != null ){
             try {
                 mProxyApis.teecFinalizeContext();
@@ -87,10 +86,15 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             mProxyApis.terminateConnection();
         }
 
+        mTeeName = null;
+        mInitialized = false;
+        smIdGenerator = null;
+        mContext = null;
+        mProxyApis = null;
+
         //clear up resources.
         mSharedMemory.clear();
         mSessionMap.clear();
-        mProxyApis = null;
 
         Log.i(TAG, "context finalized and connection terminated");
     }
@@ -137,8 +141,12 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
             return;
         }
 
+        if(sharedMemory == null){
+            throw new BadParametersException("input shared memory interface is null", ITEEClient.ReturnOriginCode.TEEC_ORIGIN_API);
+        }
+
         // tell remote tee to release the shared memory.
-        if ( sharedMemory != null ) try {
+        try {
             mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
         } catch (RemoteException e) {
             throw new CommunicationErrorException("Communication error with remote TEE service.");
@@ -182,7 +190,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
             }
             else{
-                Log.e(TAG, "Unknown type of parameter.");
+                Log.d(TAG, "Null or unknown type of parameter.");
             }
         }
     }

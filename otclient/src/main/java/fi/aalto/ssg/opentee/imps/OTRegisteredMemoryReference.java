@@ -38,6 +38,11 @@ public class OTRegisteredMemoryReference implements ITEEClient.IRegisteredMemory
     public int getOffset(){return this.mOffset;}
 
     @Override
+    public int getReturnSize() {
+        return this.mSharedMemory.getReturnSize();
+    }
+
+    @Override
     public Type getType() {
         return Type.TEEC_PTYPE_RMR;
     }

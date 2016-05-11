@@ -823,6 +823,15 @@ public final class GPDataTypes {
      * <code>optional .fi.aalto.ssg.opentee.imps.pbdatatypes.TeecValue teecValue = 3;</code>
      */
     TeecValueOrBuilder getTeecValueOrBuilder();
+
+    /**
+     * <code>optional int32 placeHolder = 4;</code>
+     */
+    boolean hasPlaceHolder();
+    /**
+     * <code>optional int32 placeHolder = 4;</code>
+     */
+    int getPlaceHolder();
   }
   /**
    * Protobuf type {@code fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter}
@@ -913,6 +922,11 @@ public final class GPDataTypes {
               bitField0_ |= 0x00000004;
               break;
             }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              placeHolder_ = input.readInt32();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -965,6 +979,10 @@ public final class GPDataTypes {
        * <code>val = 2;</code>
        */
       val(1, 2),
+      /**
+       * <code>empty = 3;</code>
+       */
+      empty(2, 3),
       ;
 
       /**
@@ -975,6 +993,10 @@ public final class GPDataTypes {
        * <code>val = 2;</code>
        */
       public static final int val_VALUE = 2;
+      /**
+       * <code>empty = 3;</code>
+       */
+      public static final int empty_VALUE = 3;
 
 
       public final int getNumber() { return value; }
@@ -983,6 +1005,7 @@ public final class GPDataTypes {
         switch (value) {
           case 1: return smr;
           case 2: return val;
+          case 3: return empty;
           default: return null;
         }
       }
@@ -1092,10 +1115,26 @@ public final class GPDataTypes {
       return teecValue_;
     }
 
+    public static final int PLACEHOLDER_FIELD_NUMBER = 4;
+    private int placeHolder_;
+    /**
+     * <code>optional int32 placeHolder = 4;</code>
+     */
+    public boolean hasPlaceHolder() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 placeHolder = 4;</code>
+     */
+    public int getPlaceHolder() {
+      return placeHolder_;
+    }
+
     private void initFields() {
       type_ = Type.smr;
       teecSharedMemoryReference_ = TeecSharedMemoryReference.getDefaultInstance();
       teecValue_ = TeecValue.getDefaultInstance();
+      placeHolder_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1135,6 +1174,9 @@ public final class GPDataTypes {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeMessage(3, teecValue_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, placeHolder_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1155,6 +1197,10 @@ public final class GPDataTypes {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, teecValue_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, placeHolder_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1289,6 +1335,8 @@ public final class GPDataTypes {
           teecValueBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
+        placeHolder_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -1337,6 +1385,10 @@ public final class GPDataTypes {
         } else {
           result.teecValue_ = teecValueBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.placeHolder_ = placeHolder_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1361,6 +1413,9 @@ public final class GPDataTypes {
         }
         if (other.hasTeecValue()) {
           mergeTeecValue(other.getTeecValue());
+        }
+        if (other.hasPlaceHolder()) {
+          setPlaceHolder(other.getPlaceHolder());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1670,6 +1725,38 @@ public final class GPDataTypes {
           teecValue_ = null;
         }
         return teecValueBuilder_;
+      }
+
+      private int placeHolder_ ;
+      /**
+       * <code>optional int32 placeHolder = 4;</code>
+       */
+      public boolean hasPlaceHolder() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 placeHolder = 4;</code>
+       */
+      public int getPlaceHolder() {
+        return placeHolder_;
+      }
+      /**
+       * <code>optional int32 placeHolder = 4;</code>
+       */
+      public Builder setPlaceHolder(int value) {
+        bitField0_ |= 0x00000008;
+        placeHolder_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 placeHolder = 4;</code>
+       */
+      public Builder clearPlaceHolder() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        placeHolder_ = 0;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:fi.aalto.ssg.opentee.imps.pbdatatypes.TeecParameter)
@@ -3930,28 +4017,29 @@ public final class GPDataTypes {
       "e.imps.pbdatatypes\"h\n\rTeecOperation\022\020\n\010m" +
       "Started\030\001 \002(\005\022E\n\007mParams\030\002 \003(\01324.fi.aalt" +
       "o.ssg.opentee.imps.pbdatatypes.TeecParam" +
-      "eter\"\234\002\n\rTeecParameter\022G\n\004type\030\001 \002(\01629.f" +
+      "eter\"\274\002\n\rTeecParameter\022G\n\004type\030\001 \002(\01629.f" +
       "i.aalto.ssg.opentee.imps.pbdatatypes.Tee" +
       "cParameter.Type\022c\n\031teecSharedMemoryRefer" +
       "ence\030\002 \001(\0132@.fi.aalto.ssg.opentee.imps.p" +
       "bdatatypes.TeecSharedMemoryReference\022C\n\t" +
       "teecValue\030\003 \001(\01320.fi.aalto.ssg.opentee.i",
-      "mps.pbdatatypes.TeecValue\"\030\n\004Type\022\007\n\003smr" +
-      "\020\001\022\007\n\003val\020\002\"b\n\020TeecSharedMemory\022\017\n\007mBuff" +
-      "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n" +
-      "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031Teec" +
-      "SharedMemoryReference\022G\n\006parent\030\001 \002(\01327." +
-      "fi.aalto.ssg.opentee.imps.pbdatatypes.Te" +
-      "ecSharedMemory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag" +
-      "\030\003 \002(\0162E.fi.aalto.ssg.opentee.imps.pbdat" +
-      "atypes.TeecSharedMemoryReference.Flag\"L\n" +
-      "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\r\022\026\n\022TEEC_MEM",
-      "REF_OUTPUT\020\016\022\025\n\021TEEC_MEMREF_INOUT\020\017\"\262\001\n\t" +
-      "TeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag" +
-      "\030\003 \002(\01625.fi.aalto.ssg.opentee.imps.pbdat" +
-      "atypes.TeecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VA" +
-      "LUE_INPUT\020\001\022\025\n\021TEEC_VALUE_OUTPUT\020\002\022\024\n\020TE" +
-      "EC_VALUE_INOUT\020\003"
+      "mps.pbdatatypes.TeecValue\022\023\n\013placeHolder" +
+      "\030\004 \001(\005\"#\n\004Type\022\007\n\003smr\020\001\022\007\n\003val\020\002\022\t\n\005empt" +
+      "y\020\003\"b\n\020TeecSharedMemory\022\017\n\007mBuffer\030\001 \002(\014" +
+      "\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n\013mReturn" +
+      "Size\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031TeecSharedMe" +
+      "moryReference\022G\n\006parent\030\001 \002(\01327.fi.aalto" +
+      ".ssg.opentee.imps.pbdatatypes.TeecShared" +
+      "Memory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag\030\003 \002(\0162E" +
+      ".fi.aalto.ssg.opentee.imps.pbdatatypes.T" +
+      "eecSharedMemoryReference.Flag\"L\n\004Flag\022\025\n",
+      "\021TEEC_MEMREF_INPUT\020\r\022\026\n\022TEEC_MEMREF_OUTP" +
+      "UT\020\016\022\025\n\021TEEC_MEMREF_INOUT\020\017\"\262\001\n\tTeecValu" +
+      "e\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag\030\003 \002(\01625" +
+      ".fi.aalto.ssg.opentee.imps.pbdatatypes.T" +
+      "eecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VALUE_INPU" +
+      "T\020\001\022\025\n\021TEEC_VALUE_OUTPUT\020\002\022\024\n\020TEEC_VALUE" +
+      "_INOUT\020\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3976,7 +4064,7 @@ public final class GPDataTypes {
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecParameter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecParameter_descriptor,
-        new String[] { "Type", "TeecSharedMemoryReference", "TeecValue", });
+        new String[] { "Type", "TeecSharedMemoryReference", "TeecValue", "PlaceHolder", });
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemory_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_fi_aalto_ssg_opentee_imps_pbdatatypes_TeecSharedMemory_fieldAccessorTable = new

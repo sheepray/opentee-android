@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.RemoteException;
 
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.BadParametersException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
@@ -36,7 +37,8 @@ public class OTClient implements ITEEClient {
     }
 
     @Override
-    public IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) {
+    public IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) throws BadParametersException {
+        if(sharedMemory == null || sharedMemory.asByteArray().length < offset) throw new BadParametersException("Incorrect input parameters", ReturnOriginCode.TEEC_ORIGIN_COMMS);
         return new OTRegisteredMemoryReference(sharedMemory, flag, offset);
     }
 

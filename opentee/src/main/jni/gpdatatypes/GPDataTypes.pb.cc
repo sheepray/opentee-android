@@ -70,10 +70,11 @@ void protobuf_AssignDesc_GPDataTypes_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TeecOperation));
   TeecParameter_descriptor_ = file->message_type(1);
-  static const int TeecParameter_offsets_[3] = {
+  static const int TeecParameter_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecParameter, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecParameter, teecsharedmemoryreference_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecParameter, teecvalue_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TeecParameter, placeholder_),
   };
   TeecParameter_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -192,28 +193,29 @@ void protobuf_AddDesc_GPDataTypes_2eproto() {
     "e.imps.pbdatatypes\"h\n\rTeecOperation\022\020\n\010m"
     "Started\030\001 \002(\005\022E\n\007mParams\030\002 \003(\01324.fi.aalt"
     "o.ssg.opentee.imps.pbdatatypes.TeecParam"
-    "eter\"\234\002\n\rTeecParameter\022G\n\004type\030\001 \002(\01629.f"
+    "eter\"\274\002\n\rTeecParameter\022G\n\004type\030\001 \002(\01629.f"
     "i.aalto.ssg.opentee.imps.pbdatatypes.Tee"
     "cParameter.Type\022c\n\031teecSharedMemoryRefer"
     "ence\030\002 \001(\0132@.fi.aalto.ssg.opentee.imps.p"
     "bdatatypes.TeecSharedMemoryReference\022C\n\t"
     "teecValue\030\003 \001(\01320.fi.aalto.ssg.opentee.i"
-    "mps.pbdatatypes.TeecValue\"\030\n\004Type\022\007\n\003smr"
-    "\020\001\022\007\n\003val\020\002\"b\n\020TeecSharedMemory\022\017\n\007mBuff"
-    "er\030\001 \002(\014\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n"
-    "\013mReturnSize\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031Teec"
-    "SharedMemoryReference\022G\n\006parent\030\001 \002(\01327."
-    "fi.aalto.ssg.opentee.imps.pbdatatypes.Te"
-    "ecSharedMemory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag"
-    "\030\003 \002(\0162E.fi.aalto.ssg.opentee.imps.pbdat"
-    "atypes.TeecSharedMemoryReference.Flag\"L\n"
-    "\004Flag\022\025\n\021TEEC_MEMREF_INPUT\020\r\022\026\n\022TEEC_MEM"
-    "REF_OUTPUT\020\016\022\025\n\021TEEC_MEMREF_INOUT\020\017\"\262\001\n\t"
-    "TeecValue\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag"
-    "\030\003 \002(\01625.fi.aalto.ssg.opentee.imps.pbdat"
-    "atypes.TeecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VA"
-    "LUE_INPUT\020\001\022\025\n\021TEEC_VALUE_OUTPUT\020\002\022\024\n\020TE"
-    "EC_VALUE_INOUT\020\003", 1016);
+    "mps.pbdatatypes.TeecValue\022\023\n\013placeHolder"
+    "\030\004 \001(\005\"#\n\004Type\022\007\n\003smr\020\001\022\007\n\003val\020\002\022\t\n\005empt"
+    "y\020\003\"b\n\020TeecSharedMemory\022\017\n\007mBuffer\030\001 \002(\014"
+    "\022\r\n\005mFlag\030\002 \002(\005\022\014\n\004size\030\003 \002(\005\022\023\n\013mReturn"
+    "Size\030\004 \001(\005\022\013\n\003mID\030\005 \001(\005\"\231\002\n\031TeecSharedMe"
+    "moryReference\022G\n\006parent\030\001 \002(\01327.fi.aalto"
+    ".ssg.opentee.imps.pbdatatypes.TeecShared"
+    "Memory\022\017\n\007mOffset\030\002 \002(\005\022T\n\005mFlag\030\003 \002(\0162E"
+    ".fi.aalto.ssg.opentee.imps.pbdatatypes.T"
+    "eecSharedMemoryReference.Flag\"L\n\004Flag\022\025\n"
+    "\021TEEC_MEMREF_INPUT\020\r\022\026\n\022TEEC_MEMREF_OUTP"
+    "UT\020\016\022\025\n\021TEEC_MEMREF_INOUT\020\017\"\262\001\n\tTeecValu"
+    "e\022\t\n\001a\030\001 \002(\005\022\t\n\001b\030\002 \002(\005\022D\n\005mFlag\030\003 \002(\01625"
+    ".fi.aalto.ssg.opentee.imps.pbdatatypes.T"
+    "eecValue.Flag\"I\n\004Flag\022\024\n\020TEEC_VALUE_INPU"
+    "T\020\001\022\025\n\021TEEC_VALUE_OUTPUT\020\002\022\024\n\020TEEC_VALUE"
+    "_INOUT\020\003", 1048);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GPDataTypes.proto", &protobuf_RegisterTypes);
   TeecOperation::default_instance_ = new TeecOperation();
@@ -509,6 +511,7 @@ bool TeecParameter_Type_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -518,6 +521,7 @@ bool TeecParameter_Type_IsValid(int value) {
 #ifndef _MSC_VER
 const TeecParameter_Type TeecParameter::smr;
 const TeecParameter_Type TeecParameter::val;
+const TeecParameter_Type TeecParameter::empty;
 const TeecParameter_Type TeecParameter::Type_MIN;
 const TeecParameter_Type TeecParameter::Type_MAX;
 const int TeecParameter::Type_ARRAYSIZE;
@@ -526,6 +530,7 @@ const int TeecParameter::Type_ARRAYSIZE;
 const int TeecParameter::kTypeFieldNumber;
 const int TeecParameter::kTeecSharedMemoryReferenceFieldNumber;
 const int TeecParameter::kTeecValueFieldNumber;
+const int TeecParameter::kPlaceHolderFieldNumber;
 #endif  // !_MSC_VER
 
 TeecParameter::TeecParameter()
@@ -551,6 +556,7 @@ void TeecParameter::SharedCtor() {
   type_ = 1;
   teecsharedmemoryreference_ = NULL;
   teecvalue_ = NULL;
+  placeholder_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -588,7 +594,7 @@ TeecParameter* TeecParameter::New() const {
 }
 
 void TeecParameter::Clear() {
-  if (_has_bits_[0 / 32] & 7) {
+  if (_has_bits_[0 / 32] & 15) {
     type_ = 1;
     if (has_teecsharedmemoryreference()) {
       if (teecsharedmemoryreference_ != NULL) teecsharedmemoryreference_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecSharedMemoryReference::Clear();
@@ -596,6 +602,7 @@ void TeecParameter::Clear() {
     if (has_teecvalue()) {
       if (teecvalue_ != NULL) teecvalue_->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue::Clear();
     }
+    placeholder_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -652,6 +659,21 @@ bool TeecParameter::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(32)) goto parse_placeHolder;
+        break;
+      }
+
+      // optional int32 placeHolder = 4;
+      case 4: {
+        if (tag == 32) {
+         parse_placeHolder:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &placeholder_)));
+          set_has_placeholder();
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -699,6 +721,11 @@ void TeecParameter::SerializeWithCachedSizes(
       3, this->teecvalue(), output);
   }
 
+  // optional int32 placeHolder = 4;
+  if (has_placeholder()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->placeholder(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -727,6 +754,11 @@ void TeecParameter::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         3, this->teecvalue(), target);
+  }
+
+  // optional int32 placeHolder = 4;
+  if (has_placeholder()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->placeholder(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -759,6 +791,13 @@ int TeecParameter::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->teecvalue());
+    }
+
+    // optional int32 placeHolder = 4;
+    if (has_placeholder()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->placeholder());
     }
 
   }
@@ -797,6 +836,9 @@ void TeecParameter::MergeFrom(const TeecParameter& from) {
     if (from.has_teecvalue()) {
       mutable_teecvalue()->::fi::aalto::ssg::opentee::imps::pbdatatypes::TeecValue::MergeFrom(from.teecvalue());
     }
+    if (from.has_placeholder()) {
+      set_placeholder(from.placeholder());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -830,6 +872,7 @@ void TeecParameter::Swap(TeecParameter* other) {
     std::swap(type_, other->type_);
     std::swap(teecsharedmemoryreference_, other->teecsharedmemoryreference_);
     std::swap(teecvalue_, other->teecvalue_);
+    std::swap(placeholder_, other->placeholder_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

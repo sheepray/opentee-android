@@ -243,7 +243,7 @@ public class ProxyApis {
             rc = mService.teecInvokeCommand(sid, commandId, opInArray, returnOrigin, iSyncOperation, opHashCode);
         }
 
-        Log.d(TAG, "teecInvokeCommand return code: " + rc);
+        Log.d(TAG, "teecInvokeCommand return code: " + Integer.toHexString(rc) );
 
         ReturnValueWrapper returnValueWrapper = new ReturnValueWrapper(rc, returnOrigin[0]);
 
