@@ -1,4 +1,4 @@
 /**
- * This package embraces all the exceptions that will be threw by the underlying library.
+ * This package contains the exceptions used by the client library.
  */
 package fi.aalto.ssg.opentee.exception;
