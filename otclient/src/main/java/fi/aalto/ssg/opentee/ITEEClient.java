@@ -12,35 +12,36 @@ import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
- * Open-TEE Java API entry point. ITEEClient interface embraces all the APIs and other public
- * interfaces. CA can use it to communicate with the remote TEE/TAs. It can be only obtained by
- * calling OpenTEE.newClient function.
+ * Open-TEE Java API entry point. <code>ITEEClient</code> interface embraces all APIs and public
+ * interfaces. CA can use it to communicate with a remote TEE/TA. It can be only obtained by
+ * calling <code>newTEEClient</code> factory method. The class which holds this factory method replies on
+ * real implementations. It is not specificed in the Java API.
  */
 public interface ITEEClient {
 
     /**
-     * This interface defines the way to interact with an Operation which is a wrapper for
-     * 0 to 4 IParameter(s). It can be created by calling the factory method <code>ITEEClient.newOperation(...)</code>.
-     * After a valid <code>IOperation</code> interface is returned, developers can refer to the corresponding Operation
+     * This interface defines the way to interact with an <code>Operation</code> which is a wrapper class for
+     * 0 to 4 <code>IParameter</code>(s). It can be created only by calling the function <code>newOperation</code>.
+     * After a valid <code>IOperation</code> interface is returned, developers can refer to the corresponding <code>Operation</code>
      * in either <code>openSession</code> or <code>invokeCommand</code> function calls.
      *
-     * When dealing with multiple threads, one IOperation interface can be shared between
-     * different threads. So it is possible that multiple threads could try to access the same <code>IOperation</code>
-     * interface at the same time. If one or more of the <code>IParameter</code> interfaces wrapped inside the <code>IOperation</code>
-     * is output from the TA, it is possible that the <code>IParameter</code>(s) might be in an inconsistent state
+     * When dealing with multiple threads, one <code>IOperation</code> interface can be shared between
+     * different threads. So it is possible that multiple threads try to access the same <code>IOperation</code>
+     * interface at the same time. If one or more <code>IParameter</code> interfaces wrapped inside the <code>IOperation</code>
+     * is output for the TA, it is possible that the <code>IParameter</code>(s) might be in an inconsistent state
      * which may result in an incorrect read of the corresponding wrapped resources within <code>IParameter</code>(s),
      * such as <code>IValue</code> and <code>SharedMemory</code>. Furthermore, if one thread attempts to apply one <code>IOperation</code> interface
      * in its <code>openSession</code> or <code>InvokeCommand</code> function call while this <code>IOperation</code> interface is being used
-     * by another thread, a BusyException will be thrown. In addition, if wrapped resources within
-     * one <code>IOperation</code> interface are modified by another thread, it is the responsibilities of the developer
-     * to avoid such a situation. In order to avoid misuse of the <code>IOperation</code> interface,
+     * by another thread, a <code>BusyException</code> will be thrown. In addition, if
+     * one <code>IOperation</code> interface is modified by another thread, it is the responsibilities of developers
+     * to be aware of the changes. In order to avoid misuse of the <code>IOperation</code> interface,
      * developers should not access any wrapped resources in an <code>IOperation</code> interface which is in use.
      * The state of the <code>IOperation</code> can be obtained by calling its <code>isStarted</code> function. So it
-     * is recommended that the developer check the state of the <code>IOperation</code> interface before accessing it.
+     * is recommended that developers should check the state of the <code>IOperation</code> interface before accessing it.
      */
     interface IOperation{
         /**
-         * If one <code>IOperation</code> interface is used in an ongoing operation (either openSession or
+         * If one <code>IOperation</code> interface is being used in an ongoing operation (either openSession or
          * invokeCommand) in a separate thread, this function will return true. Developers can
          * utilize this function to test the availability of the <code>IOperation</code> interface.
          * @return true if <code>IOperation</code> is under usage. Otherwise false if not being used.
@@ -49,58 +50,58 @@ public interface ITEEClient {
     }
 
     /**
-     * Factory method to create an operation without parameter.
-     * @return the <code>IOperation</code> interface for created operation.
+     * a method to create an operation without parameter.
+     * @return an <code>IOperation</code> interface for created operation.
      */
     IOperation newOperation();
 
     /**
-     * Factory method to create an operation with one parameter.
+     * a method to create an operation with one parameter.
      *
      * It is possible to create multiple <code>IOperation</code> interfaces using the same <code>IParameter</code>. But it
-     * is not recommended especially when the I/O directory of <code>IParameter</code> is output for TA since it
-     * is highly possible that such an <code>IParameter</code> is in an inconsistent state. This rule also
-     * apply to other <code>ITEEClient.newOperation</code> overloaded functions which take <code>IParameter</code>(s) as input.
+     * is not recommended especially when the I/O direction of <code>IParameter</code> is output for TA since it
+     * is possible that such an <code>IParameter</code> is in an inconsistent state. This rule also
+     * apply to other <code>newOperation</code> overloaded functions which take <code>IParameter</code>(s) as inputs.
      * @param firstParam the first <code>IParameter</code>.
-     * @return the <code>IOperation</code> interface for created operation.
+     * @return an <code>IOperation</code> interface for created operation.
      */
     IOperation newOperation(IParameter firstParam);
 
     /**
-     * Factory method to create an operation with two parameters.
+     * a method to create an operation with two parameters.
      * The order of input parameters should be aligned with the order of required parameters in TA.
-     * This rule also apply to other overloaded <code>newOperation</code> factory function call which takes more than
+     * This rule also apply to other overloaded <code>newOperation</code> functions which takes more than
      * two parameters.
      * @param firstParam the first <code>IParameter</code>.
      * @param secondParam the second <code>IParameter</code>.
-     * @return the <code>IOperation</code> interface for created operation.
+     * @return an <code>IOperation</code> interface for created operation.
      */
     IOperation newOperation(IParameter firstParam, IParameter secondParam);
 
     /**
-     * Factory method to create an operation with three parameters.
+     * a method to create an operation with three parameters.
      * @param firstParam the first <code>IParameter</code>.
      * @param secondParam the second <code>IParameter</code>.
      * @param thirdParam the third <code>IParameter</code>.
-     * @return the <code>IOperation</code> interface for created operation.
+     * @return an <code>IOperation</code> interface for created operation.
      */
     IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam);
 
     /**
-     * Factory method to create an operation with four parameters.
+     * a method to create an operation with four parameters.
      * @param firstParam the first <code>IParameter</code>.
      * @param secondParam the second <code>IParameter</code>.
      * @param thirdParam the third <code>IParameter</code>.
      * @param forthParam the forth <code>IParameter</code>.
-     * @return the <code>IOperation</code> interface for created Operation.
+     * @return an <code>IOperation</code> interface for created Operation.
      */
     IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam, IParameter forthParam);
 
 
     /**
-     * <code>IParameter</code> interface is the parent of <code>IRegisteredMemoryReference</code> and <code>IValue</code> interfaces,
-     * It can passed into the <code>ITEEClient.newOperation</code> to create an <code>IOperation</code> interface. It is possible
-     * to share the <code>IParameter</code> interface between different threads. The developers should be ware of the race condition
+     * <code>IParameter</code> interface is the super class of <code>IRegisteredMemoryReference</code> and <code>IValue</code> interfaces,
+     * It can passed into the <code>newOperation</code> to create an <code>IOperation</code> interface. It is possible
+     * to share the <code>IParameter</code> interface between different threads. Developers should be ware of the race condition
      * when accessing the same <code>IParameter</code>. It is also their responsibilities to handle such a scenario.
      */
     interface IParameter{
@@ -129,28 +130,29 @@ public interface ITEEClient {
     }
 
     /**
-     * Interface for registered memory reference. It can be only obtained by calling factory method
-     * <code>ITEEClient.newRegisteredMemoryReference(...)</code>. If multiple <code>IRegisteredMemoryReference</code>
-     * interfaces are referencing the same <code>ISharedMemory</code> interface,
+     * Interface for registered memory reference. When a shared memory needs to be passed to a remote TEE/TA,
+     * it must be wrapped within the <code>IRegisteredMemoryReference</code>. It can be only obtained by calling the
+     * <code>newRegisteredMemoryReference</code> function. It is possible that multiple <code>IRegisteredMemoryReference</code>
+     * interfaces are referencing the same <code>ISharedMemory</code> interface. So developers should be aware of such a situation
      */
     interface IRegisteredMemoryReference extends IParameter{
         /**
-         * Flag enum indicates the I/O direction of the referenced registered shared memory.
+         * Flag enum indicates the I/O direction of the referenced registered shared memory for TAs.
          */
         enum Flag{
             /**
              * The I/O direction of the referenced registered shared memory is input for
-             * Trusted Application.
+             * TAs.
              */
             TEEC_MEMREF_INPUT(0x0000000D),
             /**
              * The I/O direction of the referenced registered shared memory is output for
-             * Trusted Application.
+             * TAs.
              */
             TEEC_MEMREF_OUTPUT(0x0000000E),
             /**
              * The I/O directions of the referenced registered shared memory are both input and output
-             * for Trusted Application.
+             * for TAs.
              */
             TEEC_MEMREF_INOUT(0x0000000F);
 
@@ -160,7 +162,7 @@ public interface ITEEClient {
 
         /**
          * Get the referenced registered shared memory.
-         * @return <code>ISharedMemory</code> interface for the referenced registered shared memory.
+         * @return <code>ISharedMemory</code> interface for the referenced shared memory.
          */
         ITEEClient.ISharedMemory getSharedMemory();
 
@@ -180,16 +182,16 @@ public interface ITEEClient {
          * Otherwise, 0 will be returned.
          *
          * This function is normally called after the TA or TEE writes some data back to the referenced shared memory
-         * so that CA can know how big is the returned size of the data.
+         * so that CA can know how big is the size of the returned data.
          * @return an integer value as the returned size.
          */
         int getReturnSize();
     }
 
     /**
-     * Factory method to create a registered memory reference with a valid <code>ISharedMemory</code> interface and a
-     * flag to indicate the I/O direction for the referred shared memory. The flag is only valid when
-     * the corresponding shared memory also has such a flag. It will not override the flags which the shared memory already have.
+     * A method to create a <code>IRegisteredMemoryReference</code> interface with a valid <code>ISharedMemory</code> interface.
+     * The flag parameter is only taken into considerations when the I/O direction(s) it implies are a subset of I/O directions of
+     * the referenced shared memory. It will not override the flags which the shared memory already have.
      * @param sharedMemory the shared memory to refer.
      * @param flag the flag for referenced shared memory.
      * @param offset the offset from the beginning of the buffer of shared memory.
@@ -197,24 +199,24 @@ public interface ITEEClient {
     IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) throws BadParametersException;
 
     /**
-     * Interface to access a pair of two integer values. It can be only obtained by calling
-     * <code>ITEEClient.newValue</code> factory method.
+     * Interface to access a pair of two integer values. It can be only obtained by calling the
+     * <code>newValue</code> method.
      */
     interface IValue extends IParameter{
         /**
-         * Flag enum indicates the I/O direction of Value.
+         * Flag enum indicates the I/O direction of Values for TAs.
          */
         enum Flag{
             /**
-             * The I/O direction for Value is input for Trusted Application.
+             * The I/O direction for Value is input for TAs.
              */
             TEEC_VALUE_INPUT(0x0000001),
             /**
-             * The I/O direction for Value is output for Trusted Application.
+             * The I/O direction for Value is output for TAs.
              */
             TEEC_VALUE_OUTPUT(0x00000002),
             /**
-             * The I/O directions for Value are both input and output for Trusted Application.
+             * The I/O directions for Value are both input and output for TAs.
              */
             TEEC_VALUE_INOUT(0x00000003);
 
@@ -222,13 +224,22 @@ public interface ITEEClient {
             Flag(int id){this.id = id;}
         }
 
+        /**
+         * Get the first value.
+         * @return an integer.
+         */
         int getA();
+
+        /**
+         * Get the second value.
+         * @return an integer.
+         */
         int getB();
     }
 
     /**
-     * Factory method to create an interface of a pair of two integer values.
-     * @param flag The I/O directory of <code>IValue</code> for TA.
+     * A method to create an interface of a pair of two integer values.
+     * @param flag The I/O directory of <code>IValue</code> for TAs.
      * @param a The first integer value.
      * @param b The second integer value.
      * @return an <code>IValue</code> interface.
@@ -236,21 +247,20 @@ public interface ITEEClient {
     IValue newValue(IValue.Flag flag, int a, int b);
 
     /**
-     * In order for the CA to communicate with the TA within a TEE, a session must be opened between CA and TA.
+     * For a CA to communicate with a TA within a TEE, a session must be opened between the CA and TA.
      * To open a session, the CA must call <code>openSession</code> within a valid context. When a session is opened,
-     * an <code>ISession</code> interface will be returned. It contains all functions for CA to communicate with TA.
-     * Within this session, the developer can call the <code>invokeCommand</code> function to invoke corresponding function within the TA.
-     * When the session is no longer needed, the developers should close the session by calling
-     * <code>closeSession</code> function.
+     * an <code>ISession</code> interface will be returned. It contains all functions for the CA to communicate with the TA.
+     * Within this session, developers can call the <code>invokeCommand</code> function to invoke a function within the TA.
+     * When the session is no longer needed, the developers should close the session by calling <code>closeSession</code> function.
      */
     interface ISession {
 
         /**
-         * Sending a request to the connected Trusted Application with agreed commandId and parameters.
+         * Sending a request to the connected TA with agreed commandId and parameters.
          * The parameters are encapsulated in the operation.
          *
-         * @param commandId command identifier that is agreed with the Trusted Application. Based on the command id, CA can tell TA to perform a certain action. TA will know what to perform.
-         * @param operation a wrapper of parameters for the action to invoke from CA. For the certain action to perform for TA, it is quite often that such an action comes with the parameters.
+         * @param commandId command identifier that is previously agreed with the TA. Based on the command id, CA can tell TA to perform a certain action. TA will know what to perform.
+         * @param operation a wrapper of parameters for the action to take.
          * @throws exception.AccessConflictException:
          * using shared resources which are occupied by another thread;
          * @throws exception.BadFormatException:
@@ -264,8 +274,8 @@ public interface ITEEClient {
          * @throws exception.CancelErrorException:
          * the provided operation is invalid due to the cancellation from another thread;
          * @throws exception.CommunicationErrorException:
-         * 1. fatal communication error in the remote TEE and TA side;<br>
-         * 2. Communication with remote TEE service failed.
+         * 1. fatal communication error occurred in the remote TEE and TA side;<br>
+         * 2. Communication with the TEE proxy service failed.
          * @throws exception.ExcessDataException:
          * providing too much parameters in the operation.
          * @throws exception.ExternalCancelException:
@@ -278,7 +288,7 @@ public interface ITEEClient {
          * required data are missing in the operation.
          * @throws exception.NotImplementedException:
          * action mapped with this command id is not implemented in TA yet.
-         * @throws fi.aalto.ssg.opentee.exception.NotSupportedException:
+         * @throws exception.NotSupportedException:
          * action mapped with this command id is not supported in TA.
          * @throws exception.OutOfMemoryException:
          * the remote system runs out of memory.
@@ -294,7 +304,7 @@ public interface ITEEClient {
         void invokeCommand(int commandId, IOperation operation) throws TEEClientException;
 
         /**
-         * Close the connection to the remote Trusted Application. When dealing with multi-threads,
+         * Close the connection to the remote TA. When dealing with multi-threads,
          * this function is recommended to be called with the same thread which opens this session.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
@@ -306,36 +316,38 @@ public interface ITEEClient {
 
 
     /**
-     * In order to enable data sharing between the CA and TEE/TA, the notation called shared memory has been
-     * introduced. To create a shared memory, the CA firstly allocate a buffer which can be used as
-     * a shared memory. Then, the CA calls the <code>ITEEClient.registerSharedMemory </code>to register current
+     * In order to enable data sharing between a CA and TEE/TA, the notation called shared memory has been
+     * introduced to avoid expensive memory copies. A shared memory is a block of memory resides in the CA and a TEE/TA can operate on it directly.
+     * But how effective the shared memory is depends on the real implementation on specific systems.
+     * To create a shared memory, the CA firstly allocate a buffer which can be used as
+     * a shared memory. Then, the CA calls the <code>registerSharedMemory</code> to register the buffer as a
      * shared memory to the remote TEE so that the TA can also operate on it. When the CA
      * tries to register a shared memory, the I/O direction of this shared memory must be provided
-     * along with the buffer to of the shared memory. The I/O direction is a bit mask of TEEC_MEM_INPUT
+     * along with the buffer of the shared memory. The I/O direction is a bit mask of TEEC_MEM_INPUT
      * and TEEC_MEM_OUTPUT. Note that the I/O direction of this shared memory is for the remote
      * TEE/TA. See the detailed explanation of these two flags in the field description. The size of
      * the shared memory is the same as the buffer that it holds. When the CA successfully register
      * this buffer as a shared memory with a flag of TEEC_MEM_INPUT, any modification on this buffer
-     * will be synced to the TEE/TA during each function call from CA to TEE. Similarly, if the
+     * will be synced to the TEE/TA during each function call from the CA to the TEE. Similarly, if the
      * shared memory is flagged with TEEC_MEM_OUTPUT, any modification of the shared memory from the
-     * TEE side will be synced back to the CA after each remote function call from CA to TEE.
+     * TEE side will be synced back to the CA after each remote function call from the CA to the TEE.
      * <p>
      * <code>ISharedMemory</code> interface provides operations on the shared memory.
      * It is only valid in a <code>IContext</code> interface. This interface can be only obtained
-     * by calling <code>registerSharedMemory</code> function within a valid context. If the registered shared memory
-     * is not longer needed, the developers should release it by calling <code>releaseSharedMemory</code>
+     * by calling <code>registerSharedMemory</code> function. If the registered shared memory
+     * is not longer needed, developers should release it by calling <code>releaseSharedMemory</code>
      * function. After the shared memory is released, the buffer it holds will not longer used as a
-     * shared memory. So, any modification on it will no longer be synced to the remote TEE.
+     * shared memory. So, any modification on it will no longer be synced to the remote the TEE/TA.
      */
     interface ISharedMemory {
         /**
          * This value indicates the I/O direction of the shared memory is input for both
-         * TEE and Trusted Application.
+         * TEE and TA.
          */
         int TEEC_MEM_INPUT = 0x00000001;
         /**
          * This value indicates the I/O direction of the shared memory is output for both
-         * TEE and Trusted Application.
+         * TEE and TA.
          */
         int TEEC_MEM_OUTPUT = 0x00000002;
 
@@ -346,13 +358,13 @@ public interface ITEEClient {
         int getFlags();
 
         /**
-         * Get the content of the shared memory. This function returns a reference to the buffer.
+         * Get the content of the shared memory. This function returns a reference to the buffer that the shared memory holds.
          * @return an byte array reference.
          */
         byte[] asByteArray();
 
         /**
-         * Get the size of the output from Trusted Application if there is such an output.
+         * Get the size of the output from the TA if there is such an output.
          * @return the actual size of the output byte array.
          */
         int getReturnSize();
@@ -372,8 +384,8 @@ public interface ITEEClient {
     int TEEC_SUCCESS = 0;
 
     /**
-     * Return origin code enum indicates the origin when an exception is threw. It can be obtained
-     * by calling <code>getReturnOrigin</code> of a caught exception. The developers can get a valid return origin
+     * A enum indicates the origin when an exception is threw. It can be obtained
+     * by calling <code>getReturnOrigin</code> of a caught exception. Developers can get a valid return origin
      * only when the exceptions are threw by these two functions: <code>openSession</code> and <code>invokeCommand</code>.
      * Otherwise, the return origin will be null.
      */
@@ -382,18 +394,21 @@ public interface ITEEClient {
          * The exception is originated within the TEE Client API implementation.
          */
         TEEC_ORIGIN_API(0x00000001),
+
         /**
          * The exception is originated within the underlying communications stack linking:<br>
          * 1. the CA with remote TEE Proxy service;<br>
          * 2. the TEE Proxy service with the TEE.
          */
         TEEC_ORIGIN_COMMS(0x00000002),
+
         /**
          * The exception is originated within the common TEE code.
          */
         TEEC_ORIGIN_TEE(0x00000003),
+
         /**
-         * The exception is originated within the Trusted Application.
+         * The exception is originated within the TA.
          */
         TEEC_ORIGIN_TA(0x00000004);
 
@@ -402,15 +417,15 @@ public interface ITEEClient {
     }
 
     /**
-     * Factory method which initializes a context to a TEE.
+     * A method which initializes a context to a TEE.
      * @param teeName the name of remote TEE. If teeName is null, a context will be initialized within
      *                a default TEE.
      * @param context Android application context.
-     * @return IContext interface.
+     * @return <code>IContext</code> interface.
      * @throws exception.AccessDeniedException:
-     * Unable to initialize a context with the remote TEE due to insufficient privileges of CA.
+     * Unable to initialize a context with the remote TEE due to insufficient privileges of the CA.
      * @throws exception.BadStateException:
-     * TEE is not ready to initialize a context for CA.
+     * TEE is not ready to initialize a context for the CA.
      * @throws exception.BadParametersException:
      * providing an invalid Android context.
      * @throws exception.BusyException:
@@ -428,7 +443,7 @@ public interface ITEEClient {
      * <code>IContext</code> interface provides all the functions to interact with an initialized context in remote TEE.
      * This interface is returned by the <code>initializeContext</code> function call. When a context
      * is no longer needed, it should be closed by calling <code>finalizeContext</code>. When
-     * the <code>IContext</code> interface is passed into different threads, the developers are responsible for
+     * the <code>IContext</code> interface is passed into different threads, developers are responsible for
      * providing thread-safe mechanism to avoid the conflict between different threads.
      */
     interface IContext{
@@ -437,30 +452,36 @@ public interface ITEEClient {
          * <code>openSession</code>.
          */
         enum ConnectionMethod{
+
             /**
              * No login data is provided.
              */
             LoginPublic(0x0000000),
+
             /**
-             * Login data about the user running the Client Application process is provided.
+             * Login data about the user running the CA process is provided.
              */
             LoginUser(0x00000001),
+
             /**
-             * Login data about the group running the Client Application process is provided.
+             * Login data about the group running the CA process is provided.
              */
             LoginGroup(0x00000002),
+
             /**
-             * Login data about the running Client Application process itself is provided.
+             * Login data about the running CA process itself is provided.
              */
             LoginApplication(0x00000004),
+
             /**
-             * Login data about the user running the Client Application and about the Client
+             * Login data about the user running the CA and about the Client
              * Application itself is provided.
              */
             LoginUserApplication(0x00000005),
+
             /**
-             * Login data about the group running the Client Application and about the Client
-             * Application and the about the Client Application itself is provided.
+             * Login data about the group running the CA and about the Client
+             * Application and the about the CA itself is provided.
              */
             LoginGroupApplication(0x00000006);
 
@@ -469,8 +490,8 @@ public interface ITEEClient {
         }
 
         /**
-         * Finalizing the context and close the connection to TEE after all sessions have been terminated
-         * and all shared memory has been released. This function should be called in at the end of the
+         * Finalizing the context and close the connection to the TEE after all sessions have been terminated
+         * and all shared memories have been released. This function is recommended to be called at the end of the
          * thread which initialized the context.
          *
          * @throws exception.CommunicationErrorException:
@@ -479,23 +500,22 @@ public interface ITEEClient {
         void finalizeContext() throws TEEClientException;
 
         /**
-         * Registers a block of existing Client Application memory as a block of Shared Memory within
-         * a valid TEE context. When this function tries to register a buffer as a shared memory which
+         * Register a block of existing CA memory as a shared memory within. When this function tries to register a buffer as a shared memory which
          * is already used by another shared memory, this function will also return a valid <code>ISharedMemory</code> interface. The
-         * TEE will regard this buffer as two identical shared memory. Under such circumstances,
-         * this cause problems such as an <code>MacInvalidException</code>.
+         * TEE will regard this buffer as two identical shared memory.
+         * This will cause problems such as an <code>MacInvalidException</code>.
          * However, when a shared memory is released, the buffer it holds can be registered
-         * again as a new shared memory. For the CA, the buffer is the same but it is identical for
+         * again as a new shared memory. For the CA, the new shared memory has the same buffer but it is identical for
          * the TEE.
-         * @param buffer indicates the reference of pre-allocated byte array which is to be shared.
-         * @param flags indicates I/O direction of this shared memory for Trusted Application.
+         * @param buffer pre-allocated byte array which is to be shared.
+         * @param flags indicates I/O direction of this shared memory for TAs.
          * @throws exception.BadParametersException:
          * 1. try to register a null/empty buffer as a shared memory;<br>
          * 2. providing incorrect flag value.
          * @throws exception.BadStateException:
          * TEE is not ready to register a shared memory.
          * @throws exception.BusyException:
-         * TEE is busy
+         * TEE is busy.
          * @throws exception.CommunicationErrorException:
          * Communication with remote TEE service failed.
          * @throws exception.ExternalCancelException:
@@ -518,21 +538,21 @@ public interface ITEEClient {
          * stated in the description of the <code>ISharedMemory</code> interface, when the shared memory is released, the TEE/TA will no longer
          * be able to read or write data to the shared memory. However, the buffer that this shared memory
          * holds will still remain valid. When using the same shared memory within multi-threads, it
-         * is recommended to release the shared memory in the same thread who registered it.
-         * @param sharedMemory the reference the ISharedMemory instance.
+         * is recommended to release the shared memory in the same thread which registered it.
+         * @param sharedMemory the reference to an <code>ISharedMemory</code> instance.
          * @throws exception.CommunicationErrorException:
-         * Communication with remote TEE service failed.
+         * Communication with the remote TEE service failed.
          * @throws exception.BadParametersException:
-         * Incorrect ISharedMemory instance such as passing a null object.
+         * Incorrect <code>ISharedMemory</code> instance such as passing a null object.
          */
         void releaseSharedMemory(ISharedMemory sharedMemory) throws TEEClientException;
 
         /**
-         * Opens a session with a TA within the current context. A session is a channel
+         * Open a session with a TA within the current context. A session is a channel
          * through which a CA can communicate with a specific TA (specified by the uuid). In order to open
          * such a channel successfully, the CA must provide precise and correct data to authenticate itself
          * to the TA.
-         * @param uuid UUID of the Trusted Application.
+         * @param uuid UUID of the TA.
          * @param connectionMethod the method of connection to use.
          * @param connectionData any necessary data for connectionMethod.
          * @param operation operation to perform.
