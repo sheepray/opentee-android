@@ -48,7 +48,6 @@ public class OTSharedMemory implements ITEEClient.ISharedMemory, Parcelable {
         return this.mReturnSize;
     }
 
-    @Override
     public int getId() {
         return this.mId;
     }

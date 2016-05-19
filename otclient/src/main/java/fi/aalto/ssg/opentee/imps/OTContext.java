@@ -147,7 +147,7 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
         // tell remote tee to release the shared memory.
         try {
-            mProxyApis.teecReleaseSharedMemory(sharedMemory.getId());
+            mProxyApis.teecReleaseSharedMemory(((OTSharedMemory)sharedMemory).getId());
         } catch (RemoteException e) {
             throw new CommunicationErrorException("Communication error with remote TEE service.");
         }

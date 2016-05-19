@@ -373,7 +373,7 @@ public interface ITEEClient {
          * Get the id of the shared memory.
          * @return the id of the shared memory.
          */
-        int getId();
+        //int getId();
     }
 
 
