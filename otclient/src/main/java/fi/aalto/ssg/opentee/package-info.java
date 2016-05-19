@@ -93,8 +93,8 @@
  *The following example codes demonstrate how to utilize the Java API
  * to communicate with the TAs residing in the TEE.
  * <p>
- *  Firstly, we need to get an <code>ITEEClient</code> interface by calling a factory method
- *  <code>newTEEClient</code>. The class which implements the <code>newTEEClient</code> depends on real implementations. It is not specified in the Java API.
+ *  Firstly, we assume that we get an <code>ITEEClient</code> interface by calling a factory method. The way to obtain an <code>ITEEClient</code>
+ *  interface depends on real implementation. The following code is just an example.
  *  <pre>
  *  <code>ITEEClient client = FactoryMethodWrappers.newTEEClient();</code>
  *  </pre>

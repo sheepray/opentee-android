@@ -13,9 +13,8 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
 
 /**
  * Open-TEE Java API entry point. <code>ITEEClient</code> interface embraces all APIs and public
- * interfaces. CA can use it to communicate with a remote TEE/TA. It can be only obtained by
- * calling <code>newTEEClient</code> factory method. The class which holds this factory method replies on
- * real implementations. It is not specificed in the Java API.
+ * interfaces. CA can use it to communicate with a remote TEE/TA. The way how an <code>ITEEClient</code> can be obtained is determined by
+ * real implementations. It is not specified in this Java API.
  */
 public interface ITEEClient {
 
