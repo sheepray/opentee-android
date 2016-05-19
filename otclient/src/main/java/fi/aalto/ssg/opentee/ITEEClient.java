@@ -367,7 +367,7 @@ public interface ITEEClient {
          * Get the size of the output from the TA if there is such an output.
          * @return the actual size of the output byte array.
          */
-        int getReturnSize();
+        //int getReturnSize();
 
         /**
          * Get the id of the shared memory.

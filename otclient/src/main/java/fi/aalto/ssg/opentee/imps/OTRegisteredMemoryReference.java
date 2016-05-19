@@ -39,7 +39,8 @@ public class OTRegisteredMemoryReference implements ITEEClient.IRegisteredMemory
 
     @Override
     public int getReturnSize() {
-        return this.mSharedMemory.getReturnSize();
+        //return this.mSharedMemory.getReturnSize();
+        return ((OTSharedMemory)mSharedMemory).getReturnSize();
     }
 
     @Override
