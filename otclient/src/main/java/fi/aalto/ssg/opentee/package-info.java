@@ -1,6 +1,5 @@
 /**
  *Java API Version: V 1.0 beta<br>
- *Tested Environment: Nexus 6 (shamu build tag) running Android 5.1.1<br>
  *<p>
  *This is the main entrance of public APIs. In order to help explaining the APIs,
  * there are several essential key words defined in the following:<br>
