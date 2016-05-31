@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
         logView = (TextView)findViewById(R.id.view_log);
         //logView.append("OmniShare Trustlet Tester App\n");
-        logView.append("Data buffer: " + HexUtils.encodeHexString(data) + "\n");
+        logView.append("Initial data buffer: " + HexUtils.encodeHexString(data) + "\n");
 
         mUpdateUi = new Handler(updateUiCallBack);
 

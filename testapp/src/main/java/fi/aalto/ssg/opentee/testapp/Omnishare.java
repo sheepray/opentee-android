@@ -230,7 +230,7 @@ public class Omnishare {
 
     public static final int OMS_AES_KEY_SIZE = 32;
 
-    private static boolean omnishareDoCrypto(ITEEClient client, ITEEClient.IContext ctx, ITEEClient.ISession ses, byte[] keyChain, int keyCount, int keyLen, CRYPTO_OP opCmd, byte[] src, byte[] des) throws BadFormatException, BadParametersException {
+    private static byte[] omnishareDoCrypto(ITEEClient client, ITEEClient.IContext ctx, ITEEClient.ISession ses, byte[] keyChain, int keyCount, int keyLen, CRYPTO_OP opCmd, byte[] src, byte[] des) throws BadFormatException, BadParametersException {
         if(client == null || ctx == null || ses == null ||
            opCmd == null ||
            //src == null || src.length == 0 ||
@@ -252,7 +252,7 @@ public class Omnishare {
                 srcSm = ctx.registerSharedMemory(src, ITEEClient.ISharedMemory.TEEC_MEM_INPUT);
             } catch (TEEClientException e) {
                 e.printStackTrace();
-                return false;
+                return null;
             }
 
             srcRmr = client.newRegisteredMemoryReference(srcSm, ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
@@ -276,7 +276,7 @@ public class Omnishare {
                     }
                 }
 
-                return false;
+                return null;
             }
 
             keyRmr = client.newRegisteredMemoryReference(keySm,
@@ -307,7 +307,7 @@ public class Omnishare {
                 }
             }
 
-            return false;
+            return null;
         }
 
         desRmr = client.newRegisteredMemoryReference(desSm,
@@ -321,6 +321,10 @@ public class Omnishare {
             ses.invokeCommand(CMD_DO_CRYPTO, op);
         } catch (TEEClientException e) {
             e.printStackTrace();
+        }
+
+        if(desRmr.getReturnSize() != des.length){
+            des = Arrays.copyOf(des, desRmr.getReturnSize());
         }
 
         try {
@@ -341,7 +345,7 @@ public class Omnishare {
             e.printStackTrace();
         }
 
-        return true;
+        return des;
 
     }
 
@@ -356,8 +360,9 @@ public class Omnishare {
 
         if(keys != null && keys.length != keyCount * keyLen) throw new BadParametersException("invalid key array length");
 
-        if ( !omnishareDoCrypto(client, ctx, ses, keys, keyCount, keyLen, op, src, des) ) des = null;
+        //if ( !omnishareDoCrypto(client, ctx, ses, keys, keyCount, keyLen, op, src, des) ) des = null;
 
-        return des;
+        //return des;
+        return omnishareDoCrypto(client, ctx, ses, keys, keyCount, keyLen, op, src, des);
     }
 }

@@ -31,6 +31,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
     Handler mUiHandler;
     Context mContext;
     WorkerCallback mCallback = null;
+    int mLineNum = 1;
 
     ITEEClient client = null;
     ITEEClient.IContext ctx = null;
@@ -74,7 +75,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                     Message uiMsg = mUiHandler.obtainMessage(MainActivity.CMD_UPDATE_LOGVIEW,
                             MainActivity.ID_CREATE_ROOT_KEY_BUTTON,
                             status? 1 : 0,
-                            status? "root key generated" : "root key generation failed, try again");
+                            status? "\n" + (mLineNum++) + ")INFO: Root key generated\n" : "root key generation failed, try again\n");
                     mUiHandler.sendMessage(uiMsg);
                     break;
 
@@ -86,7 +87,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                     Message uiMsg_init = mUiHandler.obtainMessage(MainActivity.CMD_UPDATE_LOGVIEW,
                             MainActivity.ID_INI_BUTTON,
                             status_init? 1: 0,
-                            status_init? "initialized" : " fail to initialize");
+                            status_init? (mLineNum++) + ")INFO: Environment initialized.\n" : " fail to initialize\n");
 
                     mUiHandler.sendMessage(uiMsg_init);
                     break;
@@ -99,7 +100,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                     Message uiMsg_finalize = mUiHandler.obtainMessage(MainActivity.CMD_UPDATE_LOGVIEW,
                             MainActivity.ID_FINALIZE_BUTTON,
                             1,
-                            "finalized");
+                            (mLineNum++) + ")INFO: Environment finalized.\n");
 
                     mUiHandler.sendMessage(uiMsg_finalize);
                     break;
@@ -153,7 +154,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                             MainActivity.ID_CREATE_ROOT_KEY_BUTTON,
                             status_create_dir_key? 1 : 0,
                             status_create_dir_key?
-                                    "INFO: Directory Key Generated, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" :
+                                    (mLineNum++) + ")INFO: Directory Key Generated, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" :
                                     "ERROR: Directory Key Generation Failed\n");
 
                     mUiHandler.sendMessage(uiMsg_createDirKey);
@@ -182,7 +183,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                             MainActivity.ID_DO_ENCRY_BUTTON,
                             status_do_enc? 1 : 0,
                             status_do_enc?
-                                    "INFO: Encryption Complete, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" +  "Data buffer: " + HexUtils.encodeHexString(data) + "\n":
+                                    (mLineNum++) + ")INFO: Encryption Complete, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" +  "Encrypted buffer: " + HexUtils.encodeHexString(data) + "\n":
                                     "ERROR: File Encryption Failed\n\n");
 
                     mUiHandler.sendMessage(uiMsg_doEnc);
@@ -210,7 +211,7 @@ public class Worker extends HandlerThread implements WorkerCallback {
                     Message uiMsg_doDec = mUiHandler.obtainMessage(MainActivity.CMD_UPDATE_LOGVIEW,
                             MainActivity.ID_DO_DECRY_BUTTON,
                             status_do_dec? 1:0,
-                            status_do_dec? "INFO: Encryption Complete, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" +  "Data buffer: " + HexUtils.encodeHexString(data) + "\n":
+                            status_do_dec? (mLineNum++) + ")INFO: Decryption Complete, Key Count: " + keychain.getKeyCount() + " Key Size:" + keychain.getKeySize() + "\n" +  "Decrypted buffer: \n" + HexUtils.encodeHexString(data) + "\n":
                                     "ERROR: File Encryption Failed\n\n");
                     mUiHandler.sendMessage(uiMsg_doDec);
 
