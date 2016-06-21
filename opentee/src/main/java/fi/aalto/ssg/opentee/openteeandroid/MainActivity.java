@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String OT_ENGINE_STATUS = "ot_engine_status";
 
     private static final String SETTING_FILE_NAME = "setting_OTConnectionService";
-    private static final String TAG = "OTConnectionService";
+    private static final String TAG = "TEE Proxy Service";
 
     private HandlerThread mWorkerHandler;
     Handler handler;
@@ -56,8 +56,24 @@ public class MainActivity extends AppCompatActivity {
             worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
 
             //install TA
-            //worker.installAssetToHomeDir(context, OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
-            worker.installAssetToHomeDir(context, OTConstants.LIB_TA_OMNISHARE_ASSET_TA_NAME, OTConstants.OT_TA_DIR, overwrite);
+            Setting setting = new Setting(getApplicationContext());
+            String propertiesStr = setting.getProperties().getProperty("TA_List");
+            if(propertiesStr == null){
+                Log.e(TAG, "no TA to be deployed!");
+            }
+            else{
+                Log.i(TAG, "-------- begin installing TAs -----------");
+
+                String[] properties = propertiesStr.split(",");
+                for(String taName: properties){
+                    if(!taName.isEmpty()){
+                        Log.i(TAG, "installing TA:" + taName);
+                        worker.installAssetToHomeDir(context, taName, OTConstants.OT_TA_DIR, overwrite);
+                    }
+                }
+
+                Log.i(TAG, "-----------------------------------------");
+            }
 
             //put the status of the opentee engine to setting
             SharedPreferences.Editor editor = getSharedPreferences(SETTING_FILE_NAME, 0).edit();
