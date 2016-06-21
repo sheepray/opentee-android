@@ -1,6 +1,7 @@
 ## Project Descriptions
 This project provides Java APIs (named OT-J) for Trusted Execution Environments.<br/>
-It is highly recommended to read the **document/thesis-main.pdf** to gain a full view and background of this project. 
+It is highly recommended to read the **document/thesis-main.pdf** to gain a full view and background of this project.
+
 It contains:
 - **document**: includes the documents for this project, such as the Java API documentation and detailed descriptions of this project.
 
