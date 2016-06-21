@@ -1,15 +1,29 @@
 ## Project Descriptions
 This project provides Java APIs (named OT-J) for Trusted Execution Environments.<br/>
+It is highly recommended to read the **document/thesis-main.pdf** to gain a full view and background of this project. 
 It contains:
-- document: includes the documents for this project, such as the Java API documentation and detailed descriptions of this project.
-- opentee:
-- otclient:
-- testapp:
+- **document**: includes the documents for this project, such as the Java API documentation and detailed descriptions of this project.
+
+- **opentee**: contains
+	* TEE Proxy Service
+	* NativeLibtee
+	* Libtee
+	* Open-TEE
+
+- **otclient**: contains the Java API (OT-J) and its implementations. Android Client Applications need to import this module in order to interact with the **opentee** module.
+
+- **testapp**: contains an Android test application which utilizes the OT-J.
 
 Bug report to: rui.yang at aalto.fi
 
+## Before you start
+### Why should you use it?
+### What it can provide?
+### What you must have in order to utilize it?
+
 ## How To -
 ### - start
+#### Set Up Environment:
 
 ### - generate a java doc out of the API.
 There is already a generated java doc in **document/teec_java_api.pdf**. If changes have been made to API and the **teec_java_api.pdf** does not follow up with the changes, it is recommended to generate the java doc using the following command: (check required packages before generating the java doc)
