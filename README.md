@@ -40,14 +40,15 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 ```
 
 2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
-3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator.
-4. Follow the same step above to run the **testapp** run-time configuration.
-5. Check there are no compilations errors. If there is, please refer to **FAQ** section.
+3. You need either an Android device or an Android emulator to run our test application. Please check the instructions in [here](https://developer.android.com/studio/run/index.html) to set up a debugging environment.
+4. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator.
+5. Follow the same step above to run the **testapp** run-time configuration.
+6. Check there are no compilations errors. If there is, please refer to **FAQ** section.
 
 ### - run the test application
-6. Once you have run the **opentee** and **testapp** run-time configurations, wait for test application to be started in the mobile device or emulator. After the UI is launched, click the buttons in the following sequence in the test application: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
-7. After you clicked the "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. If not, or there are running errors, please refere to **FAQ** section.
-8. Take the **testapp** module as the example to start developing your own CAs.
+1. Once you have run the **opentee** and **testapp** run-time configurations, wait for test application to be started in the mobile device or emulator. After the UI is launched, click the buttons in the following sequence in the test application: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
+2. After you clicked the "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. If not, or there are running errors, please refere to **FAQ** section.
+3. Take the **testapp** module as the example to start developing your own CAs.
 
 ### - run your TAs
 * Copy your TAs into **opentee/src/main/assets/$abi_version**.
@@ -56,7 +57,7 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 TA_List=ta_1.so,ta_2.so,ta_3.so
 ```
 
-Once you have followed the instructions to install your TAs correctly, the TAs will be started by Open-TEE automatically. Please check the log of the **opentee** to make sure that your TAs are installed. In the log message, you will see something similar to the following text:
+Once you have followed the instructions to install your TAs correctly, the TAs will be started by Open-TEE automatically. Please check the [log](https://developer.android.com/studio/debug/index.html#systemLog) of the **opentee** to make sure that your TAs are installed. In the log message, you will see something similar to the following text:
 ```c
 I/TEE Proxy Service: -------- begin installing TAs -----------
 I/TEE Proxy Service: installing TA:ta_1.so
