@@ -39,8 +39,8 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 	$ git clone --recursive git@git.ssg.aalto.fi:platsec/opentee-android.git
 ```
 
-2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test**. Then wait for Android Studio to finish the importing task.
-3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. And click the run button and select your target device either a real Android device or an emulator.
+2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
+3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator.
 4. Follow the same step above to run the **testapp** run-time configuration.
 5. Check there are no compilations errors. If there is, please refer to **FAQ** section.
 
