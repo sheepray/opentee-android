@@ -53,6 +53,7 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 ### - run your TAs
 * Copy your TAs into **opentee/src/main/assets/$abi_version**.
 * Change the value of TA_List in **opentee/src/main/assets/config.properties** to the name of your TAs. Mutiple names must be separated using ",". See example as follows:
+
 ```shell
 TA_List=ta_1.so,ta_2.so,ta_3.so
 ```
