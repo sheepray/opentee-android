@@ -54,6 +54,8 @@ __inline void hex_dump(void* buffer, int size){
     data = NULL;
 
     LOGI("%p:\n %s", buffer, ss.str().c_str());
+
+    ss.clear();
 }
 
 
@@ -618,16 +620,6 @@ jbyteArray transfer_TEEC_Operation_to_op(JNIEnv* env, const TEEC_Operation* teec
     jbyteArray new_op_in_bytes = env->NewByteArray(new_op.length());
     env->SetByteArrayRegion(new_op_in_bytes, 0, new_op.length(), (jbyte*)new_op.c_str());
 
-
-/*
-    //test code: parsed correctly.
-    TEEC_Operation teec_operation2 = {0};
-    transfer_opString_to_TEEC_Operation(env, new_op, &teec_operation2);
-//    LOGE("a:%x, b:%x", teec_operation2.params[1].value.a, teec_operation2.params[1].value.b);
-    LOGD("[re-parsed] flag:%d, size:%d", teec_operation2.params[0].memref.parent->flags,
-                             teec_operation2.params[0].memref.parent->size);
-
-*/
     LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return new_op_in_bytes;
@@ -719,14 +711,6 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
         // remove the operation once done using it.
         operations_map.erase(opHashCodeWithPid);
 
-/*
-        //simulate TEEC_SharedMemory and TEEC_Value have been changed.
-        memcpy(teec_operation.params[0].memref.parent->buffer, "SUN", 3);
-        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
-        teec_operation.params[1].value.a = 0x520;
-        teec_operation.params[1].value.b = 0x1314;
-        LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
-*/
         /**
         * sync shared memory and Value back.
         */
@@ -844,16 +828,6 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
                 // remove the operation from the operations_map after done using it.
                 operations_map.erase(opHashCodeWithPid);
 
-                /*
-                //simulate that TEEC_SharedMemory and TEEC_Value have been changed.
-                memcpy(teec_operation.params[0].memref.parent->buffer, "RUI", 3);
-
-                LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
-                teec_operation.params[1].value.a = 0x8888;
-                teec_operation.params[1].value.b = 0x6666;
-                LOGE("\ta:%x, b:%x", teec_operation.params[1].value.a, teec_operation.params[1].value.b);
-                */
-
                 // sync shared memory and Value back.
                 new_op_in_bytes = transfer_TEEC_Operation_to_op(env, &teec_operation, opInBytes);
             }
@@ -913,4 +887,3 @@ JNIEXPORT void JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_tee
 #ifdef __cplusplus
 }
 #endif
-

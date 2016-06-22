@@ -23,8 +23,8 @@ public class OTCaller {
         this.mSessionList = new HashMap<>();
     }
 
-    public synchronized Map<Integer, OTSharedMemory> getSharedMemoryList(){return this.mSharedMemoryList;}
-    public synchronized Map<Integer, Integer> getSessionList(){return this.mSessionList;}
+    public Map<Integer, OTSharedMemory> getSharedMemoryList(){return this.mSharedMemoryList;}
+    public Map<Integer, Integer> getSessionList(){return this.mSessionList;}
 
     public synchronized void addSharedMemory(int smIdInJni, OTSharedMemory sharedMemory){
         if ( sharedMemory != null ){
@@ -56,13 +56,18 @@ public class OTCaller {
             if( entry.getValue() == sid ){
                 Log.i(TAG, mID + "'s session:" + sid + " with sidInJni: " + entry.getKey() + " removed.");
 
-                mSessionList.remove(entry);
-                return entry.getKey();
+                int sidInJni =  entry.getKey();
+                mSessionList.remove(entry.getKey());
+                return sidInJni;
             }
         }
 
         Log.i(TAG, mID + "'s session:" + sid + " not found.");
         return -1;
+    }
+
+    public synchronized void removeSessionBySidInJni(int sidInJni){
+        this.mSessionList.remove(sidInJni);
     }
 
     /* get the ID of shared memory in JNI layer using its ID in Java layer */

@@ -14,8 +14,10 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
@@ -26,11 +28,7 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 /**
  * This class implements the multiplexing in the service side. It controls and monitors IPC calls
  * from remote clients.
- * Note: OTGuard keeps two HashMaps.
- * 1. One is for the id map with the remote CA
- * library. The id in this case is set by the CA library.
- * 2. Another one is to map the shared memory with the JNI layer.
- * In sum, for one shared memory, there are two ids for it in OTGuard.
+ * Note: OTGuard keeps three global HashMaps. One for sessions, another one for shared memory and the third one for the callers..
  */
 public class OTGuard {
     final String TAG = "OTGuard";
@@ -53,7 +51,7 @@ public class OTGuard {
         this.sessionIdMap = new HashMap<>();
         this.smIdGenerator = new Random();
 
-        Log.e(TAG, this.mQuote);
+        Log.i(TAG, "Guard created in service side with quote: " + this.mQuote);
     }
 
     /* get the socket path which libtee and open-tee engine use to communicate with each other */
@@ -122,14 +120,28 @@ public class OTGuard {
             return;
         }
 
-        /* release all shared memory */
-        for(Integer key: caller.getSharedMemoryList().keySet()){
-            teecReleaseSharedMemory(callerId, key);
+        /* release all of its shared memory */
+        if(!caller.getSharedMemoryList().isEmpty()){
+            Log.e(TAG, "Still have " + caller.getSharedMemoryList().size() + " shared memory not released yet! TEE Proxy service will release it now.");
         }
 
-        /* close all sessions */
-        for(Integer sid: caller.getSessionList().keySet()){
-            teecCloseSession(callerId, sid);
+        Iterator smIt = caller.getSharedMemoryList().entrySet().iterator();
+        while(smIt.hasNext()){
+            Map.Entry entry = (Map.Entry)smIt.next();
+            teecReleaseSharedMemory(callerId, (int)entry.getKey());
+            smIt.remove();
+        }
+
+        /* close all of its sessions */
+        if(!caller.getSessionList().isEmpty()){
+            Log.e(TAG, "Still have " + caller.getSessionList().size() + " sessions not closed! TEE Proxy service will close it now.");
+        }
+
+        Iterator sIt = caller.getSessionList().entrySet().iterator();
+        while(sIt.hasNext()){
+            Map.Entry entry = (Map.Entry)sIt.next();
+            teecCloseSession(callerId, (int)entry.getKey());
+            sIt.remove();
         }
 
         /* remove the caller */
@@ -146,12 +158,11 @@ public class OTGuard {
     }
 
     public int teecRegisterSharedMemory(int callerId, OTSharedMemory otSharedMemory){
-        if (findCallerById(callerId) == null) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
+        OTCaller caller = findCallerById(callerId);
 
-        /**
-         * call Libtee to register shared memory
-         */
-        // serialize the otSharedMemory into byte array.
+        if (caller == null) return OTReturnCode.TEEC_ERROR_ACCESS_DENIED;
+
+        /* serialize the otSharedMemory into byte array.*/
         GPDataTypes.TeecSharedMemory.Builder smBuilder = GPDataTypes.TeecSharedMemory.newBuilder();
         int tmpSmIDInJni = generateSharedMemoryId();
         if(otSharedMemory != null){
@@ -161,16 +172,16 @@ public class OTGuard {
             smBuilder.setMID(otSharedMemory.getId());
             smBuilder.setMFlag(otSharedMemory.getFlags());
         }
+
+        /* call TEEC_RegisterSharedMemory in JNI layer */
         int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray(),
                 tmpSmIDInJni);
 
-        // upon succeed from Libtee:
         if ( return_code == ITEEClient.TEEC_SUCCESS ){
-            // add the OTSharedMemory into the OTSharedMemory list of the caller
-            findCallerById(callerId).addSharedMemory(tmpSmIDInJni, otSharedMemory);
+            /* add the OTSharedMemory to the caller */
+            caller.addSharedMemory(tmpSmIDInJni, otSharedMemory);
 
-            // add the OTSharedMemory along with the signed id to smIDMap to keep track of shared memory
-            // between OTGuard and JNI layer.
+            /* add the ID of OTSharedMemory in JNI to smIDMap to keep track of shared memory between OTGuard and JNI layer. */
             smIDMap.put(tmpSmIDInJni, 0);
         }
 
@@ -182,7 +193,7 @@ public class OTGuard {
 
         if (caller == null) return;
 
-        // release shared memory in JNI layer.
+        /* release shared memory in JNI layer. */
         int smIdInJni = caller.getSmIdInJniBySmid(smId);
 
         if ( smIdInJni != -1 ){
@@ -195,7 +206,7 @@ public class OTGuard {
         }
 
         // remove shared memory from caller.
-        caller.removeSharedMemoryBySmIdInJni(smId);
+        caller.removeSharedMemoryBySmIdInJni(smIdInJni);
     }
 
     /*
@@ -299,6 +310,7 @@ public class OTGuard {
         int sidForJni = generateSessionId();
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
         IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
+
         // call the teecOpenSession in native libtee.
         byte[] newOpInByte = NativeLibtee.teecOpenSession(sidForJni,
                 uuid,
@@ -313,23 +325,15 @@ public class OTGuard {
 
         // upon success, add session to that caller.
         if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) {
-            //OTCallerSession otCallerSession = new OTCallerSession(sid);
-            //caller.addSession(sidForJni, otCallerSession);
             caller.addSession(sidForJni, sid);
             sessionIdMap.put(sidForJni, sid);
         }
-
-        //OTCallerSession otCallerSession = new OTCallerSession(sid); // didn't pass
-        //OTCaller tmp = new OTCaller(1);   // passed
 
         if(iSyncOperation != null){
             byte[] newOpInBytes = {' '};
 
             // only sync ops if succeed.
             if(returnCode.getValue() == OTReturnCode.TEEC_SUCCESS) newOpInBytes = newOpInByte.clone();
-
-            //test code
-            //OTFactoryMethods.print_op_in_bytes(TAG, newOpInBytes);
 
             // sync operation back.
             try {
@@ -350,6 +354,9 @@ public class OTGuard {
         if ( !mOTCallerList.containsKey(callerId) ) Log.e(TAG, "Incorrect callerId:" + callerId);
 
         OTCaller caller = findCallerById(callerId);
+
+        if(caller == null) return;
+
         // remove session id from caller.
         int sidInJni = caller.removeSessionBySid(sid);
 
@@ -379,6 +386,7 @@ public class OTGuard {
 
         IntWrapper retOriginFromJni = new IntWrapper(-1); // to receive the return origin from jni layer.
         IntWrapper returnCode = new IntWrapper(-1); // to receive the return code from jni layer.
+
         // call the teecInvokeCommand in native libtee.
         byte[] newOpInBytes = NativeLibtee.teecInvokeCommand(sidInJni,
                 commandId,
@@ -393,8 +401,6 @@ public class OTGuard {
             // sync operation back.
             try {
                 Log.d(TAG, "Operation sync back using callback function with return code " + returnCode.getValue());
-
-                //test code, wait for 1000ms: worked
 
                 Log.i(TAG, "len of op to sync back = " + newOpInBytes.length);
 
@@ -424,13 +430,13 @@ public class OTGuard {
     }
 
 
-    // there is need to regenerate the id for the shared memory since different applications may
-    // send the shared memory with the same id which is identical in ther context while not in OTGuard.
-    // the same principle also apply to the Session.
+    /*  there is need to regenerate the id for the shared memory since different applications may
+        send the shared memory with the same id which is identical in ther context while not in OTGuard.
+        the same principle also apply to the Session. */
     private int generateSharedMemoryId(){
         int id;
         do{
-            id = smIdGenerator.nextInt(50000); // assume the maximum allowed  num of this generator is 50000.
+            id = smIdGenerator.nextInt(500000); // assume the maximum allowed  num of this generator is 500000.
         }while(occupiedSmId(id));
 
         Log.d(TAG, "Generating memory id for both OTGuard and JNI:" + id);
@@ -445,7 +451,7 @@ public class OTGuard {
     private int generateSessionId(){
         int id;
         do{
-            id = smIdGenerator.nextInt(50000); // reuse the shared memory id random number generator.
+            id = smIdGenerator.nextInt(500000); // reuse the shared memory id random number generator.
         }while(occupiedSid(id));
 
         Log.d(TAG, "Generating session id for both OTGuard and JNI:" + id);
