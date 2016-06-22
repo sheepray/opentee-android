@@ -32,7 +32,7 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 
 ## How To -
 ### - compile the project
-1. Create a new directory and clone this repo.
+1. Create a new directory and clone this repo. This process may take a few minutes to finish.
 ```shell
 	$ mkdir opentee-android-test
 	$ cd opentee-android-test
@@ -41,7 +41,7 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 
 2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
 3. You need either an Android device or an Android emulator to run our test application. Please check the instructions in [here](https://developer.android.com/studio/run/index.html) to set up a debugging environment.
-4. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator.
+4. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator. This also takes few minutes to finish if you run it for the first time.
 5. Follow the same step above to run the **testapp** run-time configuration.
 6. Check there are no compilations errors. If there is, please refer to **FAQ** section.
 
