@@ -34,13 +34,16 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 ### - compile the project
 1. Create a new directory and clone this repo.
 ```shell
-	$ mkdir opentee-android
-	$ cd opentee-android
-	$ git clone git@git.ssg.aalto.fi:platsec/opentee-android.git
+	$ mkdir opentee-android-test
+	$ cd opentee-android-test
+	$ git clone --recursive git@git.ssg.aalto.fi:platsec/opentee-android.git
 ```
 
-4. Run "opentee" and "testapp" run time configurations.
+2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test**. Then wait for Android Studio to finish the importing task.
+3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. And click the run button.
+4. Follow the same step above to run the **testapp** run-time configuration.
 5. Check there are no compilations errors. If there is, please refer to **FAQ** section.
+
 ### - run the test application
 6. Click the buttons in the following sequence in the test application: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
 7. After you clicked the "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. If not, or there are running errors, please refere to **FAQ** section.
