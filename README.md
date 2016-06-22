@@ -25,22 +25,40 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 1. You just want to check out the test application.
 2. You already have ELF formatted TAs with compliance to the GP TEE specifications. Right now you want to develop Android CAs to use the features that these TAs provide while not ready to deploy into a real GP-compliant TEE yet. For how to deply TAs, please refer to next section.
 
+### Required Tools
+* **Android Studio** is an IDE to develop Android applications. Please follow the [instructions](https://developer.android.com/studio/install.html) in here to install it.
+* **Android SDK** normally comes with the Android Studio. If not, when you try to compile Android applications, it will notify you to download it. For how to specificly download it, please follow [instructions](https://developer.android.com/studio/command-line/index.html) to download it.
+* **Android NDK** provides the ability for Android applications to integrate native code. Please check [here](https://developer.android.com/ndk/downloads/index.html) to download it.
+
 ## How To -
-### - start
-1. Clone this repo.
-2. Copy TAs into **opentee/src/main/assets/$abi_version**.
-3. Change the value of TA_List in **opentee/src/main/assets/config.properties** to the name of your TAs. Mutiple names must be separated using ",".
+### - compile the project
+1. Create a new directory and clone this repo.
+```shell
+	$ mkdir opentee-android
+	$ cd opentee-android
+	$ git clone git@git.ssg.aalto.fi:platsec/opentee-android.git
+```
+
 4. Run "opentee" and "testapp" run time configurations.
 5. Check there are no compilations errors. If there is, please refer to **FAQ** section.
+### - run the test application
 6. Click the buttons in the following sequence in the test application: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
-7. After you clikced the "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. If not, or there are running errors, please refere to **FAQ** section.
+7. After you clicked the "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. If not, or there are running errors, please refere to **FAQ** section.
 8. Take the **testapp** module as the example to start developing your own CAs.
 
 ### - run your TAs
+* Copy TAs into **opentee/src/main/assets/$abi_version**.
+* Change the value of TA_List in **opentee/src/main/assets/config.properties** to the name of your TAs. Mutiple names must be separated using ",". See example as follows:
+```shell
+TA_List=ta_1.so,ta_2.so,ta_3.so
+```
+
 Once you have followed the instructions to install your TAs correctly, the TAs will be started by Open-TEE automatically. Please check the log of the **opentee** to make sure that your TAs are installed. In the log message, you will see something similar to the following text:
-```java
-I/TEE Proxy Service: -------- begin installing TAs -----------
-I/TEE Proxy Service: installing TA:libomnishare_ta.so
+```c
+I/TEE Proxy Service: -------- begin installing TAs -----------
+I/TEE Proxy Service: installing TA:ta_1.so
+I/TEE Proxy Service: installing TA:ta_2.so
+I/TEE Proxy Service: installing TA:ta_3.so
 I/TEE Proxy Service: -----------------------------------------
 ```
 
