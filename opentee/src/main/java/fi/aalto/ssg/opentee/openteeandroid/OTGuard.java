@@ -24,9 +24,9 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
 
 /**
- * This class implements the multiplexing in the service side.It controls and monitors IPC calls
+ * This class implements the multiplexing in the service side. It controls and monitors IPC calls
  * from remote clients.
- * Note: OTGuard keep two maps for the ID of shared memory.
+ * Note: OTGuard keeps two HashMaps.
  * 1. One is for the id map with the remote CA
  * library. The id in this case is set by the CA library.
  * 2. Another one is to map the shared memory with the JNI layer.
@@ -35,10 +35,11 @@ import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 public class OTGuard {
     final String TAG = "OTGuard";
     String mQuote;
-    Map<Integer, OTCaller> mOTCallerList; // <pid, caller>
     boolean mConnectedToOT = false;
     Context mContext;
     String mTeeName;
+
+    Map<Integer, OTCaller> mOTCallerList; // <pid, caller>
     Map<Integer, Integer> smIDMap; // <smIdInJni, placeHolder>
     Map<Integer, Integer> sessionIdMap; // <sessionIdInJni, sessionIdForCaller>
     Random smIdGenerator;
@@ -55,32 +56,15 @@ public class OTGuard {
         Log.e(TAG, this.mQuote);
     }
 
-    /**
-     *
-     * @param pid process id.
-     * @return true if allowed or false if not.
-     */
-    public boolean accessControlCheck(int pid){
-        return Arrays.asList(OTPermissions.ALLOWED_PID_LIST).contains(pid);
-    }
-
+    /* get the socket path which libtee and open-tee engine use to communicate with each other */
     String getOtSocketFilePath() throws IOException, InterruptedException {
-        //String oTSocketFilePath;
         return OTUtils.getFullPath(mContext) + "/open_tee_socket";
     }
 
-    /**
-     *
-     * @param callerId
-     * @param teeName
-     * @return
-     */
     public int initializeContext(int callerId, String teeName){
         int return_code = OTReturnCode.TEEC_SUCCESS;
 
-        /**
-         * If not connected to opentee, then connect.
-         */
+        /* connect to open-tee if not connected. */
         if ( !mConnectedToOT ){
             String otSocketFilePath = null;
             try {
@@ -96,23 +80,24 @@ public class OTGuard {
                 return OTReturnCode.TEEC_ERROR_GENERIC;
             }
 
-            Log.e(TAG, "initializeContext teeName: " + teeName + " OT_SOCKET_FILE_PATH:" + otSocketFilePath);
+            Log.i(TAG, "initialize a context to the TEE: " + (teeName == null? "default": teeName) +
+                       ". And OT_SOCKET_FILE_PATH:" + otSocketFilePath);
 
             return_code = NativeLibtee.teecInitializeContext(teeName, otSocketFilePath);
 
-            Log.e(TAG, " return code " + Integer.toHexString(return_code));
+            Log.i(TAG, " return code " + Integer.toHexString(return_code));
 
             if ( return_code == ITEEClient.TEEC_SUCCESS){
                 mConnectedToOT = true;
                 mTeeName = teeName;
 
-                Log.i(TAG, "Connected to opentee.");
+                Log.i(TAG, "Connected to open-tee.");
             }
 
         }
 
         if ( findCallerById(callerId) == null ) {
-            //create new caller identity if not exist.
+            /* create new caller identity if not exist. */
             Log.i(TAG, "Caller not existed. Create one.");
 
             OTCaller caller = new OTCaller(callerId);
@@ -122,7 +107,7 @@ public class OTGuard {
         }
 
         return return_code;
-    }
+    } // end of initializeContext.
 
     public void teecFinalizeContext(int callerId){
 
@@ -131,14 +116,23 @@ public class OTGuard {
             return;
         }
 
-        if ( findCallerById(callerId) == null ){
+        OTCaller caller = findCallerById(callerId);
+        if (caller == null){
             Log.e(TAG, "Unknown caller callerId:" + callerId);
             return;
         }
 
-        //TODO: release all resources including shared memory and opening sessions.
+        /* release all shared memory */
+        for(Integer key: caller.getSharedMemoryList().keySet()){
+            teecReleaseSharedMemory(callerId, key);
+        }
 
-        // remove the caller.
+        /* close all sessions */
+        for(Integer sid: caller.getSessionList().keySet()){
+            teecCloseSession(callerId, sid);
+        }
+
+        /* remove the caller */
         mOTCallerList.remove(callerId);
 
         Log.i(TAG, "context for " + callerId + " is finalized");
@@ -166,7 +160,6 @@ public class OTGuard {
             smBuilder.setSize(otSharedMemory.getSize());
             smBuilder.setMID(otSharedMemory.getId());
             smBuilder.setMFlag(otSharedMemory.getFlags());
-
         }
         int return_code = NativeLibtee.teecRegisterSharedMemory(smBuilder.build().toByteArray(),
                 tmpSmIDInJni);
@@ -289,7 +282,7 @@ public class OTGuard {
         }
 
         return opsInBytes;
-    }
+    } // end of replaceSMId.
 
     public int teecOpenSession(int callerId, int sid, UUID uuid, int connMethod, int connData, byte[] opsInBytes, int[] retOrigin, ISyncOperation iSyncOperation, int opHashCode){
         // known caller?
@@ -351,7 +344,7 @@ public class OTGuard {
         }
 
         return returnCode.getValue();
-    }
+    } // end of openSession.
 
     public void teecCloseSession(int callerId, int sid){
         if ( !mOTCallerList.containsKey(callerId) ) Log.e(TAG, "Incorrect callerId:" + callerId);

@@ -27,20 +27,12 @@ public class NativeLibtee {
     /**
      * native functions section
      */
-
-    /**
-     *
-     * @param teeName specifies the name of the TEE to connect to.
-     * @return TeecResult
-     */
     public static synchronized native int teecInitializeContext(String teeName,
                                                                 String otSocketFilePath);
-
     public static synchronized native void teecFinalizeContext();
 
     public static synchronized native int teecRegisterSharedMemory(byte[] otSharedMemory,
                                                                    int smId);
-
     public static synchronized native void teecReleaseSharedMemory(int sharedMemoryID);
 
     public static synchronized native byte[] teecOpenSession(int sidInJni,

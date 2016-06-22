@@ -25,7 +25,7 @@ import android.util.Log;
 import java.io.IOException;
 
 /**
- * prepare and start the opentee engine
+ * prepare and start the open-tee engine and TAs.
  */
 public class MainActivity extends AppCompatActivity {
     public static final String OT_ENGINE_STATUS = "ot_engine_status";
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private HandlerThread mWorkerHandler;
     Handler handler;
 
+    /* Overall installation task after initial launch of the application */
     Runnable installationTask = new Runnable() {
         @Override
         public void run() {
@@ -44,18 +45,18 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d(TAG, "Ready files for opentee to run");
 
-            //fresh copy
+            /* fresh copy for open-tee and TAs */
             boolean overwrite = true;
 
-            //install configuration file
+            /* install configuration file */
             worker.installConfigToHomeDir(context, OTConstants.OPENTEE_CONF_NAME);
 
-            //install opentee
+            /* install open-tee */
             worker.installAssetToHomeDir(context, OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OT_BIN_DIR, overwrite);
             worker.installAssetToHomeDir(context, OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
             worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
 
-            //install TA
+            /* install TAs */
             Setting setting = new Setting(getApplicationContext());
             String propertiesStr = setting.getProperties().getProperty("TA_List");
             if(propertiesStr == null){
@@ -75,12 +76,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "-----------------------------------------");
             }
 
-            //put the status of the opentee engine to setting
+            /* put the status of the open-tee engine to setting */
             SharedPreferences.Editor editor = getSharedPreferences(SETTING_FILE_NAME, 0).edit();
             editor.putBoolean(OT_ENGINE_STATUS, true);
             editor.commit();
 
-            //start the opentee engine
+            /* start the open-tee engine */
             try {
                 worker.startOpenTEEEngine(context);
             } catch (IOException | InterruptedException e) {
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Installation ready");
 
         }
-    };
+    }; // end of installation task.
 
     Runnable stopEngineTask = new Runnable() {
         @Override
@@ -108,16 +109,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //clear the setting
+        /* clear the setting for open-tee engine status */
         SharedPreferences.Editor editor = getSharedPreferences(OT_ENGINE_STATUS, 0).edit();
         editor.clear();
         editor.commit();
 
-        //create another thread to avoid too much in main thread
+        /* create another thread to avoid too much work in main thread */
         mWorkerHandler = new HandlerThread("tough worker");
         mWorkerHandler.start();
 
-        //install and start the opentee-engine
+        /* active the installation task */
         handler = new Handler(mWorkerHandler.getLooper());
         handler.post(installationTask);
 
@@ -125,19 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        //stop the open-tee engine if still running
-        final SharedPreferences pref = getSharedPreferences(SETTING_FILE_NAME, 0);
-        if ( pref.getBoolean(OT_ENGINE_STATUS, false) ){
-            //open-tee engine still running, kill it.
-
-            /*
-            Worker worker = new Worker();
-            worker.stopOpenTEEEngine(getApplicationContext());
-            worker.stopExecutor();
-            */
-
-        }
-
+        /* stop open-tee engine */
         handler.post(stopEngineTask);
 
         Log.d(TAG, "Stopping the engine");

@@ -15,7 +15,7 @@ package fi.aalto.ssg.opentee.openteeandroid;
 
 /**
  * This class defines all the global constant variables in this project
- * Credit: based on previous opentee-android project
+ * Credit: based on previous opentee-android project.
  */
 public class OTConstants {
     //directory names
@@ -24,7 +24,6 @@ public class OTConstants {
     public static final String OT_LIB_DIR = "lib";
     public static final String OT_TEE_DIR = "tee";
     public static final String OT_TA_DIR = "ta";
-    public static final String OT_CA_DIR = "ca";
 
     //file name
     public static final String OPENTEE_ENGINE_ASSET_BIN_NAME = "opentee-engine";
@@ -32,8 +31,6 @@ public class OTConstants {
     public static final String OPENTEE_SECURE_STORAGE_DIRNAME = ".TEE_secure_storage";
     public static final String OPENTEE_SOCKET_FILENAME = "open_tee_socket";
     public static final String OPENTEE_PID_FILENAME = "opentee-engine.pid";
-    public static final String LIB_TA_CONN_TEST_APP_ASSET_TA_NAME = "libta_conn_test_app.so";
-    public static final String LIB_TA_OMNISHARE_ASSET_TA_NAME = "libomnishare_ta.so";
 
 
     //lib paths

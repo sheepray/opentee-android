@@ -12,18 +12,19 @@ import fi.aalto.ssg.opentee.IOTConnectionInterface;
 import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.imps.OTSharedMemory;
 
+/* This class runs as an Android service. It is started automatically when the application is launched */
 public class OTConnectionService extends Service {
-    String TAG = "OTConnectionService.Imp";
+    final String TAG = "OTConnectionService.Imp";
     boolean mAllowRebind = false;
-    String mQuote = "You Shall Not Pass!";
+    final String mQuote = "You Shall Not Pass!";
     static OTGuard mOTGuard = null; // only need one OTGuard.
 
     public OTConnectionService() {
         super();
+
         Log.d(TAG, "creating OTConnectionService");
+
         this.mOTGuard = new OTGuard(this.mQuote, this);
-        //note: if this function called multiple times, move the construction of OTGuard into onCreate
-        // function.
     }
 
 
@@ -146,7 +147,7 @@ public class OTConnectionService extends Service {
             mOTGuard.teecRequestCancellation(Binder.getCallingPid(),
                     opId);
         }
-    };
+    }; // end of implementing the IOTConnectionInterface.Stub()
 
     @Override
     public IBinder onBind(Intent intent) {

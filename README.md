@@ -15,7 +15,7 @@ It has:
 
 - **testapp**: contains an Android test application which utilizes the OT-J.
 
-Bug report to: rui.yang at aalto.fi
+Bug report to: rui.yang at aalto.fi, or create a new issue for this repo.
 
 ## Before you start
 Take a galance at **document/thesis-main.pdf** before continue if you are not familiar with TEE.
