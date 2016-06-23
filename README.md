@@ -31,7 +31,7 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 * **Android NDK** provides the ability for Android applications to integrate native code. Please check [here](https://developer.android.com/ndk/downloads/index.html) to download it.
 
 ## How To -
-### - compile the project -
+### - compile the project --
 Create a new directory and clone this repo. This process may take a few minutes to finish.
 ```shell
 	$ mkdir opentee-android-test
@@ -39,7 +39,7 @@ Create a new directory and clone this repo. This process may take a few minutes 
 	$ git clone --recursive git@git.ssg.aalto.fi:platsec/opentee-android.git
 ```
 
-#### - using command line.
+#### -- using command line.
 ##### Linux
 Run the following command:
 ```shell
@@ -47,7 +47,7 @@ Run the following command:
 	$ sh install.sh
 ```
 
-#### - with Android Studio.
+#### -- with Android Studio.
 1. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
 2. You need either an Android device or an Android emulator to run our test application. Please check the instructions in [here](https://developer.android.com/studio/run/index.html) to set up a debugging environment.
 3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator. This also takes few minutes to finish if you run it for the first time.
