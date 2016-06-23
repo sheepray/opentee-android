@@ -26,12 +26,18 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 2. You already have ELF formatted TAs with compliance to the GP TEE specifications. Right now you want to develop Android CAs to use the features that these TAs provide while not ready to deploy into a real GP-compliant TEE yet. For how to deply TAs, please refer to next section.
 
 ### Required Tools
-* **Android Studio(optional)** is an IDE to develop Android applications. Please follow the [instructions](https://developer.android.com/studio/install.html) in here to install it.
+* **Android Studio (optional)** is an IDE to develop Android applications. Please follow the [instructions](https://developer.android.com/studio/install.html) in here to install it.
 * **Android SDK** normally comes with the Android Studio. If not, when you try to compile Android applications, it will notify you to download it. For how to specificly download it, please follow [instructions](https://developer.android.com/studio/command-line/index.html) to download it.
 * **Android NDK** provides the ability for Android applications to integrate native code. Please check [here](https://developer.android.com/ndk/downloads/index.html) to download it.
 
 ## How To -
 ### - compile the project -
+Create a new directory and clone this repo. This process may take a few minutes to finish.
+```shell
+	$ mkdir opentee-android-test
+	$ cd opentee-android-test
+	$ git clone --recursive git@git.ssg.aalto.fi:platsec/opentee-android.git
+```
 
 #### - using command line.
 ##### Linux
@@ -41,18 +47,11 @@ Go to the **opentee-android** project and run the following command:
 ```
 
 #### - with Android Studio.
-1. Create a new directory and clone this repo. This process may take a few minutes to finish.
-```shell
-	$ mkdir opentee-android-test
-	$ cd opentee-android-test
-	$ git clone --recursive git@git.ssg.aalto.fi:platsec/opentee-android.git
-```
-
-2. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
-3. You need either an Android device or an Android emulator to run our test application. Please check the instructions in [here](https://developer.android.com/studio/run/index.html) to set up a debugging environment.
-4. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator. This also takes few minutes to finish if you run it for the first time.
-5. Follow the same step above to run the **testapp** run-time configuration.
-6. Check there are no compilations errors. If there is, please refer to **FAQ** section.
+1. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
+2. You need either an Android device or an Android emulator to run our test application. Please check the instructions in [here](https://developer.android.com/studio/run/index.html) to set up a debugging environment.
+3. Run **opentee** run-time configuration by selecting the opentee from the click-down list on the left side of the **Run** button. Click the **Run** button and select your target device either a real Android device or an emulator. This also takes few minutes to finish if you run it for the first time.
+4. Follow the same step above to run the **testapp** run-time configuration.
+5. Check there are no compilations errors. If there is, please refer to **FAQ** section.
 
 ### - run the test application
 1. Once you have run the **opentee** and **testapp** run-time configurations, wait for test application to be started in the mobile device or emulator. After the UI is launched, click the buttons in the following sequence in the test application: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
