@@ -26,12 +26,21 @@ This project has a virtual GP-compliant TEE, which allows you to develop Android
 2. You already have ELF formatted TAs with compliance to the GP TEE specifications. Right now you want to develop Android CAs to use the features that these TAs provide while not ready to deploy into a real GP-compliant TEE yet. For how to deply TAs, please refer to next section.
 
 ### Required Tools
-* **Android Studio** is an IDE to develop Android applications. Please follow the [instructions](https://developer.android.com/studio/install.html) in here to install it.
+* **Android Studio(optional)** is an IDE to develop Android applications. Please follow the [instructions](https://developer.android.com/studio/install.html) in here to install it.
 * **Android SDK** normally comes with the Android Studio. If not, when you try to compile Android applications, it will notify you to download it. For how to specificly download it, please follow [instructions](https://developer.android.com/studio/command-line/index.html) to download it.
 * **Android NDK** provides the ability for Android applications to integrate native code. Please check [here](https://developer.android.com/ndk/downloads/index.html) to download it.
 
 ## How To -
-### - compile the project
+### - compile the project -
+
+#### - using command line.
+##### Linux
+Go to the **opentee-android** project and run the following command:
+```shell
+	$ sh install.sh
+```
+
+#### - with Android Studio.
 1. Create a new directory and clone this repo. This process may take a few minutes to finish.
 ```shell
 	$ mkdir opentee-android-test
