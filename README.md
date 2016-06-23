@@ -41,8 +41,9 @@ Create a new directory and clone this repo. This process may take a few minutes 
 
 #### - using command line.
 ##### Linux
-Go to the **opentee-android** project and run the following command:
+Run the following command:
 ```shell
+	$ cd opentee-android
 	$ sh install.sh
 ```
 
