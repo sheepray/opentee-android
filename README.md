@@ -40,7 +40,6 @@ Create a new directory and clone this repo. This process may take a few minutes 
 ```
 
 #### -- using command line.
-##### Linux
 Run the following command:
 ```shell
 	$ cd opentee-android
@@ -77,7 +76,12 @@ I/TEE Proxy Service: -----------------------------------------
 ```
 
 ### - update Open-TEE
-
+Follow the instructions in [Open-TEE github page](https://open-tee.github.io/android/) to build Open-TEE engine for specific platform. Then copy the generated OpenTEE engine and shared libraries into the assets folder of opentee module using following commands:
+```shell
+	$ ANDROID_ROOT/out/target/product/$abiVersion/system/bin/opentee-engine $OPENTEE_Android/opentee/src/main/assets/$ABI/
+	$ ANDROID_ROOT/out/target/product/$abiVersion/system/lib/*.so $OPENTEE_Android/opentee/src/main/assets/$ABI/
+```
+ 
 ### - generate a java doc out of the API.
 #### required packages
 1. javadoc: it should come with the Oracle OpenJDK pakcage. Try to issue $javadoc command to check it is ready or not. If not, just install latest OpenJDK package.
@@ -90,3 +94,7 @@ There is already a generated java doc in **document/teec_java_api.pdf**. If chan
 
 ## FAQ
 For issues not mentioned below, please report it as an issue or bug.
+
+## License
+This source code is available under the terms of the Apache License, Version 2.0:[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
+This project has used [Protocol Buffers](https://developers.google.com/protocol-buffers/) 2.6.1 of Google Inc.

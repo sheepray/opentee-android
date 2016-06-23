@@ -36,6 +36,7 @@ public class OTConstants {
     //lib paths
     public static final String LIB_LAUNCHER_API_ASSET_TEE_NAME = "libLauncherApi.so";
     public static final String LIB_MANAGER_API_ASSET_TEE_NAME = "libManagerApi.so";
+    public static final String LIB_COMMON_API_ASSET_TEE_NAME = "libCommonApi.so";
 
     //utility names
     public static final String OPENTEE_DIR_CONF_PLACEHOLDER = "OPENTEEDIR";
