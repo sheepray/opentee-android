@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./gradlew
+./gradlew
 
 avaDevices=$(adb devices)
 echo "$avaDevices"
