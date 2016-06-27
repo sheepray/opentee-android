@@ -373,8 +373,7 @@ void printTeecOperation(const TEEC_Operation* op){
     LOGD("[end  ]%s\n\r", __FUNCTION__);
 }
 
-//test func
-void printClockSeqAndNode(uint8_t vars[8]){
+__inline void print_clock_seq_and_node(uint8_t vars[8]){
     LOGI("ClockSeqAndNode:%.*s", 8, (char*)vars);
 }
 
@@ -401,54 +400,52 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
     LOGD("[start]%s", __FUNCTION__);
 
     TeecOperation op;
+
     op.ParseFromString(opsInString);
 
-    LOGI("\tstarted %d. num of params:%d %d",
+    LOGI("\tstarted %d. num of params:%d",
           op.mstarted(),
-          op.mparams_size(),
-          sizeof(TEEC_NONE) / sizeof(uint8_t));
+          op.mparams_size());
 
-    // set started field.
     teec_operation->started = op.mstarted();
 
-    // get paramTypes and set the params array.
     uint32_t paramTypesArray[] = {TEEC_NONE, TEEC_NONE, TEEC_NONE, TEEC_NONE};
 
     for(int i = 0; i < op.mparams_size(); i++){
+
         const TeecParameter param = op.mparams(i);
+
         if( param.has_teecsharedmemoryreference() ){
             // param is TEEC_RegisteredMemoryReference.
             LOGI("\t\tparam is TEEC_RMR.");
             const TeecSharedMemoryReference rmr = param.teecsharedmemoryreference();
 
-            /*
-             * get TEEC_SharedMemory and sync the content if the flag is TEEC_MEM_INPUT.
-             */
             int smId = rmr.parent().mid();
+
             TEEC_SharedMemory* sm = find_sharedmemory_by_id(smId);
+
             if(sm == NULL){
                 LOGE("\t\tinternal error -- unable to find shared memory with id.", smId);
                 return false;
             }
 
-            LOGE("\t\told buffer[%p]:%s with flag:%x", sm, sm->buffer, sm->flags);
+            LOGD("\t\told buffer with flag:%x", sm->flags);
             hex_dump(sm->buffer, sm->size);
 
+            //the share memory is not only output for TA. So sync it back to CA.
             if(rmr.parent().mflag() != JavaConstants::MEMREF_OUTPUT){
-                //the share memory is not only for output fo TA.
-
                 int8_t * smBuffer = (int8_t*)rmr.parent().mbuffer().c_str();
                 memcpy(sm->buffer, smBuffer, sizeof(smBuffer));
-                LOGE("\t\tnew buffer:%s", sm->buffer);
+
+                LOGE("\t\tnew buffer:");
                 hex_dump(sm->buffer, sm->size);
-                free(smBuffer);
             }
 
             teec_operation->params[i].memref.parent = sm;
             teec_operation->params[i].memref.size = sm->size;
             teec_operation->params[i].memref.offset = rmr.moffset();
 
-            // set type.
+            // set flag for shared memory.
             if(rmr.moffset() > 0){
                 // using part of the memory.
                 switch(rmr.mflag()){
@@ -509,7 +506,7 @@ bool transfer_opString_to_TEEC_Operation(JNIEnv* env, const string opsInString, 
     LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return true;
-}
+} // end of transfer_opString_to_TEEC_Operation.
 
 /**
  * transfer the operation in jbyteArray into TEEC_Operation.
@@ -521,12 +518,13 @@ void transfer_op_to_TEEC_Operation(JNIEnv* env, const jbyteArray opInBytes, TEEC
         LOGI("\top is null");
         return;
     }
-    // get length.
+
     int l = env->GetArrayLength(opInBytes);
-    // buffer to receive the byte array.
+
     uint8_t* opInBytesBuffer = (uint8_t *)malloc(l*sizeof(uint8_t));
-    // store the byte array into buffer.
+
     env->GetByteArrayRegion(opInBytes, 0, l, (jbyte*)opInBytesBuffer);
+
     // create a string to store this buffer.
     string opsInString(opInBytesBuffer, opInBytesBuffer + l);
 
@@ -623,7 +621,7 @@ jbyteArray transfer_TEEC_Operation_to_op(JNIEnv* env, const TEEC_Operation* teec
     LOGD("[end  ]%s\n\r", __FUNCTION__);
 
     return new_op_in_bytes;
-}
+} // end of transfer_TEEC_Operation_to_op
 
 /*
     Open session.
@@ -671,7 +669,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
                         teec_uuid.timeMid,
                         teec_uuid.timeHiAndVersion);
 
-    printClockSeqAndNode(teec_uuid.clockSeqAndNode);
+    print_clock_seq_and_node(teec_uuid.clockSeqAndNode);
 
     jbyteArray new_op_in_bytes = NULL;
     uint32_t teec_ret_ori = 0;
@@ -745,7 +743,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 
     // return updated operation.
     return new_op_in_bytes;
-}
+}// end of Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecOpenSession
 
 /*
     Close session by id.
@@ -856,7 +854,7 @@ JNIEXPORT jbyteArray JNICALL Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibt
 
     //return updated operation in byte array;
     return new_op_in_bytes;
-}
+}// end of Java_fi_aalto_ssg_opentee_openteeandroid_NativeLibtee_teecInvokeCommand
 
 /*
     Request cancellation.

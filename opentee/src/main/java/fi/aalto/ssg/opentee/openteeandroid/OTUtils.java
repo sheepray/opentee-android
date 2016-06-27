@@ -16,8 +16,6 @@ package fi.aalto.ssg.opentee.openteeandroid;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,8 +26,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * This class contains different Open-TEE utility functions
@@ -150,7 +146,8 @@ public class OTUtils {
         Map<String, String> map = new HashMap<>();
         map.put("OPENTEE_STORAGE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SECURE_STORAGE_DIRNAME + File.separator);
         map.put("OPENTEE_SOCKET_FILE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME);
-        map.put("LD_LIBRARY_PATH", appHomePath + File.separator + OTConstants.OT_LIB_DIR);
+        //map.put("LD_LIBRARY_PATH", appHomePath + File.separator + OTConstants.OT_LIB_DIR);
+        map.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + OTConstants.OT_LIB_DIR);
         return map;
     }
 

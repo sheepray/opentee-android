@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
             worker.installAssetToHomeDir(context, OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OT_BIN_DIR, overwrite);
             worker.installAssetToHomeDir(context, OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
             worker.installAssetToHomeDir(context, OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
-            worker.installAssetToHomeDir(context, OTConstants.LIB_COMMON_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
 
             /* install TAs */
             Setting setting = new Setting(getApplicationContext());
