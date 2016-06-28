@@ -17,7 +17,7 @@ import fi.aalto.ssg.opentee.exception.BadParametersException;
  * Example code to deal with remote TEE service in a separate thread.
  */
 public class Worker extends HandlerThread implements WorkerCallback {
-    final int OMS_MAX_RSA_MODULO_SIZE = 256;
+    final int OMS_MAX_RSA_MODULO_SIZE = 128;
 
     final String TAG = "Worker";
 

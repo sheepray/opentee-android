@@ -146,8 +146,7 @@ public class OTUtils {
         Map<String, String> map = new HashMap<>();
         map.put("OPENTEE_STORAGE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SECURE_STORAGE_DIRNAME + File.separator);
         map.put("OPENTEE_SOCKET_FILE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME);
-        //map.put("LD_LIBRARY_PATH", appHomePath + File.separator + OTConstants.OT_LIB_DIR);
-        //map.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + OTConstants.OT_LIB_DIR);
+        map.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + OTConstants.OT_LIB_DIR);
         return map;
     }
 
