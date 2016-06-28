@@ -43,7 +43,7 @@ Create a new directory and clone this repo. This process may take a few minutes 
 Run the following command:
 ```shell
 	$ cd opentee-android
-	$ sh install.sh
+	$ bash install.sh
 ```
 
 #### -- with Android Studio.
