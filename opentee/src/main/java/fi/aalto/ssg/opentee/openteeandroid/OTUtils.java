@@ -1,9 +1,11 @@
 /*
+ * Copyright (c) 2016 Aalto University
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -143,10 +145,13 @@ public class OTUtils {
      */
     public static Map<String, String> getOTEnvVars(Context context) throws IOException, InterruptedException {
         String appHomePath = getFullPath(context);
+
         Map<String, String> map = new HashMap<>();
+
         map.put("OPENTEE_STORAGE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SECURE_STORAGE_DIRNAME + File.separator);
         map.put("OPENTEE_SOCKET_FILE_PATH", appHomePath + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME);
         map.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + OTConstants.OT_LIB_DIR);
+
         return map;
     }
 
