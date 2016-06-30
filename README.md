@@ -43,8 +43,9 @@ Create a new directory and clone this repo. This process may take a few minutes 
 Run the following command:
 ```shell
 	$ cd opentee-android
-	$ bash install.sh
+	$ ./install.sh
 ```
+**install.sh** will build the project. After that, you have to select the target device that you want to install opentee and testapp. Then this script will install these two applications to the selected device. Later it will aslo launch the main activity of both apps. For errors happened during running this script, please refer to the  FAQ section or post an issue to this repository.
 
 #### -- with Android Studio.
 1. Import **opentee-android** to Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Then wait for Android Studio to finish the importing task.
