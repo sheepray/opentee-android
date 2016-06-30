@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "fi.aalto.ssg.opentee.openteeandroid"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
 
@@ -54,7 +54,7 @@ android {
                 abiFilters "armeabi", "armeabi-v7a", "x86"
                 versionCode = 0;
             }
-            minSdkVersion 22
+            minSdkVersion 21
             targetSdkVersion 22
         }
 
@@ -64,7 +64,7 @@ android {
                 abiFilter "armeabi"
                 versionCode = 1;
             }
-            minSdkVersion 22
+            minSdkVersion 21
             targetSdkVersion 22
         }
         armv7a {
@@ -73,7 +73,7 @@ android {
                 abiFilter "armeabi-v7a"
                 versionCode = 3;
             }
-            minSdkVersion 22
+            minSdkVersion 21
             targetSdkVersion 22
         }
         x86 {
@@ -82,7 +82,7 @@ android {
                 abiFilter "x86"
                 versionCode = 6;
             }
-            minSdkVersion 22
+            minSdkVersion 21
             targetSdkVersion 22
         }
     }
@@ -103,7 +103,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:+'
     compile "com.google.protobuf:protobuf-java:2.6.1"
     compile project(':otclient')
 }
